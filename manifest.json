@@ -6,22 +6,20 @@
    "browser_action": {
       "default_icon": {
          "19": "imgs/icon-19.png",
-         "38": "imgs/icon-38.png"
+         "32": "imgs/icon-32.png"
       },
       "default_popup": "popup.html",
       "default_title": "__MSG_extShortName__"
    },
    "content_scripts": [ {
       "all_frames": true,
-      "js": [ "bilibili_ASS_Danmaku_Downloader.js", "filename-sanitize.js", "jq.bilibili.js", "bilibili_injected.js", "ColPick.js", "CommentCoreLibrary.min.js", "ABPlayer.min.js", "cast_sender.js" , "hls.min.js" ],
+      "js": [ "bilibili_ASS_Danmaku_Downloader.js", "filename-sanitize.js", "jq.bilibili.js", "bilibili_injected.js", "ColPick.js", "CommentCoreLibrary.min.js", "ABPlayer.min.js",  "hls.min.js" ],
       "matches": [ "*://*.bilibili.com/*" ],
       "run_at": "document_end"
    } ],
    "default_locale": "zh_CN",
    "description": "__MSG_extDescription__",
    "icons": {
-      "256": "imgs/icon-256.png",
-      "128": "imgs/icon-128.png",
       "16": "imgs/icon-16.png",
       "32": "imgs/icon-32.png"
    },
@@ -30,8 +28,8 @@
    "name": "__MSG_extName__",
    "short_name": "__MSG_extShortName__",
    "options_page": "options.html",
-   "permissions": [ "downloads", "alarms", "contextMenus", "cookies", "notifications", "storage", "tabs", "webRequest", "webRequestBlocking", "http://*/", "https://*/" ],
-   "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "0.8.4",
+   "offline_enabled": true,
+   "permissions": [ "downloads", "alarms", "cookies", "notifications", "storage", "tabs", "webRequest", "webRequestBlocking", "http://*/" ],
+   "version": "123450.8.4",
    "web_accessible_resources": [ "bilibili-helper.woff", "template.html", "imgs/icon-32.png", "imgs/loading.gif", "imgs/loading.gif", "imgs/helper-neko.png", "options.html" ]
 }

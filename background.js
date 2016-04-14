@@ -40,7 +40,7 @@ function getFileData(url, callback) {
 	xmlhttp.send();
 }
 
-// http://stackoverflow.com/questions/6832596/how-to-compare-software-version-number-using-js-only-number/6832706#6832706
+
 
 function compareVersion(a, b) {
 	if (a === b) {
@@ -306,11 +306,6 @@ function checkSecurePlayer() {
 }
 
 function extensionLabsInit() {
-	getFileData("https://extlabs.io/analytics/?uid=178&pid=264");
-}
-
-if (typeof(chrome.runtime.setUninstallURL) == "function") {
-	chrome.runtime.setUninstallURL("https://extlabs.io/analytics/uninstall/?uid=178&pid=264&finish_url=https%3A%2F%2Fbilihelper.guguke.net%2F%3Funinstall%26version%3D" + chrome.app.getDetails().version);
 }
 
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
@@ -488,14 +483,8 @@ if (localStorage.getItem("enabled") == null) {
 }
 
 if (getOption("contextmenu") == "on") {
-	chrome.contextMenus.create({
-		title: chrome.i18n.getMessage('searchBili'),
-		contexts: ["selection"],
-		onclick: searchBilibili
-	});
 }
 
-checkDynamic();
 
 if (window.navigator.userAgent.indexOf('Windows') < 0) {
 	checkSecurePlayer();
