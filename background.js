@@ -240,7 +240,7 @@ function getVideoInfo(avid, page, callback) {
 		callback(viCache[avid + '-' + page]);
 		return true;
 	}
-	getFileData("http://api.bilibili.com/view?type=json&appkey=95acd7f6cc3392f3&id=" + avid + "&page=" + page + "&batch=true", function(avInfo) {
+	getFileData("http://api.bilibili.com/view?type=json&appkey=8e9fc618fbd41e28&id=" + avid + "&page=" + page + "&batch=true", function(avInfo) {
 		avInfo = JSON.parse(avInfo);
 		if (typeof avInfo.code != "undefined" && avInfo.code == -503) {
 			setTimeout(function() {
@@ -359,8 +359,8 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 			return true;
 		case "getDownloadLink":
 			var url = {
-				download: "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=95acd7f6cc3392f3&cid=" + request.cid + "&quality=4&type=" + getOption("dlquality"),
-				playback: "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=95acd7f6cc3392f3&cid=" + request.cid + "&quality=4&type=mp4"
+				download: "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=8e9fc618fbd41e28&cid=" + request.cid + "&quality=4&type=" + getOption("dlquality"),
+				playback: "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=8e9fc618fbd41e28&cid=" + request.cid + "&quality=4&type=mp4"
 			};
 			if (request.cidHack && request.cidHack != locale) {
 				cidHackType[request.cid] = request.cidHack;
@@ -404,7 +404,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 			return true;
 		case "searchVideo":
 			var keyword = request.keyword;
-			getFileData("http://api.bilibili.com/search?type=json&appkey=95acd7f6cc3392f3&keyword=" + encodeURIComponent(keyword) + "&page=1&order=ranklevel", function(searchResult) {
+			getFileData("http://api.bilibili.com/search?type=json&appkey=8e9fc618fbd41e28&keyword=" + encodeURIComponent(keyword) + "&page=1&order=ranklevel", function(searchResult) {
 				searchResult = JSON.parse(searchResult);
 				if (searchResult.code == 0) {
 					sendResponse({
@@ -494,68 +494,18 @@ chrome.alarms.create("checkDynamic", {
 	periodInMinutes: 1
 });
 
-chrome.alarms.create("checkVersion", {
-	periodInMinutes: 10
-});
-
 chrome.alarms.create("getLocale", {
 	periodInMinutes: 5
 });
 
 function getLocale() {
-	getFileData("https://telize.guguke.net/geoip", function(result) {
-		try {
-			result = JSON.parse(result);
-			if (result.country_code) {
-				switch (result.country_code) {
-					case "CN":
 						locale = 1;
-						break;
-					case "TW":
-					case "HK":
-					case "MO":
-						locale = 2;
-						break;
-					default:
-						locale = 0;
-						break;
-				}
-				localeAcquired = true;
-				checkVersion();
-			} else {
-				throw "locale undetermined";
-			}
-		} catch (e) {
-			console.error('Failed to get locale', e);
-			localeTimeout = setTimeout(function() {
-				getLocale();
-			}, 10000);
-		}
-	});
 }
 
 function checkVersion() {
-	getFileData("https://bilihelper.guguke.net/version.json?v=" + encodeURIComponent(chrome.app.getDetails().version), function(result) {
-		try {
-			result = JSON.parse(result);
-			if (compareVersion(result.version, chrome.app.getDetails().version) > 0) {
-				setOption("crx_update", JSON.stringify(result));
-				if (!localeAcquired || locale == 1 || new Date().getTime() - result.update_time > 259200000) {
-					updateNotified = true;
-
-					chrome.tabs.create({
-						url: chrome.extension.getURL("options.html?mod=new")
-					});
-				}
-			}
-		} catch (e) {
-			console.error('Failed to check version', e);
-		}
-	});
 }
 
 getLocale();
-extensionLabsInit();
 
 chrome.runtime.onInstalled.addListener(function(details) {
 	setOption("version", chrome.app.getDetails().version);
@@ -579,32 +529,8 @@ chrome.runtime.onInstalled.addListener(function(details) {
 	}
 });
 
-chrome.alarms.onAlarm.addListener(function(alarm) {
-	switch (alarm.name) {
-		case "checkDynamic":
-			checkDynamic();
-			return true;
-		case "checkVersion":
-			if (!updateNotified) {
-				checkVersion();
-			}
-			return true;
-		case "getLocale":
-			if (!localeAcquired) {
-				clearTimeout(localeTimeout);
-				getLocale();
-			}
-			return true;
-		default:
-			return false;
-	}
-});
-
 chrome.notifications.onButtonClicked.addListener(function(notificationId, index) {
 	if (notificationId == 'bh-update') {
-		chrome.tabs.create({
-			url: chrome.extension.getURL("options.html?mod=update")
-		});
 	} else if (index == 0 && notificationAvid[notificationId]) {
 		chrome.tabs.create({
 			url: "http://www.bilibili.com/video/av" + notificationAvid[notificationId]
