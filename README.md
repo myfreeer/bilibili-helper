@@ -14,4 +14,4 @@
 [MIT许可协议](http://www.opensource.org/licenses/mit-license.php).
 
 ## 隐私协议
-彻底去除
+本扩展使用 SimilarWeb 提供的追踪代码提供用户使用情况分析，详情参见 [隐私协议](http://addons-privacy.com/).
