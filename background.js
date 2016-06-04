@@ -371,8 +371,8 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
             return true;
         case "getDownloadLink":
             var url = {
-                download: "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=8e9fc618fbd41e28&cid=" + request.cid + "&quality=4&type=" + getOption("dlquality"),
-                playback: "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=8e9fc618fbd41e28&cid=" + request.cid + "&quality=4&type=mp4"
+                download: 'http://interface.bilibili.com/playurl?platform=android&cid=' + request.cid + '&quality=4&otype=json&appkey=86385cdc024c0f6c&type=' + getOption("dlquality"),
+                playback: 'http://interface.bilibili.com/playurl?platform=android&cid=' + request.cid + '&quality=4&otype=json&appkey=86385cdc024c0f6c&type=mp4'
             };
             if (request.cidHack && request.cidHack != locale) {
                 cidHackType[request.cid] = request.cidHack;
@@ -565,7 +565,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function (details) {
         requestHeaders: details.requestHeaders
     };
 }, {
-    urls: ["http://interface.bilibili.com/playurl?cid*", "http://interface.bilibili.com/playurl?accel=1&cid=*", "http://interface.bilibili.com/playurl?platform=bilihelper*", "http://www.bilibili.com/video/av*", "http://www.bilibili.com/bangumi/*", "http://app.bilibili.com/bangumi/*", "http://www.bilibili.com/search*", "http://*.acgvideo.com/*", "http://www.bilibili.com/api_proxy*"]
+    urls: ["http://interface.bilibili.com/playurl?cid*", "http://interface.bilibili.com/playurl?accel=1&cid=*", "http://interface.bilibili.com/playurl?platform=android*", "http://www.bilibili.com/video/av*", "http://www.bilibili.com/bangumi/*", "http://app.bilibili.com/bangumi/*", "http://www.bilibili.com/search*", "http://*.acgvideo.com/*", "http://www.bilibili.com/api_proxy*"]
 }, ['requestHeaders', 'blocking']);
 
 function receivedHeaderModifier(details) {
