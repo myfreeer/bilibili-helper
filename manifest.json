@@ -13,7 +13,7 @@
    },
    "content_scripts": [ {
       "all_frames": true,
-      "js": [ "bilibili_ASS_Danmaku_Downloader.js", "filename-sanitize.js", "jq.bilibili.js", "bilibili_injected.js","ocrad.js","bilibili_live.js", "ColPick.js", "CommentCoreLibrary.min.js", "ABPlayer.min.js" , "hls.min.js" ],
+      "js": [ "bilibili_ASS_Danmaku_Downloader.js", "filename-sanitize.js", "jq.bilibili.js", "bilibili_injected.js", "ocrad.js", "bilibili_live.js", "ColPick.js", "CommentCoreLibrary.min.js", "ABPlayer.min.js", "hls.min.js" ],
       "matches": [ "*://*.bilibili.com/*" ],
       "run_at": "document_end"
    } ],
@@ -31,6 +31,6 @@
    "short_name": "__MSG_extShortName__",
    "options_page": "options.html",
    "permissions": [ "contextMenus", "notifications", "storage", "tabs", "webRequest", "webRequestBlocking", "http://*/", "https://*.bilibili.com/", "https://*.hdslb.com/", "http://*.acgvideo.com/" ],
-   "version": "10000000.8.4",
+   "version": "10000000.8.5",
    "web_accessible_resources": [ "bilibili-helper.woff", "template.html", "imgs/icon-32.png", "imgs/loading.gif", "imgs/loading.gif", "imgs/helper-neko.png", "options.html", "imgs/menu-icon.png" ]
 }
