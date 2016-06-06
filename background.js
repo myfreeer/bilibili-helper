@@ -286,7 +286,7 @@ function getVideoInfo(avid, page, callback) {
     }
     getFileData("http://api.bilibili.com/view?type=json&appkey=8e9fc618fbd41e28&id=" + avid + "&page=" + page + "&batch=true", function (avInfo) {
         avInfo = JSON.parse(avInfo);
-        if (typeof avInfo.code != "undefined" || avInfo.code == -503) {
+        if (typeof avInfo.code != "undefined" && avInfo.code == -503) {
             setTimeout(function () {
                 getVideoInfo(avid, page, callback);
             }, 500);
