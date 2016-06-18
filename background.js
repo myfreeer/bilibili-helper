@@ -10,6 +10,7 @@ var notification       = false,
     updateNotified     = false,
     videoPlaybackHosts = ["http://*.hdslb.com/*", "http://*.acgvideo.com/*"],
     Live               = {};
+    bangumi          = false;
 var bkg_page           = chrome.extension.getBackgroundPage();
 
 Live.set = function (n, k, v) {
@@ -34,7 +35,7 @@ Live.get = function (n, k, v) {
     }
     var l = JSON.parse(window.localStorage[n]);
     if (!k) return l;
-    if (l[k] == 'true' || l[k] == 'false')l[k] = eval(l[k]);
+    if (l[k] == 'true' || l[k] == 'false')l[k] = JSON.parse(l[k]);
     return l[k];
 };
 Live.del = function (n, k) {
@@ -247,6 +248,15 @@ function resolvePlaybackLink(avPlaybackLink, callback) {
         if (typeof callback == "function") callback(avPlaybackLink);
         return false;
     }
+    if (typeof avPlaybackLink.durl[0].backup_url == 'object' &&
+      avPlaybackLink.durl[0].backup_url.length) {
+      avPlaybackLink.durl[0].backup_url.forEach(function(url) {
+        if (url.indexOf('hd.mp4') > -1) {
+          avPlaybackLink.durl[0].url = url;
+          console.log('replace', url);
+        }
+      })
+    }
     var xmlhttp   = new XMLHttpRequest(),
         xmlChange = function () {
             if (xmlhttp.readyState == 2) {
@@ -275,7 +285,7 @@ function resolvePlaybackLink(avPlaybackLink, callback) {
     xmlhttp.send();
 }
 
-function getVideoInfo(avid, page, callback) {
+function getVideoInfo(avid, page,isbangumi, callback) {
 
     page         = parseInt(page);
     var currTime = parseInt(new Date().getTime() / 1000);
@@ -284,13 +294,71 @@ function getVideoInfo(avid, page, callback) {
         callback(viCache[avid + '-' + page]);
         return true;
     }
+    bangumi = isbangumi;
+    resetVideoHostList();
+    if(isbangumi){
+        getFileData("http://bangumi.bilibili.com/web_api/episode/get_source?episode_id=" + avid,function(result){
+            result = JSON.parse(result)['result'];
+            avid =result.aid;
+            getFileData("http://api.bilibili.com/view?type=json&appkey=8e9fc618fbd41e28&id=" + avid + "&page=" + page + "&batch=true", function (avInfo) {
+                avInfo = JSON.parse(avInfo);
+                if (typeof avInfo.code != "undefined" && avInfo.code == -503) {
+                    setTimeout(function () {
+                        getVideoInfo(avid, page, isbangumi, callback);
+                    }, 1000);
+                } else {
+                    if (typeof avInfo.list == "object") {
+                        avInfo.pages = avInfo.list.length;
+                        for (var i = 0; i < avInfo.pages; i++) {
+                            if (avInfo.list[i].page == page) {
+                                avInfo.cid = avInfo.list[i].cid;
+                                break;
+                            }
+                        }
+                    }
+                    if (typeof avInfo.cid == "number") {
+                        viCache[avid + '-' + page] = {
+                            mid        : avInfo.mid,
+                            tid        : avInfo.tid,
+                            cid        : avInfo.cid,
+                            pic        : avInfo.pic,
+                            pages      : avInfo.pages,
+                            title      : avInfo.title,
+                            list       : avInfo.list,
+                            sp_title   : avInfo.sp_title,
+                            spid       : avInfo.spid,
+                            season_id  : avInfo.season_id,
+                            created_at : avInfo.created_at,
+                            description: avInfo.description,
+                            tag        : avInfo.tag,
+                            ts         : currTime,
+                            bangumi    : false
+                        };
+                        if (typeof avInfo.bangumi == "object") {
+                            getFileData("http://api.bilibili.cn/sp?spid=" + avInfo.spid, function (spInfo) {
+                                spInfo = JSON.parse(spInfo);
+                                if (spInfo.isbangumi == 1) {
+                                    viCache[avid + '-' + page].bangumi = {
+                                        cover: spInfo.cover,
+                                        desc : spInfo.description
+                                    }
+                                }
+                                callback(viCache[avid + '-' + page]);
+                            });
+                        } else callback(viCache[avid + '-' + page]);
+                    } else {
+                        callback(avInfo);
+                    }
+                }
+            });
+        });
+    }else 
     getFileData("http://api.bilibili.com/view?type=json&appkey=8e9fc618fbd41e28&id=" + avid + "&page=" + page + "&batch=true", function (avInfo) {
         avInfo = JSON.parse(avInfo);
         if (typeof avInfo.code != "undefined" && avInfo.code == -503) {
             setTimeout(function () {
-                getVideoInfo(avid, page, callback);
-            }, 500);
-        } else {
+                getVideoInfo(avid, page, isbangumi, callback);
+            }, 1000);        } else {
             if (typeof avInfo.list == "object") {
                 avInfo.pages = avInfo.list.length;
                 for (var i = 0; i < avInfo.pages; i++) {
@@ -350,6 +418,7 @@ function checkSecurePlayer() {
 }
 
 
+
 function setFavourite(upInfo) {
     if (Live.favouritesIdList.indexOf(upInfo.roomId) == -1) {
         Live.favouritesIdList.push(upInfo.roomId);
@@ -388,6 +457,12 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
             sendResponse();
             return true;
         case "getOption":
+            sendResponse({
+                value: getOption(request.key)
+            });
+            return true;
+        case "setOption":
+            setOption(request.key,request.value);
             sendResponse({
                 value: getOption(request.key)
             });
@@ -445,7 +520,7 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
             });
             return true;
         case "getVideoInfo":
-            getVideoInfo(request.avid, request.pg, function (avInfo) {
+            getVideoInfo(request.avid, request.pg, request.isBangumi, function (avInfo) {
                 sendResponse({
                     videoInfo: avInfo
                 });
@@ -453,8 +528,8 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
             return true;
         case "getDownloadLink":
             var url = {
-                download: "http://interface.bilibili.com/playurl?appkey=86385cdc024c0f6c&platform=android&quality=4&cid=" + request.cid + "&otype=json&platform=android&type=" + getOption("dlquality"),
-                playback: "http://interface.bilibili.com/playurl?appkey=86385cdc024c0f6c&platform=android&quality=4&cid=" + request.cid + "&otype=json&platform=android"
+                download: "http://interface.bilibili.com/playurl?appkey=86385cdc024c0f6c&platform=android&quality=4&cid=" + request.cid + "&otype=json&platform=android&accel=1&player=1&type=" + getOption("dlquality"),
+                playback: "http://interface.bilibili.com/playurl?appkey=86385cdc024c0f6c&platform=android&quality=4&cid=" + request.cid + "&otype=json&platform=android&accel=1&player=1"
             };
             if (request.cidHack && request.cidHack != locale) {
                 cidHackType[request.cid] = request.cidHack;
@@ -576,29 +651,39 @@ if (localStorage.getItem("enabled") == null) {
     enableAll();
 }
 
-
+if (getOption("contextmenu") == "on") {
+    chrome.contextMenus.create({
+        title   : chrome.i18n.getMessage('searchBili'),
+        contexts: ["selection"],
+        onclick : searchBilibili
+    });
+}
 
 if (window.navigator.userAgent.indexOf('Windows') < 0) {
     checkSecurePlayer();
 }
-
-
-
 
 function getLocale() {
                         locale = 1;
 }
 
 function checkVersion() {
-
 }
 
 getLocale();
 
-
-
 chrome.notifications.onButtonClicked.addListener(function (notificationId, index) {
-if (index == 0 && notificationAvid[notificationId]) {
+    if (Live.notisesIdList[notificationId] != undefined) {
+        if (index === 0) {
+            chrome.tabs.create({
+                url: Live.notisesIdList[notificationId].link
+            });
+        } else if (index === 1) {
+            chrome.tabs.create({
+                url: 'http://live.bilibili.com/i/following'
+            });
+        }
+    } else if (index == 0 && notificationAvid[notificationId]) {
         chrome.tabs.create({
             url: "http://www.bilibili.com/video/av" + notificationAvid[notificationId]
         });
@@ -654,7 +739,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function (details) {
         requestHeaders: details.requestHeaders
     };
 }, {
-    urls: ["http://interface.bilibili.com/playurl?cid*", "http://interface.bilibili.com/playurl?accel=1&cid=*", "http://interface.bilibili.com/playurl?*", "http://www.bilibili.com/video/av*", "http://www.bilibili.com/bangumi/*", "http://app.bilibili.com/bangumi/*", "http://www.bilibili.com/search*", "http://*.acgvideo.com/*", "http://www.bilibili.com/api_proxy*"]
+    urls: ["http://interface.bilibili.com/playurl?cid*", "http://interface.bilibili.com/playurl?accel=1&cid=*", "http://interface.bilibili.com/playurl?*", "http://www.bilibili.com/video/av*", "http://www.bilibili.com/bangumi/*", "http://app.bilibili.com/bangumi/*", "http://www.bilibili.com/search*", "http://*.acgvideo.com/*", "http://www.bilibili.com/api_proxy*","http://bangumi.bilibili.com/*"]
 }, ['requestHeaders', 'blocking']);
 
 function receivedHeaderModifier(details) {
@@ -664,10 +749,15 @@ function receivedHeaderModifier(details) {
             hasCORS = true;
         }
     });
-    if (!hasCORS) {
+    if (!hasCORS && !bangumi) {
         details.responseHeaders.push({
             name : "Access-Control-Allow-Origin",
             value: "http://www.bilibili.com"
+        });
+    }else{
+        details.responseHeaders.push({
+            name : "Access-Control-Allow-Origin",
+            value: "http://bangumi.bilibili.com"
         });
     }
     return {
@@ -712,7 +802,7 @@ chrome.webRequest.onHeadersReceived.addListener(function (details) {
         responseHeaders: headers
     };
 }, {
-    urls: ["http://www.bilibili.com/video/av*"]
+    urls: ["http://www.bilibili.com/video/av*","http://bangumi.bilibili.com/anime/v/*"]
 }, ["responseHeaders", "blocking"]);
 
 function getCookie(name) {
@@ -773,7 +863,7 @@ Live.notise = {
 
                 if (newList.length) {
                     each(newList, function (i) {
-                        if (Live.favouritesIdList.indexOf(parseInt(newList[i].roomid)) != -1 || Live.favouritesIdList.length == 0) {
+                        if (Live.favouritesIdList.indexOf(parseInt(newList[i].roomid)) != -1) {
                             var data = newList[i], myNotificationID = null;
                             chrome.notifications.create(data.roomid, {
                                 type       : "basic",
@@ -828,6 +918,13 @@ Live.notise = {
     },
     init       : function () {
         Live.notise.count = 0;
+        Live.notise.hasMore    = !1;
+        Live.notise.list       = [];
+        Live.notise.count      = 0;
+        Live.notise.intervalNum= undefined;
+        Live.notise.heart      = {};
+        Live.notise.roomIdList = {};
+        Live.notise.cacheList  = {};
         Live.notise.heartBeat();
         Live.notise.getList();
         Live.notise.intervalNum = setInterval(function () {
