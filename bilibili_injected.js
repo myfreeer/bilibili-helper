@@ -551,16 +551,25 @@
 						biliHelper.mainBlock.commentSection = commentDiv;
 						biliHelper.mainBlock.append(biliHelper.mainBlock.commentSection);
 						$.get('http://comment.bilibili.com/' + biliHelper.cid + '.xml', function(response) {
-							var assData = '\ufeff' + generateASS(setPosition(parseXML('', response)), {
+							var /*assData = '\ufeff' + generateASS(setPosition(parseXML('', response)), {
 									'title': getNiceSectionFilename(biliHelper.avid, biliHelper.page, biliHelper.totalPage, 1, 1),
 									'ori': location.href
 								}),
 								assBlob = new Blob([assData], {
 									type: 'application/octet-stream'
 								}),
-								assUrl = window.URL.createObjectURL(assBlob),
-								assBtn = $('<a class="b-btn w">下载 ASS 格式弹幕</a>').attr('download', downloadFileName.replace('.xml', '.ass')).attr('href', assUrl).click(function(e) {
+								assUrl = window.URL.createObjectURL(assBlob),*/
+								assBtn = $('<a class="b-btn w">下载 ASS 格式弹幕</a>').attr('download', downloadFileName.replace('.xml', '.ass')).attr('href', null).click(function(e) {
+									var assData = '\ufeff' + generateASS(setPosition(parseXML('', response)), {
+									'title': getNiceSectionFilename(biliHelper.avid, biliHelper.page, biliHelper.totalPage, 1, 1),
+									'ori': location.href
+								}),
+								assBlob = new Blob([assData], {
+									type: 'application/octet-stream'
+								}),
+								assUrl = window.URL.createObjectURL(assBlob);
 									e.preventDefault();
+									e.target.href=assUrl;
 									chrome.extension.sendMessage({
 										command: 'requestForDownload',
 										url: $(e.target).attr('href'),
