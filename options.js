@@ -268,59 +268,5 @@ $(document).ready(function () {
         return String(year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second);
     }
 
-    var updateInfo = JSON.parse(bkg_page.getOption('crx_update'));
-
-    if (updateInfo.version && bkg_page.compareVersion(updateInfo.version, chrome.app.getDetails().version) > 0) {
-        $('#update').show();
-        $('#update .version').text(updateInfo.version);
-        $('#update .date').text(formateDatetime(updateInfo.update_time / 1000));
-        if (updateInfo.detail) {
-            $('#update .detail').text(updateInfo.detail);
-        } else {
-            $('#update .detail').parent().hide();
-        }
-        $('#update .url').attr('href', 'https://bilihelper.guguke.net/');
-        $('#about #update p').addClass('highlight');
-    }
-
-    switch (getQueryVariable('mod')) {
-        case 'update':
-            swal({
-                title            : "升级成功",
-                text             : "您已成功升级至哔哩哔哩助手版本 v" + chrome.app.getDetails().version + "！请参阅右侧有关扩展更新内容，再次感谢您对哔哩哔哩助手项目的支持。",
-                type             : "success",
-                confirmButtonText: "好的",
-                html             : true
-            });
-            break;
-        case 'install':
-            swal({
-                title            : "安装成功",
-                text             : "感谢您安装哔哩哔哩助手版本 v" + chrome.app.getDetails().version + "！请根据您的需要在左侧更改扩展的选项，右侧为有关扩展的相关介绍和说明。使用此扩展前请您阅读相关<a href=\"http://addons-privacy.com/\" target=\"_blank\">使用协议和隐私策略</a>。",
-                type             : "success",
-                confirmButtonText: "同意并开始使用扩展",
-                html             : true,
-                //closeOnConfirm: false
-            }, function () {
-                //$('#support_qm').click();
-            });
-            break;
-        case 'new':
-            if (updateInfo.version) {
-                swal({
-                    title            : "发现新版本",
-                    text             : "发现新版哔哩哔哩助手: v" + updateInfo.version + "<br/>您当前使用的版本是: v" + chrome.app.getDetails().version + "<br/>如果您不能通过 Google 自动更新扩展或者在使用上遇到严重的问题，建议您参阅右侧信息，手动更新。",
-                    type             : "warning",
-                    confirmButtonText: "好的",
-                    cancelButtonText : "不再提醒",
-                    html             : true,
-                    showCancelButton : true
-                }, function (isConfirm) {
-                    !isConfirm && bkg_page.setOption("versionNotify", 'off', false);
-                });
-            }
-            break;
-    }
-
     window.history.replaceState({}, document.title, '/options.html');
 });
