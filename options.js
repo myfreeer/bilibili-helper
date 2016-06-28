@@ -95,7 +95,7 @@ $(document).ready(function () {
         bkg_page.setOption("ad_opacity", $(this).val(), true);
         updatepreview();
     });
-    
+
 
     /*$('.support').click(function() {
      if ($(this).hasClass('on')) return false;
@@ -183,7 +183,7 @@ $(document).ready(function () {
         $('.liveNotification').removeClass('on');
         $(this).addClass('on');
         bkg_page.setOption("liveNotification", $(this).attr("option"));
-        
+
         if (bkg_page.getOption("liveNotification") != 'on') {
             clearInterval(bkg_page.Live.notise.intervalNum);
         }else if (bkg_page.getOption("liveNotification") == 'on') {
@@ -280,21 +280,8 @@ $(document).ready(function () {
             $('#update .detail').parent().hide();
         }
         $('#update .url').attr('href', 'https://bilihelper.guguke.net/');
+        $('#about #update p').addClass('highlight');
     }
-
-    /*$('#support_qm').click(function() {
-     swal({
-     title: "通过 VigLink 支持扩展开发",
-     text: "通过在非 https 域网页参与合作商家的链接中加入合作信息等不影响原网页内容或安全性的方式, 为扩展项目获得盈利以支持解析服务器等相关开销. 您可以随时选择退出该项目.",
-     type: "info",
-     confirmButtonText: "参与",
-     cancelButtonText: "之后再说",
-     showCancelButton: true,
-     html: true
-     }, function(confirm) {
-     if (confirm) $('.button.support[option="on"]').click();
-     });
-     });*/
 
     switch (getQueryVariable('mod')) {
         case 'update':
@@ -325,9 +312,11 @@ $(document).ready(function () {
                     text             : "发现新版哔哩哔哩助手: v" + updateInfo.version + "<br/>您当前使用的版本是: v" + chrome.app.getDetails().version + "<br/>如果您不能通过 Google 自动更新扩展或者在使用上遇到严重的问题，建议您参阅右侧信息，手动更新。",
                     type             : "warning",
                     confirmButtonText: "好的",
-                    html             : true
-                }, function () {
-                    $('#about #update p').addClass('highlight');
+                    cancelButtonText : "不再提醒",
+                    html             : true,
+                    showCancelButton : true
+                }, function (isConfirm) {
+                    !isConfirm && bkg_page.setOption("versionNotify", 'off', false);
                 });
             }
             break;
