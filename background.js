@@ -1,27 +1,27 @@
-var notification       = false,
-    notificationAvid   = {},
-    playerTabs         = {},
-    cidHackType        = {},
-    viCache            = {},
-    locale             = 0,
-    localeAcquired     = false,
-    localeTimeout      = null,
-    secureAvailable    = false,
-    updateNotified     = false,
+var notification = false,
+    notificationAvid = {},
+    playerTabs = {},
+    cidHackType = {},
+    viCache = {},
+    locale = 0,
+    localeAcquired = false,
+    localeTimeout = null,
+    secureAvailable = false,
+    updateNotified = false,
     videoPlaybackHosts = ["http://*.hdslb.com/*", "http://*.acgvideo.com/*"],
-    Live               = {};
-    bangumi          = false;
-var bkg_page           = chrome.extension.getBackgroundPage();
+    Live = {};
+bangumi = false;
+var bkg_page = chrome.extension.getBackgroundPage();
 
 Live.set = function (n, k, v) {
     if (!window.localStorage || !n) return;
     var storage = window.localStorage;
-    if (!storage[n])storage[n] = JSON.stringify({});
+    if (!storage[n]) storage[n] = JSON.stringify({});
     var l = JSON.parse(storage[n]);
     if (v == undefined) {
-        storage[n] = typeof k == 'string'? k.trim():JSON.stringify(k);
+        storage[n] = typeof k == 'string' ? k.trim() : JSON.stringify(k);
     } else {
-        l[k] = typeof v == 'string'?v.trim():JSON.stringify(v);
+        l[k] = typeof v == 'string' ? v.trim() : JSON.stringify(v);
         storage[n] = JSON.stringify(l);
     }
 };
@@ -30,17 +30,19 @@ Live.get = function (n, k, v) {
     if (!window.localStorage || !n) return;
 
     if (!window.localStorage[n]) {
-        window.localStorage[n] = JSON.stringify(v || {});
-        return eval(v);
+        var temp = v || {};
+        if (k != undefined && v != undefined) temp[k] = v;
+        window.localStorage[n] = JSON.stringify(temp);
     }
     var l = JSON.parse(window.localStorage[n]);
-    if (!k) return l;
-    if (l[k] == 'true' || l[k] == 'false')l[k] = JSON.parse(l[k]);
+    if (k == undefined) return l;
+    if (l[k] == 'true' || l[k] == 'false') l[k] = JSON.parse(l[k]);
     return l[k];
 };
+
 Live.del = function (n, k) {
-    if (!window.localStorage || n==undefined || window.localStorage[n]==undefined) return;
-    if(k == undefined) {
+    if (!window.localStorage || n == undefined || window.localStorage[n] == undefined) return;
+    if (k == undefined) {
         window.localStorage.removeItem(n);
         return;
     }
@@ -49,15 +51,15 @@ Live.del = function (n, k) {
     window.localStorage[n] = JSON.stringify(l);
 };
 
-Live.notisesIdList    = {};
-Live.favouritesIdList = Live.get('favouritesIdList', false, []);
-Live.favouritesList   = Live.get('favouritesList', false, {});
+Live.notisesIdList = {};
+Live.favouritesIdList = Live.get('favouritesIdList', undefined, []);
+Live.favouritesList = Live.get('favouritesList', undefined, {});
 
 URL.prototype.__defineGetter__('query', function () {
-    var parsed    = this.search.substr(1).split('&');
+    var parsed = this.search.substr(1).split('&');
     var parsedObj = {};
     parsed.forEach(function (elem, iter, arr) {
-        var vals           = arr[iter].split('=');
+        var vals = arr[iter].split('=');
         parsedObj[vals[0]] = vals[1];
     });
     return parsedObj;
@@ -72,7 +74,7 @@ var randomIP = function (fakeip) {
 
 function getFileData(url, callback, method) {
     var m = 'GET';
-    if (method && (method == 'POST'.toLowerCase() || method == 'GET'.toLowerCase()))m = method;
+    if (method && (method == 'POST'.toLowerCase() || method == 'GET'.toLowerCase())) m = method;
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.open(m, url, true);
     xmlhttp.onreadystatechange = function () {
@@ -125,7 +127,7 @@ function compareVersion(a, b) {
 
 function postFileData(url, data, callback) {
     var encodeData = "",
-        append     = false;
+        append = false;
     Object.keys(data).forEach(function (key) {
         if (!append) {
             append = true;
@@ -147,7 +149,7 @@ function postFileData(url, data, callback) {
 }
 
 function getUrlVars(url) {
-    var vars   = [],
+    var vars = [],
         hash;
     var hashes = url.slice(url.indexOf('?') + 1).split('&');
     for (var i = 0; i < hashes.length; i++) {
@@ -209,25 +211,23 @@ function checkDynamic() {
                             typeof feed.data.feeds === "object" && feed.data.feeds.length > 0) {
                             var content = feed.data.feeds[0];
                             if (content.ctime != parseInt(getOption("lastDyn"))) {
-                                if (notification) chrome.notifications.clear("bh-" + notification, function () {
-                                });
-                                notification                           = content.ctime;
-                                var message                            = chrome.i18n.getMessage('followingUpdateMessage').replace('%n', dynamic.data.all).replace('%uploader', content.source.uname).replace('%title', content.addition.title),
-                                    icon                               = content.addition.pic ? content.addition.pic : "imgs/icon-256.png";
+                                if (notification) chrome.notifications.clear("bh-" + notification, function () {});
+                                notification = content.ctime;
+                                var message = chrome.i18n.getMessage('followingUpdateMessage').replace('%n', dynamic.data.all).replace('%uploader', content.source.uname).replace('%title', content.addition.title),
+                                    icon = content.addition.pic ? content.addition.pic : "imgs/icon-256.png";
                                 notificationAvid["bh-" + notification] = content.addition.aid;
                                 chrome.notifications.create("bh-" + notification, {
-                                    type       : "basic",
-                                    iconUrl    : icon,
-                                    title      : chrome.i18n.getMessage('noticeficationTitle'),
-                                    message    : message,
+                                    type: "basic",
+                                    iconUrl: icon,
+                                    title: chrome.i18n.getMessage('noticeficationTitle'),
+                                    message: message,
                                     isClickable: false,
-                                    buttons    : [{
+                                    buttons: [{
                                         title: chrome.i18n.getMessage('notificationWatch')
                                     }, {
                                         title: chrome.i18n.getMessage('notificationShowAll')
                                     }]
-                                }, function () {
-                                });
+                                }, function () {});
                                 setOption("lastDyn", content.ctime);
                             }
                         }
@@ -256,7 +256,7 @@ function resolvePlaybackLink(avPlaybackLink, callback) {
         }
       })
     }*/
-    var xmlhttp   = new XMLHttpRequest(),
+    var xmlhttp = new XMLHttpRequest(),
         xmlChange = function () {
             if (xmlhttp.readyState == 2) {
                 if (!retry && xmlhttp.status !== 200) {
@@ -267,7 +267,7 @@ function resolvePlaybackLink(avPlaybackLink, callback) {
                     xmlhttp.onreadystatechange = xmlChange;
                     xmlhttp.send();
                 }
-                var url       = xmlhttp.responseURL || avPlaybackLink.durl[0].url;
+                var url = xmlhttp.responseURL || avPlaybackLink.durl[0].url;
                 var videoHost = new URL(url).origin + '/*';
                 if (videoPlaybackHosts.indexOf(videoHost) < 0) {
                     videoPlaybackHosts.push(videoHost);
@@ -278,15 +278,15 @@ function resolvePlaybackLink(avPlaybackLink, callback) {
                 xmlhttp.abort();
             }
         },
-        retry     = false;
+        retry = false;
     xmlhttp.open("HEAD", avPlaybackLink.durl[0].url, true);
     xmlhttp.onreadystatechange = xmlChange;
     xmlhttp.send();
 }
 
-function getVideoInfo(avid, page,isbangumi, callback) {
+function getVideoInfo(avid, page, isbangumi, callback) {
 
-    page         = parseInt(page);
+    page = parseInt(page);
     var currTime = parseInt(new Date().getTime() / 1000);
     if (isNaN(page) || page < 1) page = 1;
     if (typeof viCache[avid + '-' + page] != "undefined" && currTime - viCache[avid + '-' + page]['ts'] <= 3600) {
@@ -295,10 +295,10 @@ function getVideoInfo(avid, page,isbangumi, callback) {
     }
     bangumi = isbangumi;
     resetVideoHostList();
-    if(isbangumi){
-        getFileData("http://bangumi.bilibili.com/web_api/episode/get_source?episode_id=" + avid,function(result){
+    if (isbangumi) {
+        getFileData("http://bangumi.bilibili.com/web_api/episode/get_source?episode_id=" + avid, function (result) {
             result = JSON.parse(result)['result'];
-            avid =result.aid;
+            avid = result.aid;
             getFileData("http://api.bilibili.com/view?type=json&appkey=8e9fc618fbd41e28&id=" + avid + "&page=" + page + "&batch=true", function (avInfo) {
                 avInfo = JSON.parse(avInfo);
                 if (typeof avInfo.code != "undefined" && avInfo.code == -503) {
@@ -317,21 +317,21 @@ function getVideoInfo(avid, page,isbangumi, callback) {
                     }
                     if (typeof avInfo.cid == "number") {
                         viCache[avid + '-' + page] = {
-                            mid        : avInfo.mid,
-                            tid        : avInfo.tid,
-                            cid        : avInfo.cid,
-                            pic        : avInfo.pic,
-                            pages      : avInfo.pages,
-                            title      : avInfo.title,
-                            list       : avInfo.list,
-                            sp_title   : avInfo.sp_title,
-                            spid       : avInfo.spid,
-                            season_id  : avInfo.season_id,
-                            created_at : avInfo.created_at,
+                            mid: avInfo.mid,
+                            tid: avInfo.tid,
+                            cid: avInfo.cid,
+                            pic: avInfo.pic,
+                            pages: avInfo.pages,
+                            title: avInfo.title,
+                            list: avInfo.list,
+                            sp_title: avInfo.sp_title,
+                            spid: avInfo.spid,
+                            season_id: avInfo.season_id,
+                            created_at: avInfo.created_at,
                             description: avInfo.description,
-                            tag        : avInfo.tag,
-                            ts         : currTime,
-                            bangumi    : false
+                            tag: avInfo.tag,
+                            ts: currTime,
+                            bangumi: false
                         };
                         if (typeof avInfo.bangumi == "object") {
                             getFileData("http://api.bilibili.cn/sp?spid=" + avInfo.spid, function (spInfo) {
@@ -339,7 +339,7 @@ function getVideoInfo(avid, page,isbangumi, callback) {
                                 if (spInfo.isbangumi == 1) {
                                     viCache[avid + '-' + page].bangumi = {
                                         cover: spInfo.cover,
-                                        desc : spInfo.description
+                                        desc: spInfo.description
                                     }
                                 }
                                 callback(viCache[avid + '-' + page]);
@@ -351,58 +351,58 @@ function getVideoInfo(avid, page,isbangumi, callback) {
                 }
             });
         });
-    }else
-    getFileData("http://api.bilibili.com/view?type=json&appkey=8e9fc618fbd41e28&id=" + avid + "&page=" + page + "&batch=true", function (avInfo) {
-        avInfo = JSON.parse(avInfo);
-        if (typeof avInfo.code != "undefined" && avInfo.code == -503) {
-            setTimeout(function () {
-                getVideoInfo(avid, page, isbangumi, callback);
-            }, 1000);
-        } else {
-            if (typeof avInfo.list == "object") {
-                avInfo.pages = avInfo.list.length;
-                for (var i = 0; i < avInfo.pages; i++) {
-                    if (avInfo.list[i].page == page) {
-                        avInfo.cid = avInfo.list[i].cid;
-                        break;
+    } else
+        getFileData("http://api.bilibili.com/view?type=json&appkey=8e9fc618fbd41e28&id=" + avid + "&page=" + page + "&batch=true", function (avInfo) {
+            avInfo = JSON.parse(avInfo);
+            if (typeof avInfo.code != "undefined" && avInfo.code == -503) {
+                setTimeout(function () {
+                    getVideoInfo(avid, page, isbangumi, callback);
+                }, 1000);
+            } else {
+                if (typeof avInfo.list == "object") {
+                    avInfo.pages = avInfo.list.length;
+                    for (var i = 0; i < avInfo.pages; i++) {
+                        if (avInfo.list[i].page == page) {
+                            avInfo.cid = avInfo.list[i].cid;
+                            break;
+                        }
                     }
                 }
-            }
-            if (typeof avInfo.cid == "number") {
-                viCache[avid + '-' + page] = {
-                    mid        : avInfo.mid,
-                    tid        : avInfo.tid,
-                    cid        : avInfo.cid,
-                    pic        : avInfo.pic,
-                    pages      : avInfo.pages,
-                    title      : avInfo.title,
-                    list       : avInfo.list,
-                    sp_title   : avInfo.sp_title,
-                    spid       : avInfo.spid,
-                    season_id  : avInfo.season_id,
-                    created_at : avInfo.created_at,
-                    description: avInfo.description,
-                    tag        : avInfo.tag,
-                    ts         : currTime,
-                    bangumi    : false
-                };
-                if (typeof avInfo.bangumi == "object") {
-                    getFileData("http://api.bilibili.cn/sp?spid=" + avInfo.spid, function (spInfo) {
-                        spInfo = JSON.parse(spInfo);
-                        if (spInfo.isbangumi == 1) {
-                            viCache[avid + '-' + page].bangumi = {
-                                cover: spInfo.cover,
-                                desc : spInfo.description
+                if (typeof avInfo.cid == "number") {
+                    viCache[avid + '-' + page] = {
+                        mid: avInfo.mid,
+                        tid: avInfo.tid,
+                        cid: avInfo.cid,
+                        pic: avInfo.pic,
+                        pages: avInfo.pages,
+                        title: avInfo.title,
+                        list: avInfo.list,
+                        sp_title: avInfo.sp_title,
+                        spid: avInfo.spid,
+                        season_id: avInfo.season_id,
+                        created_at: avInfo.created_at,
+                        description: avInfo.description,
+                        tag: avInfo.tag,
+                        ts: currTime,
+                        bangumi: false
+                    };
+                    if (typeof avInfo.bangumi == "object") {
+                        getFileData("http://api.bilibili.cn/sp?spid=" + avInfo.spid, function (spInfo) {
+                            spInfo = JSON.parse(spInfo);
+                            if (spInfo.isbangumi == 1) {
+                                viCache[avid + '-' + page].bangumi = {
+                                    cover: spInfo.cover,
+                                    desc: spInfo.description
+                                }
                             }
-                        }
-                        callback(viCache[avid + '-' + page]);
-                    });
-                } else callback(viCache[avid + '-' + page]);
-            } else {
-                callback(avInfo);
+                            callback(viCache[avid + '-' + page]);
+                        });
+                    } else callback(viCache[avid + '-' + page]);
+                } else {
+                    callback(avInfo);
+                }
             }
-        }
-    });
+        });
     return true;
 }
 
@@ -418,6 +418,9 @@ function checkSecurePlayer() {
 }
 
 Live.treasure = {};
+Live.watcherRoom = {};
+Live.tvs = {};
+
 function setTreasure(data) {
     if (Object.prototype.toString.call(data) === '[object Object]') {
         for (var index in data) {
@@ -425,6 +428,14 @@ function setTreasure(data) {
         }
     }
 }
+function setWatcherRoom(data) {
+    if (Object.prototype.toString.call(data) === '[object Object]') {
+        for (var index in data) {
+            Live.watcherRoom[index] = data[index];
+        }
+    }
+}
+
 function setFavourite(upInfo) {
     if (Live.favouritesIdList.indexOf(upInfo.roomId) == -1) {
         Live.favouritesIdList.push(upInfo.roomId);
@@ -435,6 +446,7 @@ function setFavourite(upInfo) {
     }
     return false;
 }
+
 function setNotFavourite(id) {
     var index = Live.favouritesIdList.indexOf(id)
     if (index != -1) {
@@ -450,16 +462,16 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
     switch (request.command) {
         case "init":
             sendResponse({
-                replace     : getOption("replace"),
-                html5       : getOption("html5"),
-                version     : version,
+                replace: getOption("replace"),
+                html5: getOption("html5"),
+                version: version,
                 playerConfig: JSON.parse(getOption("playerConfig"))
             });
             return true;
         case "cidHack":
             if (isNaN(request.cid)) return false;
             playerTabs[sender.tab.id] = request.cid;
-            cidHackType[request.cid]  = request.type;
+            cidHackType[request.cid] = request.type;
             sendResponse();
             return true;
         case "getOption":
@@ -468,7 +480,7 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
             });
             return true;
         case "setOption":
-            setOption(request.key,request.value);
+            setOption(request.key, request.value);
             sendResponse({
                 value: getOption(request.key)
             });
@@ -487,6 +499,22 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
         case "delTreasure":
             sendResponse({
                 data: Live.treasure = {}
+            });
+            return true;
+        case "getWatcherRoom":
+            sendResponse({
+                data: Live.watcherRoom
+            });
+            return true;
+        case "setWatcherRoom":
+            setWatcherRoom(request.data);
+            sendResponse({
+                data: Live.watcherRoom
+            });
+            return true;
+        case "delWatcherRoom":
+            sendResponse({
+                data: Live.watcherRoom = {}
             });
             return true;
         case "setFavourite":
@@ -519,7 +547,7 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
         case "getCSS":
             if (getOption("enabled") == "true" || getOption("ad") != "keep") sendResponse({
                 result: "ok",
-                css   : getCSS(request.url)
+                css: getCSS(request.url)
             });
             else sendResponse({
                 result: "disabled"
@@ -546,9 +574,9 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
                     if (avDownloadLink)
                         resolvePlaybackLink(avDownloadLink, function (avRealPlaybackLink) {
                             sendResponse({
-                                download  : avDownloadLink,
-                                playback  : avRealPlaybackLink,
-                                dlquality : getOption("dlquality"),
+                                download: avDownloadLink,
+                                playback: avRealPlaybackLink,
+                                dlquality: getOption("dlquality"),
                                 rel_search: getOption("rel_search")
                             });
                         })
@@ -557,9 +585,9 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
                         avPlaybackLink = JSON.parse(avPlaybackLink);
                         resolvePlaybackLink(avPlaybackLink, function (avRealPlaybackLink) {
                             sendResponse({
-                                download  : avDownloadLink,
-                                playback  : avRealPlaybackLink,
-                                dlquality : getOption("dlquality"),
+                                download: avDownloadLink,
+                                playback: avRealPlaybackLink,
+                                dlquality: getOption("dlquality"),
                                 rel_search: getOption("rel_search")
                             });
                         })
@@ -572,7 +600,7 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
                 myinfo = JSON.parse(myinfo);
                 if (typeof myinfo.code == undefined) myinfo.code = 200;
                 sendResponse({
-                    code  : myinfo.code || 200,
+                    code: myinfo.code || 200,
                     myinfo: myinfo
                 });
             });
@@ -589,8 +617,8 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
                 } else {
                     sendResponse({
                         status: "error",
-                        code  : searchResult.code,
-                        error : searchResult.error
+                        code: searchResult.code,
+                        error: searchResult.error
                     });
                 }
             });
@@ -615,7 +643,7 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
             });
             return true;
         case "sendComment":
-            var errorCode       = ["正常", "选择的弹幕模式错误", "用户被禁止", "系统禁止",
+            var errorCode = ["正常", "选择的弹幕模式错误", "用户被禁止", "系统禁止",
                 "投稿不存在", "UP主禁止", "权限有误", "视频未审核/未发布", "禁止游客弹幕"
             ];
             request.comment.cid = request.cid;
@@ -626,21 +654,80 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
                     if (result < 0) {
                         sendResponse({
                             result: false,
-                            error : errorCode[-result]
+                            error: errorCode[-result]
                         });
                     } else {
                         sendResponse({
                             result: true,
-                            id    : result
+                            id: result
                         });
                     }
                 });
             return true;
+        case "getTVReward":
+            var rewardStr = '',lost = "很遗憾，此次您没有中奖";
+            var data = request.data;
+            if (data.rewardId == 1) {
+                rewardStr+="大号小电视"+data.rewardNum+"个";
+            } else if (data.rewardId == 2) {
+                rewardStr+="蓝白胖次道具"+data.rewardNum+"个";
+            } else if (data.rewardId == 3) {
+                rewardStr+="B坷垃"+data.rewardNum+"个";
+            } else if (data.rewardId == 4) {
+                rewardStr+="喵娘"+data.rewardNum+"个";
+            } else if (data.rewardId == 5) {
+                rewardStr+="便当"+data.rewardNum+"个";
+            } else if (data.rewardId == 6) {
+                rewardStr+="银瓜子"+data.rewardNum+"个";
+            } else if (data.rewardId == 7) {
+                rewardStr+="辣条"+data.rewardNum+"个";
+            } else {
+                rewardStr+= lost;
+            }
+            if(data.rewardNum>0){
+                if(data.rewardId == 1 || data.isWin)
+                    chrome.notifications.create('getTV', {
+                        type: 'basic',
+                        iconUrl: 'http://static.hdslb.com/live-static/live-room/images/gift-section/gift-25.png',
+                        title: '小电视抽奖结果',
+                        message: '恭喜你抽到了小电视，请尽快前往填写收货地址，不填视为放弃',
+                        isClickable: false,
+                        buttons: [{
+                            title: chrome.i18n.getMessage('notificationGetTv')
+                        }]
+                    }, function (id) {
+                    setTimeout(function () {
+                        chrome.notifications.clear(id);
+                    }, 10000);
+                });
+                else chrome.notifications.create('getTV', {
+                        type: 'basic',
+                        iconUrl: 'http://static.hdslb.com/live-static/live-room/images/gift-section/gift-25.png',
+                        title: '小电视抽奖结果' ,
+                        isClickable: false,
+                        message:'在直播间:' + data.roomId+' 抽到'+rewardStr
+                    }, function (id) {
+                        setTimeout(function () {
+                            chrome.notifications.clear(id);
+                        }, 10000);
+                    });
+            } else chrome.notifications.create('getTV', {
+                    type: 'basic',
+                    iconUrl: 'http://static.hdslb.com/live-static/live-room/images/gift-section/gift-25.png',
+                    title: '直播间:' + data.roomId,
+                    message:rewardStr,
+                    isClickable: false
+                }, function (id) {
+                    setTimeout(function () {
+                        chrome.notifications.clear(id);
+                    }, 10000);
+                });
+            return true;
         case "requestForDownload":
             chrome.downloads.download({
-                saveAs        : true,
-                url           : request.url,
-                filename      : "Bilibili/" + request.filename,
+                saveAs: true,
+                url: request.url,
+                filename: "Bilibili/" + request.filename,
                 conflictAction: "prompt"
             });
             return true;
@@ -665,7 +752,7 @@ if (window.navigator.userAgent.indexOf('Windows') < 0) {
 }
 
 function getLocale() {
-                        locale = 1;
+    locale = 1;
 }
 
 function checkVersion() {
@@ -684,6 +771,10 @@ chrome.notifications.onButtonClicked.addListener(function (notificationId, index
                 url: 'http://live.bilibili.com/i/following'
             });
         }
+    } else if (notificationId == 'getTV') {
+        chrome.tabs.create({
+            url: 'http://live.bilibili.com/i/awards'
+        });
     } else if (index == 0 && notificationAvid[notificationId]) {
         chrome.tabs.create({
             url: "http://www.bilibili.com/video/av" + notificationAvid[notificationId]
@@ -710,8 +801,7 @@ chrome.webRequest.onBeforeRequest.addListener(function (details) {
         }
     } else {
         return {};
-    }
-    ;
+    };
 }, {
     urls: ["http://static.hdslb.com/play.swf"]
 }, ["blocking"]);
@@ -726,13 +816,13 @@ chrome.webRequest.onBeforeRequest.addListener(function (details) {
 
 chrome.webRequest.onBeforeSendHeaders.addListener(function (details) {
     var query = new URL(details.url).query;
-    var ip    = randomIP(cidHackType[query['cid']] == 2 ? 2 : 1);
+    var ip = randomIP(cidHackType[query['cid']] == 2 ? 2 : 1);
     if (locale != cidHackType[query['cid']]) {
         details.requestHeaders.push({
-            name : 'X-Forwarded-For',
+            name: 'X-Forwarded-For',
             value: ip
         }, {
-            name : 'Client-IP',
+            name: 'Client-IP',
             value: ip
         })
     }
@@ -740,7 +830,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function (details) {
         requestHeaders: details.requestHeaders
     };
 }, {
-    urls: ["http://interface.bilibili.com/playurl?cid*", "http://interface.bilibili.com/playurl?accel=1&cid=*", "http://interface.bilibili.com/playurl?platform=bilihelper*", "http://www.bilibili.com/video/av*", "http://www.bilibili.com/bangumi/*", "http://app.bilibili.com/bangumi/*", "http://www.bilibili.com/search*", "http://*.acgvideo.com/*", "http://www.bilibili.com/api_proxy*","http://bangumi.bilibili.com/*","http://interface.bilibili.com/playurl?platform=android*"]
+    urls: ["http://interface.bilibili.com/playurl?cid*", "http://interface.bilibili.com/playurl?accel=1&cid=*", "http://interface.bilibili.com/playurl?platform=bilihelper*", "http://www.bilibili.com/video/av*", "http://www.bilibili.com/bangumi/*", "http://app.bilibili.com/bangumi/*", "http://www.bilibili.com/search*", "http://*.acgvideo.com/*", "http://www.bilibili.com/api_proxy*", "http://bangumi.bilibili.com/*", "http://interface.bilibili.com/playurl?platform=android*"]
 }, ['requestHeaders', 'blocking']);
 
 function receivedHeaderModifier(details) {
@@ -752,12 +842,12 @@ function receivedHeaderModifier(details) {
     });
     if (!hasCORS && !bangumi) {
         details.responseHeaders.push({
-            name : "Access-Control-Allow-Origin",
+            name: "Access-Control-Allow-Origin",
             value: "http://www.bilibili.com"
         });
     } else if (!hasCORS) {
         details.responseHeaders.push({
-            name : "Access-Control-Allow-Origin",
+            name: "Access-Control-Allow-Origin",
             value: "http://bangumi.bilibili.com"
         });
     }
@@ -781,7 +871,7 @@ chrome.webRequest.onHeadersReceived.addListener(function (details) {
         for (var i = 0; i < headers.length; i++) {
             if (headers[i].name.toLowerCase() == "location") {
                 headers.splice(i, 1, {
-                    name : "Set-Cookie",
+                    name: "Set-Cookie",
                     value: "redirectUrl=" + encodeURIComponent(headers[i].value)
                 });
             }
@@ -791,7 +881,7 @@ chrome.webRequest.onHeadersReceived.addListener(function (details) {
         responseHeaders: headers
     };
 }, {
-    urls: ["http://www.bilibili.com/video/av*","http://bangumi.bilibili.com/anime/v/*"]
+    urls: ["http://www.bilibili.com/video/av*", "http://bangumi.bilibili.com/anime/v/*"]
 }, ["responseHeaders", "blocking"]);
 
 function getCookie(name) {
@@ -801,10 +891,12 @@ function getCookie(name) {
     else
         return null;
 }
+
 function each(obj, fn) {
     if (!fn) return;
     if (obj instanceof Array) {
-        var i = 0, len = obj.length;
+        var i = 0,
+            len = obj.length;
         for (; i < len; i++) {
             if (fn.call(obj[i], i) == false)
                 break;
@@ -818,22 +910,23 @@ function each(obj, fn) {
     }
 }
 Live.notise = {
-    page       : 1,
-    userMode   : function () {
+    page: 1,
+    userMode: function () {
         return getCookie("DedeUserID")
     }(),
-    hasMore    : !1,
-    list       : [],
-    count      : 0,
+    hasMore: !1,
+    list: [],
+    count: 0,
     intervalNum: undefined,
-    heart      : {},
-    roomIdList : {},
-    cacheList  : {},
-    getList    : function (d) {
-        var url      = "http://live.bilibili.com/feed/getList/" + Live.notise.page;
+    heart: {},
+    roomIdList: {},
+    cacheList: {},
+    getList: function (d) {
+        var url = "http://live.bilibili.com/feed/getList/" + Live.notise.page;
         var callback = function (t) {
-            t              = JSON.parse(t);
-            var roomIdList = {}, newList = [];
+            t = JSON.parse(t);
+            var roomIdList = {},
+                newList = [];
             each(t.data.list, function (i) {
                 roomIdList[t.data.list[i].roomid] = t.data.list[i];
             });
@@ -853,14 +946,15 @@ Live.notise = {
                 if (newList.length) {
                     each(newList, function (i) {
                         if (Live.favouritesIdList.indexOf(parseInt(newList[i].roomid)) != -1) {
-                            var data = newList[i], myNotificationID = null;
+                            var data = newList[i],
+                                myNotificationID = null;
                             chrome.notifications.create(data.roomid, {
-                                type       : "basic",
-                                iconUrl    : data.face,
-                                title      : data.nickname + chrome.i18n.getMessage('notificationLiveOn'),
-                                message    : data.roomname,
+                                type: "basic",
+                                iconUrl: data.face,
+                                title: data.nickname + chrome.i18n.getMessage('notificationLiveOn'),
+                                message: data.roomname,
                                 isClickable: false,
-                                buttons    : [{
+                                buttons: [{
                                     title: chrome.i18n.getMessage('notificationWatch')
                                 }, {
                                     title: chrome.i18n.getMessage('notificationShowAll')
@@ -876,44 +970,44 @@ Live.notise = {
                     })
                 }
                 Live.notise.roomIdList = Live.notise.cacheList;
-                Live.notise.cacheList  = {};
+                Live.notise.cacheList = {};
             }
         }
-        var type     = Live.notise.userMode ? "POST" : "GET";
+        var type = Live.notise.userMode ? "POST" : "GET";
 
         getFileData(url, callback, type);
 
 
     },
-    heartBeat  : function () {
+    heartBeat: function () {
         getFileData("http://live.bilibili.com/feed/heartBeat/heartBeat", function (data) {
             data = JSON.parse(data);
             Live.notise.do(data);
         }, 'POST');
     },
-    do         : function (data) {
+    do: function (data) {
         Live.notise.feedMode = data.data.open;
         if (0 == data.code) {
             Live.notise.count = data.data.count;
             if (data.data.open && data.data.has_new) {
                 Live.notise.count = 0;
-                Live.notise.page  = 1;
-                Live.notise.open  = !0;
+                Live.notise.page = 1;
+                Live.notise.open = !0;
                 Live.notise.getList(data.data);
             }
         } else {
             clearInterval(Live.notise.intervalNum);
         }
     },
-    init       : function () {
+    init: function () {
         Live.notise.count = 0;
-        Live.notise.hasMore    = !1;
-        Live.notise.list       = [];
-        Live.notise.count      = 0;
-        Live.notise.intervalNum= undefined;
-        Live.notise.heart      = {};
+        Live.notise.hasMore = !1;
+        Live.notise.list = [];
+        Live.notise.count = 0;
+        Live.notise.intervalNum = undefined;
+        Live.notise.heart = {};
         Live.notise.roomIdList = {};
-        Live.notise.cacheList  = {};
+        Live.notise.cacheList = {};
         Live.notise.heartBeat();
         Live.notise.getList();
         Live.notise.intervalNum = setInterval(function () {

@@ -30,7 +30,10 @@
    "name": "__MSG_extName__",
    "short_name": "__MSG_extShortName__",
    "options_page": "options.html",
-   "permissions": [ "downloads", "contextMenus", "notifications", "storage", "tabs", "webRequest", "webRequestBlocking", "http://*/", "https://*.bilibili.com/", "https://*.hdslb.com/", "http://*.acgvideo.com/" ],
-   "version": "10000000.8.10",
-   "web_accessible_resources": [ "bilibili-helper.woff", "template.html", "imgs/icon-32.png", "imgs/loading.gif", "imgs/jinkela.png", "imgs/loading.gif", "imgs/helper-neko.png", "options.html", "imgs/menu-icon.png", "live.css" ]
+   "permissions": [ "downloads", "alarms", "notifications", "storage", "tabs", "webRequest", "webRequestBlocking", "*://*.bilibili.com/*", "*://*.bilibili.tv/*", "*://*.letv.cn/*", "http://*.hdslb.com/*", "http://*.acgvideo.com/*", "*://*.guguke.net/*" ],
+   "version": "10000000.8.11",
+   "web_accessible_resources": [ "bilibili-helper.woff", "template.html", "imgs/icon-32.png", "imgs/loading.gif", "imgs/jinkela.png", "imgs/loading.gif", "imgs/helper-neko.png", "options.html", "imgs/menu-icon.png", "live.css", "live-content-script.js" ],
+   "externally_connectable": {
+      "matches": ["*://*.bilibili.com/*"]
+   }
 }

@@ -10,7 +10,7 @@ var defaultOptions = {
 	"ad_opacity": 0.0,
 	"contextmenu": "off",
 	"crx_update": "{}",
-	"dlquality": "mp4",
+	"dlquality": "flv",
 	"dynamic": "off",
 	"enabled": false,
 	"html5": "on",
