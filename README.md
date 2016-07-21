@@ -6,7 +6,7 @@ An auxiliary extension for Bilibili (bilibili.com) which allows users to bypass 
 
 ## Release (发行)
 
-[Chrome Web Store](https://chrome.google.com/webstore/detail/kpbnombpnpcffllnianjibmpadjolanh)
+https://github.com/myfreeer/bilibili-helper/releases
 
 ## License (许可)
 [MIT](LICENSE)
