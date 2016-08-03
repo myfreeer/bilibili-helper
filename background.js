@@ -30,7 +30,7 @@ Live.get = function (n, k, v) {
     if (!window.localStorage || !n) return;
 
     if (!window.localStorage[n]) {
-        var temp = v || {};
+        var temp = (v==undefined?{}:v);
         if (k != undefined && v != undefined) temp[k] = v;
         window.localStorage[n] = JSON.stringify(temp);
     }
@@ -924,6 +924,7 @@ Live.notise = {
     getList: function (d) {
         var url = "http://live.bilibili.com/feed/getList/" + Live.notise.page;
         var callback = function (t) {
+            t = t.substr(1,t.length-3);
             t = JSON.parse(t);
             var roomIdList = {},
                 newList = [];
@@ -976,8 +977,6 @@ Live.notise = {
         var type = Live.notise.userMode ? "POST" : "GET";
 
         getFileData(url, callback, type);
-
-
     },
     heartBeat: function () {
         getFileData("http://live.bilibili.com/feed/heartBeat/heartBeat", function (data) {
@@ -986,17 +985,19 @@ Live.notise = {
         }, 'POST');
     },
     do: function (data) {
-        Live.notise.feedMode = data.data.open;
-        if (0 == data.code) {
-            Live.notise.count = data.data.count;
-            if (data.data.open && data.data.has_new) {
-                Live.notise.count = 0;
-                Live.notise.page = 1;
-                Live.notise.open = !0;
-                Live.notise.getList(data.data);
+        if(data.data){
+            Live.notise.feedMode = data.data.open;
+            if (0 == data.code) {
+                Live.notise.count = data.data.count;
+                if (data.data.open && data.data.has_new) {
+                    Live.notise.count = 0;
+                    Live.notise.page = 1;
+                    Live.notise.open = !0;
+                    Live.notise.getList(data.data);
+                }
+            } else {
+                clearInterval(Live.notise.intervalNum);
             }
-        } else {
-            clearInterval(Live.notise.intervalNum);
         }
     },
     init: function () {
@@ -1022,3 +1023,9 @@ Live.notise = {
 if (getOption("liveNotification") == "on") {
     Live.notise.init();
 }
+chrome.runtime.onConnect.addListener(function (port) {
+    port.onMessage.addListener(function (request, sender, sendResponse) {
+        console.log(request.json)
+        if (!request.cmd) return false;
+    });
+});

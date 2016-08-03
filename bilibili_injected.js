@@ -249,6 +249,7 @@
 			}
 		});
 	}
+
 	var prob = document.createElement("script");
 	prob.id = "page-prob";
 	prob.innerHTML = "$('.player-wrapper .v-plist').attr('length', window.VideoPart.nodedata.length);$('#page-prob').remove();";
@@ -265,6 +266,7 @@
 		bili_reg = /\/anime\/v\/([0-9]+)$/,
 		urlResult = bili_reg.exec(document.location.pathname);
 	}
+
 	if (urlResult) {
 		biliHelper.avid = urlResult[1];
 		biliHelper.bangumiid = urlResult[1];
@@ -490,6 +492,7 @@
 			});
 			$('#bofqi').append(replaceNotice);
 		}
+
 		biliHelper.work = function() {
 			chrome.extension.sendMessage({
 				command: "getVideoInfo",

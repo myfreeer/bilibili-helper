@@ -8,15 +8,15 @@ var ad_mode = ad_kill;
 var defaultOptions = {
 	"ad": "keep",
 	"ad_opacity": 0.1,
-	"contextmenu": "on",
+	"contextmenu": "off",
 	"crx_update": "{}",
 	"dlquality": "flv",
-	"dynamic": "on",
+	"dynamic": "off",
 	"enabled": false,
-	"html5": "off",
+	"html5": "on",
 	"indexversion": "new",
 	"lastDyn": 0,
-	"playerConfig": "{\"volume\":1,\"opacity\":0.8,\"scale\":1,\"prop\":true}",
+	"playerConfig": "{\"volume\":0.5,\"opacity\":1,\"scale\":1,\"prop\":true}",
 	"rel_search": "without",
 	"replace": "on",
 	"updates": 0,
@@ -31,7 +31,9 @@ var defaultOptions = {
 	"displayOption":"[]",
 	"versionNotify":"on",
 	"watcher":"off",
-	"watchList":"[]"
+	"watchList":"[]",
+	"watchNotify":"on",
+	"watchNotifyList":"[]",
 };
 var cidCache = {};
 if(localStorage.getItem('cidCache') != null) {
