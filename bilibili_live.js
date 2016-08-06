@@ -64,8 +64,11 @@
             else Live.getRoomHTML(url).done(function (roomHtml) {
                 var reg = new RegExp("var ROOMID = ([\\d]+)");
                 var roomID = reg.exec(roomHtml)[1];
+                console.log(url, roomID);
                 Live.set('helper_live_roomId', url, roomID);
                 if (typeof callback == 'function') callback(roomID);
+            }, function () {
+                Live.getRoomIdByUrl(url, callback);
             });
         };
         Live.getUser = function () {
@@ -945,6 +948,7 @@
         Live.currentRoom = [];
 
         Live.treasure = {
+            silverSum: 0,
             correctStr: { 'g': 9, 'z': 2, '_': 4, 'Z': 2, 'o': 0, 'l': 1, 'B': 8, 'O': 0, 'S': 6, 's': 6, 'i': 1, 'I': 1 },
             silverSeed: false, //current silver
             allowCtrl: true,
@@ -998,13 +1002,13 @@
             waitingEmoji: Live.randomEmoji.happy(),
             panelEmoji: Live.randomEmoji.helpless(),
             init: function () {
-                chrome.extension.sendMessage({
+                chrome.runtime.sendMessage({
                     command: "getOption",
                     key: 'autoTreasure',
                 }, function (res) {
                     if (res['value'] == 'on') setTimeout(function () {
                         // Live.scriptOptions['treasure'] = true;
-                        chrome.extension.sendMessage({
+                        chrome.runtime.sendMessage({
                             command: "getTreasure"
                         }, function (response) {
                             Live.treasureInfoDOM = $('<div class="room-info treasure-info">自动领瓜子功能正在初始化</div>');
@@ -1012,7 +1016,7 @@
                             if (response['data'].roomId == undefined) {
                                 //init background data
                                 Live.getRoomInfo().done(function (data) {
-                                    chrome.extension.sendMessage({
+                                    chrome.runtime.sendMessage({
                                         command: "setTreasure",
                                         data: {
                                             uid: data.data.UID,
@@ -1020,10 +1024,10 @@
                                             roomShortId: location.pathname.substr(1),
                                             roomTitle: data.data.ROOMTITLE,
                                             upName: data.data.ANCHOR_NICK_NAME,
-                                            url: location.href
+                                            url: location.href,
                                         }
                                     });
-                                    $('#head-info-panel').find('.treasure-info').html('已开始在本直播间自动领瓜子');
+
                                     var msg = new Notification("自动领瓜子功能已经启动", {
                                         body: data.data.ANCHOR_NICK_NAME + '：' + data.data.ROOMTITLE,
                                         icon: "//static.hdslb.com/live-static/images/7.png"
@@ -1079,20 +1083,35 @@
                                 Live.treasure.checkNewTask();
                                 Live.treasure.treasureTip.find('.close-btn').click();
                                 $(window).on('beforeunload', function () {
-                                    chrome.extension.sendMessage({
+                                    chrome.runtime.sendMessage({
                                         command: "delTreasure"
                                     });
                                     console.log(0);
                                 });
-                                Live.get('silverSum', Live.get('helper_userInfo', 'username'), 0);
+                                var port = chrome.runtime.connect({ name: "kpbnombpnpcffllnianjibmpadjolanh" });
+                                port.onMessage.addListener(function (request) {
+                                    switch (request.command) {
+                                        case 'updateCurrentTreasure':
+                                            var startTime = request.data.time_start;
+                                            var endTime = request.data.time_end;
+                                            var minute = request.data.minute;
+                                            var award = request.data.silver;
+                                            Live.treasure.setNewTask(startTime, endTime, minute, award);
+                                            break;
+                                    }
+                                });
                             } else if (Live.get('noTreasure', Live.get('helper_userInfo', 'username'))) {
                                 Live.bilibiliHelperInfoDOM.find('.treasure-info').html('今天的瓜子已经领完');
                             } else if (response['data'].roomId != Live.getRoomId()) {
                                 Live.treasureInfoDOM.html('已在<a target="_blank" href="' + response['data'].url + '">' + response['data'].upName + '</a>的直播间自动领瓜子');
                                 $('#player-container').find('.treasure-box-ctnr').hide('middle');
+                                Live.treasure.checkNewTask(true);
                             } else if (response['data'].roomId == Live.getRoomId()) {
                                 Live.treasureInfoDOM.html('本直播间页面已经被打开过');
                                 $('#player-container').find('.treasure-box-ctnr').hide('middle');
+                                Live.treasure.checkNewTask(true);
+                            } else {
+                                Live.treasure.checkNewTask(true);
                             }
                         });
                     }, 2000);
@@ -1201,7 +1220,7 @@
                     Live.treasure.treasureBox.find('.treasure-box').removeClass('animate' + (Live.treasure.aniStep - 1));
                 }, 100);
             },
-            checkNewTask: function () {
+            checkNewTask: function (opened) {
                 Live.treasure.getCurrentTask().done(function (result) {
                     if (result.code !== undefined) {
                         result.code = parseInt(result.code, 10);
@@ -1222,11 +1241,20 @@
                         }
                         return;
                     }
-                    Live.treasure.setNewTask(result.data.time_start, result.data.time_end, parseInt(result.data.minute, 10), parseInt(result.data.silver, 10));
+                    chrome.extension.sendMessage({
+                        command: "setCurrentTreasure",
+                        data: {
+                            minute: result.data.minute,
+                            silver: result.data.silver,
+                            time_end: result.data.time_end,
+                            time_start: result.data.time_start
+                        }
+                    });
+                    if (!opened) {
+                        $('#head-info-panel').find('.treasure-info').html('已开始在本直播间自动领瓜子');
+                        Live.treasure.setNewTask(result.data.time_start, result.data.time_end, parseInt(result.data.minute, 10), parseInt(result.data.silver, 10));
+                    }
                 });
-            },
-            captchaKeyUp: function (event) {
-                event.keyCode === 13 && Live.treasure.getAward();
             },
             setNewTask: function (startTime, endTime, minute, award) {
                 Live.treasure.hidePanel();
@@ -1241,11 +1269,11 @@
                 Live.treasure.setCountdown(minute);
             },
             getAward: function () {
-                if (!Live.treasure.allowCtrl) {
-                    return;
-                }
+                if (!Live.treasure.allowCtrl) return;
+
                 Live.treasure.allowCtrl = false;
                 Live.treasure.awardBtn.awarding();
+
                 var img = Live.treasure.treasureTipAcquire.find('.captcha-img');
                 Live.treasure.context.clearRect(0, 0, Live.treasure.canvas.width, Live.treasure.canvas.height);
                 Live.treasure.context.drawImage(img[0], 0, 0);
@@ -1256,51 +1284,75 @@
                 var data = Live.treasure.taskInfo;
                 Live.treasure.captcha.userInput = Live.treasure.captcha.answer;
                 var captcha = Live.treasure.captcha.answer;
+                getAward(data.startTime, data.endTime, captcha);
 
-                $.get('http://live.bilibili.com/FreeSilver/getAward', { time_start: data.startTime, time_end: data.endTime, captcha: captcha }, function () {}, 'json').promise()
-                    .done(function (result) {
-                        if (result.code != 0) {
-                            Live.liveToast(Live.treasure.captchaInput[0], result.msg + Live.randomEmoji.helpless(), "info");
+                function getAward(time_start, time_end, captcha) {
+                    $.get('http://live.bilibili.com/FreeSilver/getAward', { time_start: time_start, time_end: time_end, captcha: captcha }, function () {}, 'json').promise()
+                        .done(function (result) {
+                            if (result.code == -99) {
+                                Live.treasure.allowCtrl = true;
+                                Live.treasure.captcha.refresh();
+                                Live.treasure.awardBtn.restore();
+                                setTimeout(function () {
+                                    chrome.extension.sendMessage({
+                                        command: "getCurrentTreasure"
+                                    }, function (response) {
+                                        console.log(request.data);
+                                        var startTime = request.data.time_start;
+                                        var endTime = response.data.time_end;
+                                        var minute = response.data.minute;
+                                        var award = response.data.silver;
+                                        Live.treasure.setNewTask(startTime, endTime, minute, award);
+                                    });
+                                }, 2000);
+                                return;
+                            } else if (result.code != 0) {
+                                Live.liveToast(Live.treasure.captchaInput[0], result.msg + Live.randomEmoji.helpless(), "info");
+                                Live.treasure.allowCtrl = true;
+                                Live.treasure.captcha.refresh();
+                                Live.treasure.awardBtn.restore();
+                                return;
+                            }
+
+                            // 如果是最后一次则结束宝箱.
+                            if (parseInt(result.data.isEnd, 10) === 1) {
+                                Live.treasure.makeFinished();
+                                return;
+                            }
+
+                            Live.liveToast(Live.treasure.captchaInput[0], "已成功领取 " + Live.treasure.taskInfo.award + " 银瓜子！" + Live.randomEmoji.happy(), "success");
+                            Live.treasure.updateCurrency(); // 更新银瓜子.
+                            Live.console.watcher('自动领瓜子 成功领取瓜子 ' + Live.treasure.taskInfo.award + ' 个')
+                            var msg = new Notification("自动领取成功", {
+                                body: "领取了" + Live.treasure.taskInfo.award + "个瓜子",
+                                icon: "//static.hdslb.com/live-static/images/7.png"
+                            });
+                            setTimeout(function () {
+                                msg.close();
+                            }, 10000);
+
+                            // 设置新的任务.
+                            Live.treasure.checkNewTask();
+                            Live.treasure.awardBtn.restore();
                             Live.treasure.allowCtrl = true;
+
+                        })
+                        .fail(function (xhrObject) {
+                            Live.liveToast($captchaInput[0], "系统错误，请稍后再试 " + Live.randomEmoji.sad(), "error");
                             Live.treasure.captcha.refresh();
                             Live.treasure.awardBtn.restore();
-                            return;
-                        }
-
-                        // 如果是最后一次则结束宝箱.
-                        if (parseInt(result.data.isEnd, 10) === 1) {
-                            Live.treasure.makeFinished();
-                            return;
-                        }
-
-                        Live.liveToast(Live.treasure.captchaInput[0], "已成功领取 " + Live.treasure.taskInfo.award + " 银瓜子！" + Live.randomEmoji.happy(), "success");
-                        Live.treasure.updateCurrency(); // 更新银瓜子.
-                        Live.console.watcher('自动领瓜子 成功领取瓜子 ' + Live.treasure.taskInfo.award + ' 个')
-                        var msg = new Notification("自动领取成功", {
-                            body: "领取了" + Live.treasure.taskInfo.award + "个瓜子",
-                            icon: "//static.hdslb.com/live-static/images/7.png"
+                            Live.treasure.allowCtrl = true;
+                            // MOCKING.
+                            // treasureCtrl.setNewTask(111, 222, 5, 10);
+                        })
+                        .always(function () {
+                            Live.treasure.captcha.userInput = "";
                         });
-                        setTimeout(function () {
-                            msg.close();
-                        }, 10000);
+                }
 
-                        // 设置新的任务.
-                        Live.treasure.checkNewTask();
-                        Live.treasure.awardBtn.restore();
-                        Live.treasure.allowCtrl = true;
+            },
+            getTreasureFromBG: function () {
 
-                    })
-                    .fail(function (xhrObject) {
-                        Live.liveToast($captchaInput[0], "系统错误，请稍后再试 " + Live.randomEmoji.sad(), "error");
-                        Live.treasure.captcha.refresh();
-                        Live.treasure.awardBtn.restore();
-                        Live.treasure.allowCtrl = true;
-                        // MOCKING.
-                        // treasureCtrl.setNewTask(111, 222, 5, 10);
-                    })
-                    .always(function () {
-                        Live.treasure.captcha.userInput = "";
-                    });
             },
             updateCurrency: function () {
                 if (isNaN(parseInt(Live.treasure.silverSeed, 10))) {
@@ -1323,7 +1375,7 @@
                         Live.treasure.treasureBox.find('.treasure-box').click();
                         setTimeout(function () {
                             Live.treasure.treasureTip.find('.acquiring-panel .get-award-btn').click();
-                        }, 1000);
+                        }, 2000);
                     }
                 });
                 Live.treasure.allowCtrl = true;
@@ -1338,10 +1390,10 @@
                 return q;
             },
             getCurrentTask: function () {
-                return $.get('http://live.bilibili.com/FreeSilver/getCurrentTask', { r: Math.random }, function () {}, 'json').promise();
+                return $.get('http://live.bilibili.com/FreeSilver/getCurrentTask', {}, function () {}, 'json').promise();
             },
             getSurplus: function () {
-                return $.get('http://live.bilibili.com/FreeSilver/getSurplus', { r: Math.random }, function () {}, 'json').promise();
+                return $.get('http://live.bilibili.com/FreeSilver/getSurplus', {}, function () {}, 'json').promise();
             },
             getCaptcha: function () {
                 return "http://live.bilibili.com/freeSilver/getCaptcha?ts=" + Date.now();
@@ -1402,7 +1454,7 @@
             init: function () {
                 Live.chat.chat_ctrl_panel = $('#chat-ctrl-panel');
                 Live.chat.counter = Live.chat.chat_ctrl_panel.find('.danmu-length-count');
-                chrome.extension.sendMessage({
+                chrome.runtime.sendMessage({
                     command: "getOption",
                     key: 'danmu',
                 }, function (response) {
@@ -1411,7 +1463,7 @@
                         setTimeout(Live.chat.initDanmu, 2000);
                     }
                 });
-                chrome.extension.sendMessage({
+                chrome.runtime.sendMessage({
                     command: "getOption",
                     key: 'chatDisplay',
                 }, function (response) {
@@ -1603,7 +1655,7 @@
                 });
             },
             initChatDisplay: function (isInit) {
-                chrome.extension.sendMessage({
+                chrome.runtime.sendMessage({
                     command: "getOption",
                     key: 'displayOption',
                 }, function (response) {
@@ -1668,7 +1720,7 @@
                     upInfo.url = location.href;
                     var notiseBtn = $('<div>').addClass('mid-part').append('<i class="live-icon-small favourite p-relative" style="top: 1px"></i><span>特别关注</span>').click(function () {
                         if ($(this).find('i').hasClass('favourited')) {
-                            chrome.extension.sendMessage({
+                            chrome.runtime.sendMessage({
                                 command: "setNotFavourite",
                                 id: upInfo.roomId
                             }, function (response) {
@@ -1678,7 +1730,7 @@
                                 }
                             });
                         } else {
-                            chrome.extension.sendMessage({
+                            chrome.runtime.sendMessage({
                                 command: "setFavourite",
                                 upInfo: upInfo
                             }, function (response) {
@@ -1687,7 +1739,7 @@
                             });
                         }
                     });
-                    chrome.extension.sendMessage({
+                    chrome.runtime.sendMessage({
                         command: "getFavourite"
                     }, function (response) {
                         if (response.data.indexOf(Live.getRoomId()) != -1) {
@@ -1721,7 +1773,7 @@
                 return Live.smallTV.tvs[roomId];
             },
             get: function (roomId) {
-                $.getJSON('/SmallTV/index', { roomid: roomId, _: (new Date()).getTime() }).promise().then(function (result) {
+                $.getJSON('/SmallTV/index', { roomid: roomId, _: (new Date()).getTime() }).promise().done(function (result) {
                     if (result.code == 0) { // 正在抽奖中
                         if (result.data.unjoin.length || result.data.join.length) {
                             // sTvVM.isShowPanel = true;
@@ -1739,7 +1791,7 @@
                             Live.smallTV.join(roomId, unjoin[index].id);
                         });
                     }
-                }, function (result) {
+                }).fail(function (result) {
                     Live.smallTV.get(roomId);
                 });
             },
@@ -1785,7 +1837,7 @@
                         if (result.data.reward.num) {
                             Live.console.watcher('小电视活动 直播间【' + roomId + '】 编号:' + tvId + ' 获得' + Live.smallTV.rewardList[result.data.reward.id] + "x" + result.data.reward.num);
                             if (Live.watcher.notifyOptions && Live.watcher.notifyOptions.tv) {
-                                chrome.extension.sendMessage({
+                                chrome.runtime.sendMessage({
                                     command: "getTVReward",
                                     data: {
                                         roomId: roomId,
@@ -1879,8 +1931,13 @@
             reward: {},
             count: 0,
             init: function () {
-                Live.summer.reward = Live.get('bilibili_helper_summer_reward') || {};
-                Live.summer.count = Live.get('bilibili_helper_summer_count') || 0;
+                try {
+                    Live.summer.reward = Live.get('bilibili_helper_summer_reward') || {};
+                    Live.set('bilibili_helper_summer_reward', Live.summer.reward);
+                    Live.summer.count = Live.get('bilibili_helper_summer_count') || 0;
+                } catch (e) {
+                    Live.set('bilibili_helper_summer_reward', {});
+                }
             },
             get: function (roomId) {
                 // var result = {
@@ -1955,7 +2012,7 @@
                                 Live.summer.lotteries[raffleId].reward = result.data;
                             } else {
                                 Live.console.watcher("刨冰活动 直播间【" + roomId + "】 编号:" + raffleId + " " + result.msg);
-                                Live.watcher.pushNotification('lottery', "直播间【" + roomId + "】刨冰抽奖结果", "编号:" + raffleId + " " + result.msg,"//static.hdslb.com/live-static/live-room/images/gift-section/gift-36.png");
+                                Live.watcher.pushNotification('lottery', "直播间【" + roomId + "】刨冰抽奖结果", "编号:" + raffleId + " " + result.msg, "//static.hdslb.com/live-static/live-room/images/gift-section/gift-36.png");
                             }
 
                             // if ((Live.summer.lotteryMap[roomId].length - 1) > Live.summer.iteratorMap[roomId]) {
@@ -1964,7 +2021,7 @@
                             //     Live.summer.join(roomId, raffleId);
                             // }
                         });
-                    }, Live.summer.lotteries[raffleId].time * 1000);
+                    }, (Live.summer.lotteries[raffleId].time + 50) * 1000);
                 }, function () {
                     Live.console.watcher('刨冰活动 直播间【' + roomId + '】 编号:' + raffleId + ' 参加抽奖信息失败');
                     Live.summer.join(roomId, raffleId);
@@ -2007,12 +2064,12 @@
                 'lottery': false
             },
             init: function () {
-                chrome.extension.sendMessage({
+                chrome.runtime.sendMessage({
                     command: "getOption",
                     key: 'watcher'
                 }, function (res) {
                     if (res['value'] == 'on') setTimeout(function () {
-                        chrome.extension.sendMessage({
+                        chrome.runtime.sendMessage({
                             command: "getWatcherRoom"
                         }, function (response) {
                             Live.watcherInfoDOM = $('<div class="room-info watcher-info">直播信息监控功能正在初始化</div>');
@@ -2021,7 +2078,7 @@
                                 //setWatcherRoom
                                 var roomId = Live.getRoomId();
                                 Live.getRoomInfo().done(function (data) {
-                                    chrome.extension.sendMessage({
+                                    chrome.runtime.sendMessage({
                                         command: "setWatcherRoom",
                                         data: {
                                             uid: data.data.UID,
@@ -2033,7 +2090,7 @@
                                         }
                                     });
                                 });
-                                chrome.extension.sendMessage({
+                                chrome.runtime.sendMessage({
                                     command: "getOption",
                                     key: 'watchList',
                                 }, function (response) {
@@ -2048,7 +2105,7 @@
                                         }
                                     });
                                     $(window).on('beforeunload', function () {
-                                        chrome.extension.sendMessage({
+                                        chrome.runtime.sendMessage({
                                             command: "delWatcherRoom"
                                         });
                                         console.log(0);
@@ -2062,13 +2119,13 @@
                                         Live.watcher.classify(message);
                                     });
                                 });
-                                chrome.extension.sendMessage({
+                                chrome.runtime.sendMessage({
                                     command: "getOption",
                                     key: 'watchNotify',
                                 }, function (response) {
                                     Live.watcher.notifyStatus = response['value'] == 'on';
                                 });
-                                chrome.extension.sendMessage({
+                                chrome.runtime.sendMessage({
                                     command: "getOption",
                                     key: 'watchNotifyList',
                                 }, function (response) {
@@ -2131,17 +2188,24 @@
             },
             dealWithSysGift: function (json) {
                 //"tips": "【正義の此方】在直播间【81688】内 赠送 刨冰共 100 个，触发 1 次刨冰雨抽奖，快去前往抽奖吧！"
-                var msg = json.tips;
-                // console.log(json,msg);
-                if (json.tips && msg[0] == "【" && json.url != "" && json.rep == 1) { //smallTV
-                    var reg = new RegExp("【([\\S]+)】在直播间【([\\d]+)】内 赠送 刨冰共 ([\\d]+)");
-                    var res = reg.exec(msg);
-                    var user = res[1];
-                    var roomUrl = res[2];
-                    var num = res[3];
-                    Live.getRoomIdByUrl(roomUrl, function (roomId) {
-                        Live.summer.get(roomId);
-                    });
+                try {
+
+                    var msg = json.tips;
+                    if (typeof msg != 'string') return;
+                    else if (msg.charAt(0) != '【') return;
+                    if (json.tips && msg[0] == "【" && json.url != "" && json.rep == 1) { //smallTV
+                        var reg = new RegExp("【([\\S]+)】在直播间【([\\d]+)】内 赠送 刨冰共 ([\\d]+)");
+                        var res = reg.exec(msg);
+                        var user = res[1];
+                        var roomUrl = res[2];
+                        var num = res[3];
+                        Live.getRoomIdByUrl(roomUrl, function (roomId) {
+                            Live.summer.get(roomId);
+                        });
+                    }
+                } catch (e) {
+                    console.log(e);
+                    return;
                 }
             },
             pushNotification: function (type, title, body, icon) {
@@ -2456,7 +2520,7 @@
         // };
         Live.init = {
             do: function () {
-                chrome.extension.sendMessage({
+                chrome.runtime.sendMessage({
                     command: "getOption",
                     key: 'version',
                 }, function (response) {
@@ -2468,7 +2532,7 @@
                 Live.clearLocalStorage();
                 Live.initUserInfo(function () {
                     if (Live.get('helper_userInfo', 'login')) {
-                        chrome.extension.sendMessage({
+                        chrome.runtime.sendMessage({
                             command: "getOption",
                             key: 'doSign',
                         }, function (response) {
