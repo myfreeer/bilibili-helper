@@ -771,13 +771,16 @@ if (localStorage.getItem("enabled") == null) {
     enableAll();
 }
 
-if (getOption("contextmenu") == "on") {
-}
+
+checkDynamic();
 
 if (window.navigator.userAgent.indexOf('Windows') < 0) {
     checkSecurePlayer();
 }
 
+chrome.alarms.create("checkDynamic", {
+    periodInMinutes: 10
+});
 function getLocale() {
     locale = 1;
 }
@@ -786,6 +789,16 @@ function checkVersion() {
 }
 
 getLocale();
+
+chrome.alarms.onAlarm.addListener(function (alarm) {
+    switch (alarm.name) {
+        case "checkDynamic":
+            checkDynamic();
+            return true;
+        default:
+            return false;
+    }
+});
 
 chrome.notifications.onButtonClicked.addListener(function (notificationId, index) {
     if (Live.notisesIdList[notificationId] != undefined) {
