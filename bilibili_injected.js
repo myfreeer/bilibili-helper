@@ -631,7 +631,7 @@
 												displayUserInfo(uid, JSON.parse(data));
 												return false;
 											}
-											$.getJSON('http://api.bilibili.cn/userinfo?mid=' + uid + '&type=json', function(data) {
+											$.getJSON('http://api.bilibili.com/userinfo?mid=' + uid + '&type=json', function(data) {
 												if (data.code == 0) {
 													sessionStorage.setItem('user/' + uid, JSON.stringify({
 														name: data.name,
