@@ -593,7 +593,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         case "getDownloadLink":
             var url = {
                 download: "http://interface.bilibili.com/playurl?appkey=" + appkey + "&cid=" + request.cid + "&otype=json&type=" + getOption("dlquality") + "&sign=" + md5("appkey=" + appkey + "&cid=" + request.cid + "&otype=json&type=" + getOption("dlquality") + appsec),
-                playback: "http://interface.bilibili.com/playurl?appkey=" + appkey + "&cid=" + request.cid + "&otype=json&type=" + getOption("dlquality") + "&sign=" + md5("appkey=" + appkey + "&cid=" + request.cid + "&otype=json&type=mp4" +  appsec)
+                playback: "http://interface.bilibili.com/playurl?appkey=" + appkey + "&cid=" + request.cid + "&otype=json&type=mp4" + "&sign=" + md5("appkey=" + appkey + "&cid=" + request.cid + "&otype=json&type=mp4" +  appsec)
             };
             if (request.cidHack && request.cidHack != locale) {
                 cidHackType[request.cid] = request.cidHack;
