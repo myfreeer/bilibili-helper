@@ -13,6 +13,10 @@ var notification = false,
 bangumi = false;
 var bkg_page = chrome.extension.getBackgroundPage();
 
+//https://www.blackglory.me/bilibili-video-source-get/
+var appkey = '85eb6835b0a1034e';
+var appsec = '2ad42749773c441109bdc0191257a664'
+
 Live.set = function (n, k, v) {
     if (!window.localStorage || !n) return;
     var storage = window.localStorage;
@@ -588,8 +592,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             return true;
         case "getDownloadLink":
             var url = {
-                download: "http://interface.bilibili.com/playurl?&cid=" + request.cid + "&from=miniplay&otype=json&player=1&sign=" + md5("cid=" + request.cid +"&from=miniplay&otype=json&player=11c15888dc316e05a15fdd0a02ed6584f"),
-                playback: "http://interface.bilibili.com/playurl?&cid=" + request.cid + "&from=miniplay&otype=json&player=1&sign=" + md5("cid=" + request.cid +"&from=miniplay&otype=json&player=11c15888dc316e05a15fdd0a02ed6584f")
+                download: "http://interface.bilibili.com/playurl?appkey=" + appkey + "&cid=" + request.cid + "&otype=json&type=" + getOption("dlquality") + "&sign=" + md5("appkey=" + appkey + "&cid=" + request.cid + "&otype=json&type=" + getOption("dlquality") + appsec),
+                playback: "http://interface.bilibili.com/playurl?appkey=" + appkey + "&cid=" + request.cid + "&otype=json&type=" + getOption("dlquality") + "&sign=" + md5("appkey=" + appkey + "&cid=" + request.cid + "&otype=json&type=mp4" +  appsec)
             };
             if (request.cidHack && request.cidHack != locale) {
                 cidHackType[request.cid] = request.cidHack;
