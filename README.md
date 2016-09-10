@@ -17,3 +17,7 @@ https://github.com/NightlyFantasy/Bili_Fix_Player (MIT License)
 https://github.com/zacyu/ABPlayerHTML5-bilibili-ver (MIT License)
 
 https://github.com/jabbany/CommentCoreLibrary (MIT License)
+
+https://github.com/blueimp/JavaScript-MD5 (MIT License)
+
+https://github.com/soimort/you-get (MIT license)
