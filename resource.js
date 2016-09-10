@@ -34,6 +34,7 @@ var defaultOptions = {
 	"watchList":"[]",
 	"watchNotify":"on",
 	"watchNotifyList":"[]",
+	"giftpackage":"on",
 };
 var cidCache = {};
 if(localStorage.getItem('cidCache') != null) {
