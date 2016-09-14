@@ -472,7 +472,7 @@
 			$('#bofqi').html('<div id="player_placeholder" class="player"></div>');
 			$('#bofqi').find('#player_placeholder').css({
 				background: 'url(' + biliHelper.videoPic + ') 50% 50% / cover no-repeat',
-				'-webkit-filter': 'blur(20px)',
+				'-webkit-filter': 'blur(10px)',
 				overflow: 'hidden',
 				visibility: 'visible'
 			});
