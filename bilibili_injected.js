@@ -164,17 +164,25 @@
 			biliHelper.downloadUrls = [];
 			biliHelper.playbackUrls = [];
 			notifyCidHack();
-			if (videoDownloadLink.result == "error" || typeof videoPlaybackLink === "undefined" || typeof videoPlaybackLink.durl === "undefined") {
-				if (typeof videoDownloadLink.message == "string") {
-					if (typeof videoPlaybackLink.message == "string") {
-						if (videoDownloadLink.message.indexOf("地区") > -1) {
+			if (videoDownloadLink.result.indexOf("error") >= 0 || typeof videoPlaybackLink == "undefined" || typeof videoPlaybackLink.durl == "undefined" || videoPlaybackLink.code <0) {
+				if (typeof videoDownloadLink.message == "string" || videoDownloadLink.result.indexOf("error") >= 0  || typeof videoDownloadLink.error_text == "string") {
+					if (typeof videoPlaybackLink.message == "string" || videoPlaybackLink.result.indexOf("error") >= 0  || typeof videoPlaybackLink.error_text == "string") {
+						try{if (videoDownloadLink.message.indexOf("地区") > -1) {
 							biliHelper.copyright = true;
 							if (forceCidHack || biliHelper.cidHack != 2) {
 								finishUp(2);
 								return false;
 							}
+						}} catch(e) {};
+						biliHelper.error = '错误: ' + videoDownloadLink.message + ' ' + videoDownloadLink.error_text + ' ' + videoPlaybackLink.result;
+						var errorMessage = biliHelper.error || "视频地址获取失败";
+						biliHelper.mainBlock.downloaderSection.find('p').html('<span></span>' + parseSafe(errorMessage));
+						if (biliHelper.replacePlayer && !biliHelper.redirectUrl && !biliHelper.genPage) {
+							biliHelper.switcher.swf();
+						} else {
+							biliHelper.switcher.original();
 						}
-						biliHelper.error = '错误: ' + videoDownloadLink.message;
+						biliHelper.favorHTML5 = false;
 						return false;
 					} else {
 						videoDownloadLink = videoPlaybackLink;
@@ -472,7 +480,7 @@
 			$('#bofqi').html('<div id="player_placeholder" class="player"></div>');
 			$('#bofqi').find('#player_placeholder').css({
 				background: 'url(' + biliHelper.videoPic + ') 50% 50% / cover no-repeat',
-				'-webkit-filter': 'blur(10px)',
+				'-webkit-filter': 'blur(5px)',
 				overflow: 'hidden',
 				visibility: 'visible'
 			});
