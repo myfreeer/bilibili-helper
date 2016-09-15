@@ -236,7 +236,8 @@
 						biliHelper.mainBlock.downloaderSection.find('p .b-btn.w').click();
 					});
 				}
-				biliHelper.mainBlock.downloaderSection.find('p').append($('<a class="b-btn" target="_blank" href="http://www.bilibilijj.com/Files/DownLoad/' + biliHelper.cid + '.mp3/www.bilibilijj.com.mp3?mp3=true"></a>').text('抽出并下载音频'));
+				biliHelper.mainBlock.downloaderSection.find('p').append($('<a class="b-btn" target="_blank" title="实验性功能，由bilibilijj提供，访问慢且不稳定" href="http://www.bilibilijj.com/Files/DownLoad/' + biliHelper.cid + '.mp3/www.bilibilijj.com.mp3?mp3=true"></a>').text('仅下载音频'));
+				biliHelper.mainBlock.downloaderSection.find('p').append($('<a class="b-btn" target="_blank" href="' + biliHelper.videoPic + '"></a>').text('封面'));
 			}
 			if (biliHelper.playbackUrls && biliHelper.playbackUrls.length == 1) {
 				biliHelper.mainBlock.switcherSection.find('a[type="html5"]').removeClass('hidden');
