@@ -32,6 +32,7 @@ var defaultOptions = {
 	"versionNotify":"on",
 	"watcher":"off",
 	"watchList":"[]",
+	"danmaku_filter":"[]",
 	"watchNotify":"on",
 	"watchNotifyList":"[]",
 	"giftpackage":"on",

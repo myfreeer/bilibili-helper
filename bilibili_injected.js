@@ -244,8 +244,45 @@
 			}
 			$('#loading-notice').fadeOut(300);
 			if (biliHelper.favorHTML5 && localStorage.getItem('bilimac_player_type') != 'force' && biliHelper.cid && biliHelper.playbackUrls && biliHelper.playbackUrls.length == 1 && biliHelper.playbackUrls[0].url.indexOf('m3u8') < 0) {
-				$('#loading-notice').fadeOut(300, function() {
-					biliHelper.switcher.html5();
+				$('#loading-notice').fadeOut(300, function() {					
+					// getCommentFilter is async. Let's prepare the filter right before the html5 player loads
+					chrome.extension.sendMessage({
+						command: 'getCommentFilter'
+					}, function(response){
+						try {
+							filters = JSON.parse(response);
+							console.log(response);
+						} catch(e) {
+							filters = [];
+							console.warn("Invalid filter record: "+response+"\n"+e);
+						}
+						// Pre-process the filters for (negligible?) better performance
+						var filters_categorized = {regex:[],text:[],color:[],user:[]};
+						for (var i = filters.length-1; i >= 0; i--) {
+							if (!filters[i].active) {
+								// Remove inactive rules
+								filters.splice(i,1);
+								continue;
+							}
+							// Use regex engine only for regex
+							if (filters[i].type=='text' && /\.|\[|\]|\(|\)|\*|\?|\||\\|\^|\$|\{|\}/.exec(filters[i].content)) {
+								try {
+									filters[i].content = new RegExp(filters[i].content);
+									filters[i].type='regex';
+								} catch (e) {
+									console.warn("Invalid regex `"+filters[i].content+"' treated as text\n"+e);
+								}
+							}
+							// Convert hex colors strings into integers
+							if (filters[i].type=='color') {
+								filters[i].content = 1*('0x'+filters[i].content); // Invalid hex becomes NaN
+							}
+							filters_categorized[filters[i].type].push(filters[i]);
+						}
+						filters = filters_categorized;
+						// Filters are ready, load the html5 player
+						biliHelper.switcher.html5();
+					});
 				});
 			} else if (biliHelper.replacePlayer) {
 				$('#loading-notice').fadeOut(300, function() {

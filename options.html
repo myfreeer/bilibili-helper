@@ -379,9 +379,10 @@ input[type="color"] {
 </style>
 </head>
 
+
 <body>
-	<div id="main_form" class="card">
-    	<div class="header">
+    <div id="main_form" class="card">
+        <div class="header">
         <img src="./imgs/icon-128.png" class="icon"><span id="menu_title"></span><span id="version"></span>
         </div>
         <ul id="options_form" class="options_form">
@@ -399,6 +400,10 @@ input[type="color"] {
                 <p>HTML5优先</p>
                 <div class="button html5" option="on">开启功能</div>
                 <div class="button html5" option="off">关闭功能</div>
+                <div class="option">
+                	<span class="title" style="margin-left: -120px">视频弹幕屏蔽</span>
+                	<div class="button danmaku_filter" style="margin-right: -120px;width: 200px">编辑屏蔽列表</div>
+                </div>
             </li>
             <li class="category">
                 <p>获取视频下载地址格式</p>
@@ -429,7 +434,7 @@ input[type="color"] {
                 <p id="ad_opacity_opt" class="little_opt">不透明度&nbsp;<input id="ad_opacity" type="range" min="0" max="1" step="0.01"></p>
             </li>
         </ul>
-        
+
     </div>
     <div id="live_form" class="card">
         <div class="header">
@@ -575,6 +580,7 @@ input[type="color"] {
             </li>
         </ul>
     </div>
+    <div id="main_panel" style="width:calc(100% - 508px)">
     <div id="about" class="card">
         <div id="update" style="display:none">
             <h1 class="title">发现新版本</h1>
@@ -593,6 +599,61 @@ input[type="color"] {
         <p>※ 本项目中使用的 HTML5 播放器中使用了来自 colpick.com 以 <a href="http://opensource.org/licenses/MIT" target="_blank">MIT许可协议</a> 和 <a href="http://opensource.org/licenses/GPL-3.0" target="_blank">GPL许可协议</a> 发布的 jQuery 插件 <a href="http://colpick.com/plugin" target="_blank">colpick Color Picker</a>。</p>
         <p>※ 本项目中使用的 ASS 格式弹幕转换脚本修改自 tiansh 以 <a href="http://www.mozilla.org/MPL/2.0/" target="_blank">Mozilla Public License 2.0</a> 发布的开源项目 <a href="https://github.com/tiansh/us-danmaku" target="_blank">us-danmaku</a>。</p>
         <p style="text-align:right">作者: <a href="http://weibo.com/guguke" target="_blank">@啾咕咕www</a><a href="http://weibo.com/ruo0037" target="_blank">@没睡醒的肉啊</a></p>
+    </div>
+
+        <div id="danmaku_filter_settings" class="card panel" style="margin-left: 782px;padding: 20px;width: 460px;display:none">
+            <style type="text/css">
+                #danmaku_filter_settings .button>span {
+                    margin: 2em 0.8em;
+                }
+                #danmaku_filter_settings table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                #danmaku_filter_settings td, #danmaku_filter_settings th {
+                    border: #ccc solid 1px;
+                    padding: 0.1em;
+                }
+                #danmaku_filter_settings #df_import {
+                    position: absolute;
+                    width: 68px;
+                    height: 20px;
+                    opacity: 0.0;
+                }
+                #danmaku_filter_settings #df_rulelist input[type=text] {
+                    height: 80%;
+                    width: calc(100% - 0.8em);
+                    font-family: monospace;
+                    border: none;
+                    border-bottom: 1px dashed #999;
+                }
+            </style>
+            <div class="button close-panel"><span>关闭</span></div>
+            <div class="button" id="df_save"><span>保存</span></div>
+            <div class="button" id="df_export"><span>导出XML</span></div>
+            <div class="button" id="df_download"><span>从B站导入</span></div>
+            <div class="button">
+                <input type="file" id="df_import"/>
+                <span>导入XML</span>
+            </div>
+            <br /><br />
+            <table>
+                <thead>
+                    <th style="width:6em"><input type="checkbox" id="df_selectall"/> 类型</th>
+                    <th>屏蔽内容</th>
+                    <th style="width:8em">操作</th>
+                </thead>
+                <tbody id="df_rulelist"></tbody>
+            </table>
+            <br />
+            <div class="button" id="df_insert_regex">新建文本(正则)规则</div>
+            <div class="button" id="df_insert_color">新建颜色规则</div>
+            <div class="button" id="df_insert_user">新建用户规则</div>
+            <br />
+            <div class="button" id="df_batch_delete">删除选中</div>
+            <div class="button" id="df_batch_enable">启用选中</div>
+            <div class="button" id="df_batch_disable">禁用选中</div>
+        </div>
     </div>
 </body>
 </html>

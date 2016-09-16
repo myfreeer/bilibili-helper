@@ -31,6 +31,6 @@
    "short_name": "__MSG_extShortName__",
    "options_page": "options.html",
    "permissions": [ "downloads", "alarms", "cookies", "notifications", "storage", "tabs", "webRequest", "webRequestBlocking", "*://*.bilibili.com/*", "*://*.bilibili.cn/*", "*://*.bilibili.tv/*", "*://*.letv.cn/*", "http://*.hdslb.com/*", "http://*.acgvideo.com/*", "*://*.guguke.net/*" ],
-   "version": "0.8.16.4",
+   "version": "0.8.16.5",
    "web_accessible_resources": [ "bilibili-helper.woff", "template.html", "imgs/icon-32.png", "imgs/loading.gif", "imgs/jinkela.png", "imgs/loading.gif", "imgs/helper-neko.png","imgs/icon.png", "options.html", "imgs/menu-icon.png", "live.css", "live-content-script.js" ]
 }

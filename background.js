@@ -253,7 +253,7 @@ function resolvePlaybackLink(avPlaybackLink, callback) {
         return false;
     }
     if (typeof avPlaybackLink.durl[0].backup_url == 'object' &&
-      avPlaybackLink.durl[0].backup_url.length) {
+    avPlaybackLink.durl[0].backup_url.length && avPlaybackLink.durl[0].url.indexOf('hd.mp4') < 0) {
       avPlaybackLink.durl[0].backup_url.forEach(function(url) {
         if (url.indexOf('hd.mp4') > -1) {
           avPlaybackLink.durl[0].url = url;
@@ -694,6 +694,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     }
                 });
             return true;
+         case 'getCommentFilter':
+             sendResponse(bkg_page.getOption('danmaku_filter'));
+             return true;
         case "getTVReward":
             var rewardStr = '',
                 lost = "很遗憾，此次您没有中奖";
