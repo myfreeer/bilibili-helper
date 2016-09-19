@@ -250,8 +250,8 @@
 						command: 'getCommentFilter'
 					}, function(response){
 						try {
-							//filters = JSON.parse(response);
-							console.log(response);
+							filters = JSON.parse(response);
+							//console.log(response);
 						} catch(e) {
 							filters = [];
 							console.warn("Invalid filter record: "+response+"\n"+e);
