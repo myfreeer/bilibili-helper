@@ -251,7 +251,7 @@
 					}, function(response){
 						try {
 							filters = JSON.parse(response);
-							//console.log(response);
+							console.log(response);
 						} catch(e) {
 							filters = [];
 							console.warn("Invalid filter record: "+response+"\n"+e);
@@ -579,6 +579,7 @@
 						biliHelper.mainBlock.errorSection = $('<div class="section error"><h3>Cid 获取失败</h3><p><span></span><span>' + parseSafe(biliHelper.error) + '</span></p></div>');
 						biliHelper.mainBlock.append(biliHelper.mainBlock.errorSection);
 						$('#loading-notice').fadeOut(300);
+						biliHelper.switcher.original();
 					}
 				} else {
 					if (!isNaN(biliHelper.cid) && biliHelper.originalPlayer) biliHelper.originalPlayer.replace('cid=' + biliHelper.cid, 'cid=' + videoInfo.cid);
@@ -757,6 +758,7 @@
 					biliHelper.error = '错误' + videoInfo.code + ': ' + videoInfo.error;
 					biliHelper.mainBlock.errorSection = $('<div class="section error"><h3>Cid 获取失败</h3><p><span></span><span>' + parseSafe(biliHelper.error) + '</span></p></div>');
 					biliHelper.mainBlock.append(biliHelper.mainBlock.errorSection);
+					biliHelper.switcher.original();
 					return false;
 				}
 
