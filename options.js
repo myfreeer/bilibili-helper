@@ -1,17 +1,17 @@
-$(document).ready(function () {
-    var bkg_page   = chrome.extension.getBackgroundPage();
-    var Live       = {}
+$(document).ready(function() {
+    var bkg_page = chrome.extension.getBackgroundPage();
+    var Live = {}
     document.title = chrome.i18n.getMessage('extShortName') + " - " + chrome.i18n.getMessage('optionPage');
 
-    Live.set = function (n, k, v) {
+    Live.set = function(n, k, v) {
         if (!window.localStorage || !n) return;
         var storage = window.localStorage;
-        if (!storage[n])storage[n] = JSON.stringify({});
+        if (!storage[n]) storage[n] = JSON.stringify({});
         var l = JSON.parse(storage[n]);
         if (v == undefined) {
-            storage[n] = typeof k == 'string'? k.trim():JSON.stringify(k);
+            storage[n] = typeof k == 'string' ? k.trim() : JSON.stringify(k);
         } else {
-            l[k] = typeof v == 'string'?v.trim():JSON.stringify(v);
+            l[k] = typeof v == 'string' ? v.trim() : JSON.stringify(v);
             storage[n] = JSON.stringify(l);
         }
     };
@@ -29,10 +29,10 @@ $(document).ready(function () {
         if (l[k] == 'true' || l[k] == 'false') l[k] = JSON.parse(l[k]);
         return l[k];
     };
-    
-    Live.del = function (n, k) {
-        if (!window.localStorage || n==undefined || window.localStorage[n]==undefined) return;
-        if(k == undefined) {
+
+    Live.del = function(n, k) {
+        if (!window.localStorage || n == undefined || window.localStorage[n] == undefined) return;
+        if (k == undefined) {
             window.localStorage.removeItem(n);
             return;
         }
@@ -40,10 +40,12 @@ $(document).ready(function () {
         delete l[k];
         window.localStorage[n] = JSON.stringify(l);
     };
+
     function each(obj, fn) {
         if (!fn) return;
         if (obj instanceof Array) {
-            var i = 0, len = obj.length;
+            var i = 0,
+                len = obj.length;
             for (; i < len; i++) {
                 if (fn.call(obj[i], i) == false)
                     break;
@@ -78,34 +80,34 @@ $(document).ready(function () {
     $("div[option=\"" + bkg_page.getOption("chatDisplay") + "\"].chatDisplay").addClass("on");
     var c_options = JSON.parse(bkg_page.getOption("displayOption"));
     $(".display-option .option .button[option=off]").addClass("on");
-    each(c_options,function(i){
-        $(".display-option .option ."+c_options[i]+"[option=\"off\"]").removeClass("on");
-        $(".display-option .option ."+c_options[i]+"[option=\"on\"]").addClass("on");
+    each(c_options, function(i) {
+        $(".display-option .option ." + c_options[i] + "[option=\"off\"]").removeClass("on");
+        $(".display-option .option ." + c_options[i] + "[option=\"on\"]").addClass("on");
     });
 
     //watcher-options
     $("div[option=\"" + bkg_page.getOption("watcher") + "\"].watcher").addClass("on");
     var w_options = JSON.parse(bkg_page.getOption("watchList"));
     $(".watcher-option .option .button[option=off]").addClass("on");
-    each(w_options,function(i){
-        $(".watcher-option .option ."+w_options[i]+"[option=\"off\"]").removeClass("on");
-        $(".watcher-option .option ."+w_options[i]+"[option=\"on\"]").addClass("on");
+    each(w_options, function(i) {
+        $(".watcher-option .option ." + w_options[i] + "[option=\"off\"]").removeClass("on");
+        $(".watcher-option .option ." + w_options[i] + "[option=\"on\"]").addClass("on");
     });
 
     //watcher-notify
     $("div[option=\"" + bkg_page.getOption("watchNotify") + "\"].watchNotify").addClass("on");
     var wn_options = JSON.parse(bkg_page.getOption("watchNotifyList"));
     $(".watcher-notify-option .option .button[option=off]").addClass("on");
-    each(wn_options,function(i){
-        $(".watcher-notify-option .option ."+wn_options[i]+"[option=\"off\"]").removeClass("on");
-        $(".watcher-notify-option .option ."+wn_options[i]+"[option=\"on\"]").addClass("on");
+    each(wn_options, function(i) {
+        $(".watcher-notify-option .option ." + wn_options[i] + "[option=\"off\"]").removeClass("on");
+        $(".watcher-notify-option .option ." + wn_options[i] + "[option=\"on\"]").addClass("on");
     });
 
     var adOption = bkg_page.getOption("ad");
     $("div[option=\"" + adOption + "\"].ad").addClass("on");
     if (adOption == "fade") $("#ad_opacity_opt").show();
     $("#ad_opacity").val(bkg_page.getOption("ad_opacity"));
-    $('.ad').click(function () {
+    $('.ad').click(function() {
         if ($(this).hasClass('on')) return false;
         $('.ad').removeClass('on');
         $(this).addClass('on');
@@ -114,7 +116,7 @@ $(document).ready(function () {
         bkg_page.setOption("ad", $(this).attr("option"), true);
         updatepreview();
     });
-    $('#ad_opacity').change(function () {
+    $('#ad_opacity').change(function() {
         bkg_page.setOption("ad_opacity", $(this).val(), true);
         updatepreview();
     });
@@ -126,54 +128,54 @@ $(document).ready(function () {
      $(this).addClass('on');
      bkg_page.setOption("support", $(this).attr("option"));
      });*/
-    $('.dynamic').click(function () {
+    $('.dynamic').click(function() {
         if ($(this).hasClass('on')) return false;
         $('.dynamic').removeClass('on');
         $(this).addClass('on');
         bkg_page.setOption("dynamic", $(this).attr("option"));
     });
-    $('.replace').click(function () {
+    $('.replace').click(function() {
         if ($(this).hasClass('on')) return false;
         $('.replace').removeClass('on');
         $(this).addClass('on');
         bkg_page.setOption("replace", $(this).attr("option"));
     });
-    $('.html5').click(function () {
+    $('.html5').click(function() {
         if ($(this).hasClass('on')) return false;
         $('.html5').removeClass('on');
         $(this).addClass('on');
         bkg_page.setOption("html5", $(this).attr("option"));
     });
-    $('.contextmenu').click(function () {
+    $('.contextmenu').click(function() {
         if ($(this).hasClass('on')) return false;
         $('.contextmenu').removeClass('on');
         $(this).addClass('on');
         bkg_page.setOption("contextmenu", $(this).attr("option"));
         if ($(this).attr("option") == 'on') {
             chrome.contextMenus.create({
-                title   : chrome.i18n.getMessage('searchBili'),
+                title: chrome.i18n.getMessage('searchBili'),
                 contexts: ["selection"],
-                onclick : bkg_page.searchBilibili
+                onclick: bkg_page.searchBilibili
             });
         } else {
             chrome.contextMenus.removeAll();
         }
     });
-    $('.dlquality').click(function () {
+    $('.dlquality').click(function() {
         if ($(this).hasClass('on')) return false;
         $('.dlquality').removeClass('on');
         $(this).addClass('on');
         bkg_page.setOption("dlquality", $(this).attr("option"));
         // updatepreview();
     });
-    $('.indexversion').click(function () {
+    $('.indexversion').click(function() {
         if ($(this).hasClass('on')) return false;
         $('.indexversion').removeClass('on');
         $(this).addClass('on');
         bkg_page.setOption("indexversion", $(this).attr("option"));
         // updatepreview();
     });
-    $('.rel_search').click(function () {
+    $('.rel_search').click(function() {
         if ($(this).hasClass('on')) return false;
         $('.rel_search').removeClass('on');
         $(this).addClass('on');
@@ -181,15 +183,15 @@ $(document).ready(function () {
         // updatepreview();
     });
     $('.danmaku_filter').click(function() {
-        $('#main_panel>div').css('display','none');
-        $('#main_panel>#danmaku_filter_settings').css('display','block');
-        window.scrollTo(0,0);
+        $('#main_panel>div').css('display', 'none');
+        $('#main_panel>#danmaku_filter_settings').css('display', 'block');
+        window.scrollTo(0, 0);
     });
     $('.close-panel').click(function() {
-        $('#main_panel>div').css('display','none');
-        $('#main_panel>#about').css('display','block');
+        $('#main_panel>div').css('display', 'none');
+        $('#main_panel>#about').css('display', 'block');
     });
-    
+
     /* Begin Danmaku-filter control script */
     var danmaku_filter = {
         list: document.querySelector('#df_rulelist'), // the rules table
@@ -208,8 +210,12 @@ $(document).ready(function () {
         updateList: function() {
             // Re-render the filter list HTML element
             danmaku_filter.list.innerHTML = '';
-            var type_names = {"text":"文本","color":"颜色","user":"用户"};
-            for (var i=0; i<danmaku_filter.filters.length; i++) {
+            var type_names = {
+                "text": "文本",
+                "color": "颜色",
+                "user": "用户"
+            };
+            for (var i = 0; i < danmaku_filter.filters.length; i++) {
                 var rule = danmaku_filter.filters[i];
                 var row = document.createElement('tr'),
                     cell_type = document.createElement('td'),
@@ -221,8 +227,8 @@ $(document).ready(function () {
                 }
 
                 var select_checkbox = document.createElement('input');
-                select_checkbox.type='checkbox';
-                if (danmaku_filter.selected.indexOf(i)!=-1) {
+                select_checkbox.type = 'checkbox';
+                if (danmaku_filter.selected.indexOf(i) != -1) {
                     select_checkbox.checked = true;
                 }
                 select_checkbox.addEventListener('change', danmaku_filter.selectItem.bind(select_checkbox, i));
@@ -232,7 +238,7 @@ $(document).ready(function () {
                 cell_type.appendChild(text_type);
 
                 var edit_content = document.createElement('input');
-                edit_content.type='text';
+                edit_content.type = 'text';
                 edit_content.value = rule.content;
                 edit_content.addEventListener('input', danmaku_filter.setItemContent.bind(edit_content, i));
                 cell_content.appendChild(edit_content);
@@ -280,7 +286,9 @@ $(document).ready(function () {
             danmaku_filter.updateList();
         },
         deleteItem: function(indexes) {
-            indexes.sort(function(a,b){return b-a;});
+            indexes.sort(function(a, b) {
+                return b - a;
+            });
             indexes.forEach(function(index) {
                 danmaku_filter.filters.splice(index, 1);
             });
@@ -314,21 +322,20 @@ $(document).ready(function () {
             });
             danmaku_filter.updateList();
         },
-        importBili: function() {
-            var type_values = {"keyword":"text","user":"user","color":"color"};
-            $.get('http://interface.bilibili.com/blocklist?random='+Math.random(), function(xmlData) {
-                danmaku_filter.filters = [];
-                xmlData.querySelectorAll('filter>f').forEach(function(rule) {
-                    danmaku_filter.filters.push(new danmaku_filter.Rule(type_values[rule.getAttribute('t')], rule.innerHTML));
-                });
-                danmaku_filter.updateList();
+        importOnline: function(uri) {
+            $.get(uri, function(xmlData) {
+            danmaku_filter.importXML(xmlData);
             });
         },
         exportXML: function() {
             var data = "<filters>\n";
-            var type_symbols = {"text":"t","color":"c","user":"u"};
+            var type_symbols = {
+                "text": "t",
+                "color": "c",
+                "user": "u"
+            };
             danmaku_filter.filters.forEach(function(rule) {
-                data += "\t<item enabled=\""+rule.active+"\">"+type_symbols[rule.type]+"="+rule.content+"</item>\n";
+                data += "\t<item enabled=\"" + rule.active + "\">" + type_symbols[rule.type] + "=" + rule.content + "</item>\n";
             });
             data += "</filters>";
             return data;
@@ -344,9 +351,25 @@ $(document).ready(function () {
             $('#df_save').click(function() {
                 bkg_page.setOption('danmaku_filter', JSON.stringify(danmaku_filter.filters));
             });
+            $('#dfhttp_export').click(function() {
+                swal({
+                    title: "在此输入链接地址：",
+                    type: 'input',
+                    showCancelButton: true,
+                    confirmButtonText: "确定",
+                    cancelButtonText: "取消",
+                }, function(inputValue) {
+                    danmaku_filter.importOnline(inputValue);
+                });
+            });
             $('#df_export').click(function() {
-                var xmlBlob = new Blob([danmaku_filter.exportXML()],{type:'text/xml'});
-                chrome.downloads.download({url:URL.createObjectURL(xmlBlob),filename:'tv.bilibili.player.xml'});
+                var xmlBlob = new Blob([danmaku_filter.exportXML()], {
+                    type: 'text/xml'
+                });
+                chrome.downloads.download({
+                    url: URL.createObjectURL(xmlBlob),
+                    filename: 'tv.bilibili.player.xml'
+                });
             });
             document.querySelector('#df_import').addEventListener('change', function(evt) {
                 var reader = new FileReader();
@@ -356,7 +379,7 @@ $(document).ready(function () {
                 reader.readAsText(evt.target.files[0]);
             });
             $('#df_download').click(function() {
-                danmaku_filter.importBili();
+                danmaku_filter.importOnline('http://interface.bilibili.com/blocklist?random=' + Math.random());
             });
             $('#df_insert_regex').click(function() {
                 danmaku_filter.insertEntry('text');
@@ -368,9 +391,16 @@ $(document).ready(function () {
                 danmaku_filter.insertEntry('user');
             });
             $('#df_batch_delete').click(function() {
-                if (confirm('确认删除'+danmaku_filter.selected.length+'项过滤规则?')) {
+                swal({
+                    title: '确认删除' + danmaku_filter.selected.length + '项过滤规则?',
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "确认",
+                    cancelButtonText: "取消"
+                }, function() {
                     danmaku_filter.deleteItem(danmaku_filter.selected);
-                }
+                });
             });
             $('#df_batch_enable').click(function() {
                 danmaku_filter.enableItem(danmaku_filter.selected, true);
@@ -391,35 +421,35 @@ $(document).ready(function () {
     };
     danmaku_filter.init();
     /* End Danmaku-filter control script */
-    $('.doSign').click(function () {
+    $('.doSign').click(function() {
         if ($(this).hasClass('on')) return false;
         $('.doSign').removeClass('on');
         $(this).addClass('on');
         bkg_page.setOption("doSign", $(this).attr("option"));
         // updatepreview();
     });
-    $('.autoTreasure').click(function () {
+    $('.autoTreasure').click(function() {
         if ($(this).hasClass('on')) return false;
         $('.autoTreasure').removeClass('on');
         $(this).addClass('on');
         bkg_page.setOption("autoTreasure", $(this).attr("option"));
         // updatepreview();
     });
-    $('.danmu').click(function () {
+    $('.danmu').click(function() {
         if ($(this).hasClass('on')) return false;
         $('.danmu').removeClass('on');
         $(this).addClass('on');
         bkg_page.setOption("danmu", $(this).attr("option"));
         // updatepreview();
     });
-    $('.giftpackage').click(function () {
+    $('.giftpackage').click(function() {
         if ($(this).hasClass('on')) return false;
         $('.giftpackage').removeClass('on');
         $(this).addClass('on');
         bkg_page.setOption("giftpackage", $(this).attr("option"));
         // updatepreview();
     });
-    $('.liveNotification').click(function () {
+    $('.liveNotification').click(function() {
         if ($(this).hasClass('on')) return false;
         $('.liveNotification').removeClass('on');
         $(this).addClass('on');
@@ -427,90 +457,91 @@ $(document).ready(function () {
 
         if (bkg_page.getOption("liveNotification") != 'on') {
             clearInterval(bkg_page.Live.notise.intervalNum);
-        }else if (bkg_page.getOption("liveNotification") == 'on') {
+        } else if (bkg_page.getOption("liveNotification") == 'on') {
             bkg_page.Live.notise.init();
         }
         // updatepreview();
     });
-    $('.chatDisplay').click(function () {
+    $('.chatDisplay').click(function() {
         if ($(this).hasClass('on')) return false;
         $('.chatDisplay').removeClass('on');
         $(this).addClass('on');
         bkg_page.setOption("chatDisplay", $(this).attr("option"));
         // updatepreview();
     });
-    $('.chat-display .display-option .option .button').click(function(){
+    $('.chat-display .display-option .option .button').click(function() {
         var classes = $(this).attr('class').split(' ')[1];
         if ($(this).hasClass('on')) return false;
-        $('.'+classes).removeClass('on');
+        $('.' + classes).removeClass('on');
         $(this).addClass('on');
         var displayOption = JSON.parse(bkg_page.getOption("displayOption"));
         var type = $(this).attr('option');
-        if(type == "on"){
+        if (type == "on") {
             var index = displayOption.indexOf(classes);
-            if(index == -1) displayOption.push(classes);
-        }else{
+            if (index == -1) displayOption.push(classes);
+        } else {
             var index = displayOption.indexOf(classes);
-            if(index != -1) displayOption.splice(index,1);
+            if (index != -1) displayOption.splice(index, 1);
         }
         bkg_page.setOption("displayOption", JSON.stringify(displayOption));
     });
-    $('.watcher').click(function () {
+    $('.watcher').click(function() {
         if ($(this).hasClass('on')) return false;
         $('.watcher').removeClass('on');
         $(this).addClass('on');
         bkg_page.setOption("watcher", $(this).attr("option"));
         // updatepreview();
     });
-    $('.watcher-options .watcher-option .option .button').click(function(){
+    $('.watcher-options .watcher-option .option .button').click(function() {
         var classes = $(this).attr('class').split(' ')[1];
         if ($(this).hasClass('on')) return false;
-        $('.watcher-options .'+classes).removeClass('on');
+        $('.watcher-options .' + classes).removeClass('on');
         $(this).addClass('on');
         var watchList = JSON.parse(bkg_page.getOption("watchList"));
         var type = $(this).attr('option');
-        if(type == "on"){
+        if (type == "on") {
             var index = watchList.indexOf(classes);
-            if(index == -1) watchList.push(classes);
-        }else{
+            if (index == -1) watchList.push(classes);
+        } else {
             var index = watchList.indexOf(classes);
-            if(index != -1) watchList.splice(index,1);
+            if (index != -1) watchList.splice(index, 1);
         }
         bkg_page.setOption("watchList", JSON.stringify(watchList));
     });
-    $('.watchNotify').click(function () {
+    $('.watchNotify').click(function() {
         if ($(this).hasClass('on')) return false;
         $('.watchNotify').removeClass('on');
         $(this).addClass('on');
         bkg_page.setOption("watchNotify", $(this).attr("option"));
         // updatepreview();
     });
-    $('.watcher-notify-options .watcher-notify-option .option .button').click(function(){
+    $('.watcher-notify-options .watcher-notify-option .option .button').click(function() {
         var classes = $(this).attr('class').split(' ')[1];
         if ($(this).hasClass('on')) return false;
-        $('.watcher-notify-options .'+classes).removeClass('on');
+        $('.watcher-notify-options .' + classes).removeClass('on');
         $(this).addClass('on');
         var watchNotifyList = JSON.parse(bkg_page.getOption("watchNotifyList"));
         var type = $(this).attr('option');
-        if(type == "on"){
+        if (type == "on") {
             var index = watchNotifyList.indexOf(classes);
-            if(index == -1) watchNotifyList.push(classes);
-        }else{
+            if (index == -1) watchNotifyList.push(classes);
+        } else {
             var index = watchNotifyList.indexOf(classes);
-            if(index != -1) watchNotifyList.splice(index,1);
+            if (index != -1) watchNotifyList.splice(index, 1);
         }
         bkg_page.setOption("watchNotifyList", JSON.stringify(watchNotifyList));
     });
+
     function initUpList() {
-        var list    = Live.get('favouritesList');
-        var idList  = Live.get('favouritesIdList');
+        var list = Live.get('favouritesList');
+        var idList = Live.get('favouritesIdList');
         var ListDom = $('#up-list');
-        each(list, function (i) {
+        each(list, function(i) {
             var upInfo = list[i];
-            var del    = $('<button class="button on delete" />').text('取消关注')
-            var l      = $('<li />').attr('roomId', upInfo.roomId).append($('<span class="upName"/>').text(upInfo.upName), del);
+            var del = $('<button class="button on delete" />').text('取消关注')
+            var l = $('<li />').attr('roomId', upInfo.roomId).append($('<span class="upName"/>').text(upInfo.upName), del);
             ListDom.append(l);
-            del.click(function () {
+            del.click(function() {
                 var index = idList.indexOf(parseInt(i));
                 if (index != -1) {
                     idList.splice(index, 1);
@@ -524,9 +555,10 @@ $(document).ready(function () {
     }
 
     initUpList();
+
     function getQueryVariable(variable) {
         var query = window.location.search.substring(1);
-        var vars  = query.split('&');
+        var vars = query.split('&');
         for (var i = 0; i < vars.length; i++) {
             var pair = vars[i].split('=');
             if (decodeURIComponent(pair[0]) == variable) {
@@ -541,8 +573,8 @@ $(document).ready(function () {
         }
         var date = new Date((parseInt(timestamp)) * 1000),
             year, month, day, hour, minute, second;
-        year     = String(date.getFullYear());
-        month    = String(date.getMonth() + 1);
+        year = String(date.getFullYear());
+        month = String(date.getMonth() + 1);
         if (month.length == 1) month = "0" + month;
         day = String(date.getDate());
         if (day.length == 1) day = "0" + day;
