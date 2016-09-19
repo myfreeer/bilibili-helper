@@ -250,7 +250,7 @@
 						command: 'getCommentFilter'
 					}, function(response){
 						try {
-							filters = JSON.parse(response);
+							//filters = JSON.parse(response);
 							console.log(response);
 						} catch(e) {
 							filters = [];
