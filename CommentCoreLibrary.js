@@ -1612,6 +1612,7 @@ function BilibiliParser(xmlDoc, text, warn){
 	// True for good, false for bad
 	var filtercache = {};
 	function filterComment(cmt) {
+		if (filters.length == 0) return false;
 		for (var i = 0; i < filters.color.length; i++) {
 			if (cmt.color == filters.color[i].content) {
 				return false;

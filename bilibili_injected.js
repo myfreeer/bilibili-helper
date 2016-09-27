@@ -164,7 +164,6 @@
 			biliHelper.downloadUrls = [];
 			biliHelper.playbackUrls = [];
 			notifyCidHack();
-			console.log(Number(videoPlaybackLink.code) < 0);
 			if (typeof videoPlaybackLink == "undefined" || typeof videoPlaybackLink.durl == "undefined" || Number(videoPlaybackLink.code) < 0) {
 				if (typeof videoDownloadLink.message == "string" || videoDownloadLink.result.indexOf("error") >= 0  || typeof videoDownloadLink.error_text == "string") {
 					if (typeof videoPlaybackLink.message == "string" || videoPlaybackLink.result.indexOf("error") >= 0  || typeof videoPlaybackLink.error_text == "string") {
@@ -237,7 +236,7 @@
 						biliHelper.mainBlock.downloaderSection.find('p .b-btn.w').click();
 					});
 				}
-				biliHelper.mainBlock.downloaderSection.find('p').append($('<a class="b-btn" target="_blank" title="实验性功能，由bilibilijj提供，访问慢且不稳定" href="http://www.bilibilijj.com/Files/DownLoad/' + biliHelper.cid + '.mp3/www.bilibilijj.com.mp3?mp3=true"></a>').text('仅下载音频'));
+				biliHelper.mainBlock.downloaderSection.find('p').append($('<a class="b-btn" target="_blank" title="实验性功能，由bilibilijj提供，访问慢且不稳定" href="http://www.bilibilijj.com/Files/DownLoad/' + biliHelper.cid + '.mp3/www.bilibilijj.com.mp3?mp3=true"></a>').text('音频'));
 				biliHelper.mainBlock.downloaderSection.find('p').append($('<a class="b-btn" target="_blank" href="' + biliHelper.videoPic + '"></a>').text('封面'));
 			}
 			if (biliHelper.playbackUrls && biliHelper.playbackUrls.length == 1) {
@@ -736,7 +735,7 @@
 								$('.player-wrapper .arc-toolbar').append(biliHelper.helperBlock);
 							});
 							biliHelperFunc();
-						}, 800);
+						}, biliHelper.genPage ? 1000 : 500);
 					});
 					return false;
 				}
