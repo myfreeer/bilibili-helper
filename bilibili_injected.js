@@ -164,7 +164,8 @@
 			biliHelper.downloadUrls = [];
 			biliHelper.playbackUrls = [];
 			notifyCidHack();
-			if (videoDownloadLink.result.indexOf("error") >= 0 || typeof videoPlaybackLink == "undefined" || typeof videoPlaybackLink.durl == "undefined" || videoPlaybackLink.code <0) {
+			console.log(Number(videoPlaybackLink.code) < 0);
+			if (typeof videoPlaybackLink == "undefined" || typeof videoPlaybackLink.durl == "undefined" || Number(videoPlaybackLink.code) < 0) {
 				if (typeof videoDownloadLink.message == "string" || videoDownloadLink.result.indexOf("error") >= 0  || typeof videoDownloadLink.error_text == "string") {
 					if (typeof videoPlaybackLink.message == "string" || videoPlaybackLink.result.indexOf("error") >= 0  || typeof videoPlaybackLink.error_text == "string") {
 						try{if (videoDownloadLink.message.indexOf("地区") > -1) {
@@ -735,7 +736,7 @@
 								$('.player-wrapper .arc-toolbar').append(biliHelper.helperBlock);
 							});
 							biliHelperFunc();
-						}, 500);
+						}, 800);
 					});
 					return false;
 				}
