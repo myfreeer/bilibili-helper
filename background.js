@@ -15,8 +15,9 @@ var bkg_page = chrome.extension.getBackgroundPage();
 
 //https://www.blackglory.me/bilibili-video-source-get/
 var appkey = '85eb6835b0a1034e';
-var appsec = '2ad42749773c441109bdc0191257a664'
-
+var appsec = '2ad42749773c441109bdc0191257a664';
+//https://github.com/soimort/you-get/blob/develop/src/you_get/extractors/bilibili.py
+var SECRETKEY_MINILOADER = '1c15888dc316e05a15fdd0a02ed6584f';
 Live.set = function (n, k, v) {
     if (!window.localStorage || !n) return;
     var storage = window.localStorage;
@@ -592,7 +593,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             return true;
         case "getDownloadLink":
             var url = {
-                download: "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + appsec),
+                download: getOption("dlquality") == 'flv' ? "http://interface.bilibili.com/playurl?&cid=" + request.cid + "&from=miniplay&otype=json&player=1&sign=" + md5("cid=" + request.cid + "&from=miniplay&otype=json&player=1" + SECRETKEY_MINILOADER) : "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + appsec),
                 playback: "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" +  appsec)
             };
             if (request.cidHack && request.cidHack != locale) {

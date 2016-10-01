@@ -611,15 +611,7 @@
 						biliHelper.mainBlock.commentSection = commentDiv;
 						biliHelper.mainBlock.append(biliHelper.mainBlock.commentSection);
 						$.get('http://comment.bilibili.com/' + biliHelper.cid + '.xml', function(response) {
-							var /*assData = '\ufeff' + generateASS(setPosition(parseXML('', response)), {
-									'title': getNiceSectionFilename(biliHelper.avid, biliHelper.page, biliHelper.totalPage, 1, 1),
-									'ori': location.href
-								}),
-								assBlob = new Blob([assData], {
-									type: 'application/octet-stream'
-								}),
-								assUrl = window.URL.createObjectURL(assBlob),*/
-								assBtn = $('<a class="b-btn w">下载 ASS 格式弹幕</a>').attr('download', downloadFileName.replace('.xml', '.ass')).attr('href', null).click(function(e) {
+							var assBtn = $('<a class="b-btn w">下载 ASS 格式弹幕</a>').attr('download', downloadFileName.replace('.xml', '.ass')).attr('href', null).click(function(e) {
 									var assData = '\ufeff' + generateASS(setPosition(parseXML('', response)), {
 									'title': getNiceSectionFilename(biliHelper.avid, biliHelper.page, biliHelper.totalPage, 1, 1),
 									'ori': location.href
@@ -745,7 +737,7 @@
 								$('.player-wrapper .arc-toolbar').append(biliHelper.helperBlock);
 							});
 							biliHelperFunc();
-						}, biliHelper.genPage ? 1000 : 500);
+						}, biliHelper.genPage ? 1500 : 500);
 					});
 					return false;
 				}
