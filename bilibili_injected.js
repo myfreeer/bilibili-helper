@@ -188,6 +188,16 @@
 						videoDownloadLink = videoPlaybackLink;
 					}
 				}
+				biliHelper.error = '错误: ' + videoDownloadLink.message + ' ' + videoDownloadLink.error_text + ' ' + videoPlaybackLink.result;
+				var errorMessage = biliHelper.error || "视频地址获取失败";
+				biliHelper.mainBlock.errorSection = $('<div class="section error"><p><span>' + parseSafe(biliHelper.error) + '</span></p></div>');
+				biliHelper.mainBlock.append(biliHelper.mainBlock.errorSection);
+				if (biliHelper.replacePlayer && !biliHelper.redirectUrl && !biliHelper.genPage) {
+					biliHelper.switcher.swf();
+				} else {
+					biliHelper.switcher.original();
+				}
+					biliHelper.favorHTML5 = false;
 			}
 			if (typeof videoDownloadLink.durl["url"] === "undefined") {
 				biliHelper.downloadUrls = videoDownloadLink.durl;
