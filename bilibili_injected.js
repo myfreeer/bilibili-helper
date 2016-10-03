@@ -2,7 +2,7 @@
 	if ($("html").hasClass("bilibili-helper")) return false;
 	var adModeOn = false;
 	var biliHelper = new Object();
-	var cmtLoaded=false;
+	var cmtLoaded = false;
 	if(location.hostname == 'www.bilibili.com') biliHelper.site = 0;
 	else if(location.hostname == 'bangumi.bilibili.com') biliHelper.site = 1;
 	else return false;
@@ -443,11 +443,14 @@
 					return chrome.runtime.sendMessage({ command: "playHdFlv" });
 					$('.ABP-Comment-List-Container').unbind('DOMSubtreeModified');
 				});*/
-				var int = setInterval(function () {
-  if (biliHelper.cmtLoaded) {
-    clearInterval(int);chrome.runtime.sendMessage({ command: "playHdFlv" });
-  }
-}, 300);
+				var int = setInterval(function() {
+				    if (biliHelper.cmtLoaded) {
+				        clearInterval(int);
+				        chrome.runtime.sendMessage({
+				            command: "playHdFlv"
+				        });
+				    }
+				}, 300);
 				},
 				bilimac: function() {
 					this.set('bilimac');
