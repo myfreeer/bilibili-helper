@@ -26,7 +26,7 @@ xhr.send(null);
 var test = function test(appkey, appsec, cid, platform) {
   var str = "http://interface.bilibili.com/playurl?";
   var reqstr = typeof platform == 'undefined' ? '' : 'platform=' + platform + '&';
-  reqstr += typeof appkey == 'undefined' ? '' : 'appkey=' + appkey + '&';
+  reqstr += typeof appkey == 'undefined' ? 'player=1&' : 'appkey=' + appkey + '&';
   reqstr += typeof cid == 'undefined' ? 'otype=json&cid=3635863' : 'otype=json&cid=' + cid;
   var sign = md5(reqstr);
   return window.open(str + reqstr + '&sign=' + sign);
