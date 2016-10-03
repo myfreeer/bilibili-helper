@@ -438,6 +438,10 @@
 							}
 						}
 					});
+				$('.ABP-Comment-List-Container').bind('DOMSubtreeModified', function () {
+					return chrome.runtime.sendMessage({ command: "playHdFlv" });
+					$('.ABP-Comment-List-Container').unbind('DOMSubtreeModified');
+				});
 				},
 				bilimac: function() {
 					this.set('bilimac');
@@ -774,7 +778,7 @@
 			});
 		}
 		biliHelper.work();
-
+		window.stop();
 		window.addEventListener("hashchange", function() {
 			var hashPage = (/page=([0-9]+)/).exec(document.location.hash);
 			if (hashPage && typeof hashPage == "object" && !isNaN(hashPage[1])) hashPage = parseInt(hashPage[1]);
@@ -785,6 +789,7 @@
 				biliHelper.mainBlock.querySection.html('<h3>弹幕发送者查询</h3><p><span></span>正在加载全部弹幕, 请稍等…</p>');
 				if (biliHelper.mainBlock.commentSection) biliHelper.mainBlock.commentSection.remove();
 				if (biliHelper.mainBlock.errorSection) biliHelper.mainBlock.errorSection.remove();
+				window.stop();
 				biliHelper.work();
 			}
 		}, false);
