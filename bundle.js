@@ -221,7 +221,7 @@
 				seeker.getVideos(url).then(res => {
 					console.log('getVideosResult:', res);
 					if (res) {
-						if (res.src.length == 1 && res.src[0].match(mp4)) return false;
+						if (res.src.length == 1 && res.src[0].match('mp4')) return false;
 						let ctrl = playVideo(res);
 						ctrl.player.onStarted.push(() => nanobar.go(100));
 						handleDamoo(res, ctrl.player, seeker, ctrl.media);
