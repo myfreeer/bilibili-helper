@@ -221,11 +221,14 @@
 				seeker.getVideos(url).then(res => {
 					console.log('getVideosResult:', res);
 					if (res) {
-						if (res.src.length == 1 && res.src[0].match('mp4')) return console.log('only mp4 available');
+						if (res.src.length == 1 && res.src[0].match('mp4')) {
+							nanobar.go(100);
+							return console.log('only mp4 available');
+						};
 						let ctrl = playVideo(res);
 						ctrl.player.onStarted.push(() => nanobar.go(100));
 						handleDamoo(res, ctrl.player, seeker, ctrl.media);
-						nanobar.go(60)
+						nanobar.go(60);
 						fulfill(ctrl);
 					} else {
 						throw new Error('getVideosResult: invalid')
