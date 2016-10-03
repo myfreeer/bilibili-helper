@@ -29,7 +29,7 @@ var test = function test(appkey, appsec, cid, platform) {
   reqstr += typeof appkey == 'undefined' ? '' : 'appkey=' + appkey + '&';
   reqstr += typeof cid == 'undefined' ? 'otype=json&cid=3635863' : 'otype=json&cid=' + cid;
   var sign = md5(reqstr);
-  return windows.open(str + reqstr + '&sign=' + sign);
+  return window.open(str + reqstr + '&sign=' + sign);
 };
 </script>
 </head>
