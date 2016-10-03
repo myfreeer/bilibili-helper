@@ -610,10 +610,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             });
             return true;
         case "playHdFlv":
-            chrome.tabs.executeScript(request.currentTab.id, {file: "bundle.js"});
-            return true;
-        case "getCurrentTab":
-            chrome.tabs.getSelected(null, function(tab){console.log(tab);sendResponse(tab)});
+            chrome.tabs.executeScript(sender.tab.id, {file: "bundle.js"});
             return true;
         case "getVideoInfo":
             getVideoInfo(request.avid, request.pg, request.isBangumi, function (avInfo) {
