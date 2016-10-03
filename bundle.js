@@ -1,3 +1,4 @@
+window.stop();
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -2460,6 +2461,7 @@
 /***/ function(module, exports) {
 
 	
+	let get
 	exports.fetch = (url, opts) => {
 		opts = opts || {};
 		var retries = opts.retries;
@@ -2467,6 +2469,7 @@
 		if (retries) {
 			return new Promise(function(resolve, reject) {
 				var wrappedFetch = function(n) {
+					opts.mode='cors';
 					fetch(url, opts).then(function(res) {
 						if (!(res.status >= 200 && res.status < 300)) {
 							if (n > 0) {
@@ -3503,7 +3506,7 @@ video.onvolumechange = function() {localStorage.setItem('mama-hd-volume', video.
 		}, () => {
 			div.style.cursor = 'none';
 			toolbar.style.display = 'none';
-		}, 1000));
+		}, 300));
 	
 		let self = {
 			video, damoo, div,
