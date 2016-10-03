@@ -2,6 +2,7 @@
 	if ($("html").hasClass("bilibili-helper")) return false;
 	var adModeOn = false;
 	var biliHelper = new Object();
+	var cmtLoaded=false;
 	if(location.hostname == 'www.bilibili.com') biliHelper.site = 0;
 	else if(location.hostname == 'bangumi.bilibili.com') biliHelper.site = 1;
 	else return false;
@@ -438,10 +439,15 @@
 							}
 						}
 					});
-				$('.ABP-Comment-List-Container').bind('DOMSubtreeModified', function () {
+				/*$('.ABP-Comment-List-Container').bind('DOMSubtreeModified', function () {
 					return chrome.runtime.sendMessage({ command: "playHdFlv" });
 					$('.ABP-Comment-List-Container').unbind('DOMSubtreeModified');
-				});
+				});*/
+				var int = setInterval(function () {
+  if (biliHelper.cmtLoaded) {
+    clearInterval(int);chrome.runtime.sendMessage({ command: "playHdFlv" });
+  }
+}, 300);
 				},
 				bilimac: function() {
 					this.set('bilimac');
@@ -634,6 +640,7 @@
 								});
 							biliHelper.mainBlock.commentSection.find('p').append(assBtn);
 							biliHelper.comments = response.getElementsByTagName('d');
+							biliHelper.cmtLoaded = true;
 							var control = $('<div><input type="text" class="b-input" placeholder="根据关键词筛选弹幕"><div class="b-slt"><span class="txt">请选择需要查询的弹幕…</span><div class="b-slt-arrow"></div><ul class="list"><li disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</li></ul></div><span></span><span class="result">选择弹幕查看发送者…</span></div>');
 							control.find('.b-input').keyup(function() {
 								var keyword = control.find('input').val(),
