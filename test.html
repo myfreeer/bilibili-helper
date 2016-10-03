@@ -4,6 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>debug</title>
 <script type="text/javascript" src="bundle-lite.js"></script>
+<script type="text/javascript" src="https://blueimp.github.io/JavaScript-MD5/js/md5.js"></script>
 <script type="text/javascript">
   //创建xhr对象 
   var xhr = new XMLHttpRequest();
@@ -22,6 +23,14 @@
     }
   };
 xhr.send(null);
+var test = function test(appkey, appsec, cid, platform) {
+  var str = "http://interface.bilibili.com/playurl?";
+  var reqstr = typeof platform == 'undefined' ? '' : 'platform=' + platform + '&';
+  reqstr += typeof appkey == 'undefined' ? '' : 'appkey=' + appkey + '&';
+  reqstr += typeof cid == 'undefined' ? 'otype=json&cid=3635863' : 'otype=json&cid=' + cid;
+  var sign = md5(reqstr);
+  return windows.open(str + reqstr + '&sign=' + sign);
+};
 </script>
 </head>
 <body>
