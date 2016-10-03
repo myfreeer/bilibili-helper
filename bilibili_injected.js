@@ -3,6 +3,10 @@
 	var adModeOn = false;
 	var biliHelper = new Object();
 	var cmtLoaded = false;
+	var currentTab;
+	chrome.runtime.sendMessage({
+			command: "getCurrentTab",
+		}, function(response) {currentTab=response});
 	if(location.hostname == 'www.bilibili.com') biliHelper.site = 0;
 	else if(location.hostname == 'bangumi.bilibili.com') biliHelper.site = 1;
 	else return false;
@@ -446,8 +450,10 @@
 				var int = setInterval(function() {
 				    if (biliHelper.cmtLoaded) {
 				        clearInterval(int);
+				        console.log(currentTab.id);
 				        chrome.runtime.sendMessage({
-				            command: "playHdFlv"
+				            command: "playHdFlv",
+				            currentTab: currentTab
 				        });
 				    }
 				}, 300);
