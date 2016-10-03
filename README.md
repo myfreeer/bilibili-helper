@@ -23,3 +23,5 @@ https://github.com/blueimp/JavaScript-MD5 (MIT License)
 https://github.com/soimort/you-get (MIT license)
 
 https://github.com/antimatter15/ocrad.js (GPL-3.0)
+
+https://github.com/nareix/mama-hd (MIT license)
