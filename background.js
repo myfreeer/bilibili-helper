@@ -286,6 +286,7 @@ function resolvePlaybackLink(avPlaybackLink, callback) {
         retry = false;
     xmlhttp.open("HEAD", avPlaybackLink.durl[0].url, true);
     xmlhttp.onreadystatechange = xmlChange;
+    xmlhttp.ontimeout = xmlChange;
     xmlhttp.send();
 }
 
