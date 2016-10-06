@@ -508,6 +508,11 @@
 				        avid: biliHelper.avid,
 				        pg: biliHelper.page + biliHelper.pageOffset
 				    }, function(response) {
+				        if (typeof response.fails !== 'undefined') {
+				            console.error(response.msg);
+				            biliHelper.switcher.set('html5');
+				            return false;
+				        };
 				        $('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + response.img + '" autobuffer preload="auto" crossorigin="anonymous"><source src="' + response.link + '" type="video/mp4"></video></div>');
 				        var abp = ABP.create(document.getElementById("bilibili_helper_html5_player"), {
 				            src: {
