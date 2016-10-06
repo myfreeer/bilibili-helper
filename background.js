@@ -264,6 +264,7 @@ function resolvePlaybackLink(avPlaybackLink, callback) {
     var xmlhttp = new XMLHttpRequest(),
         xmlChange = function () {
             if (xmlhttp.readyState == 2) {
+            	console.log(xmlhttp);
                 if (!retry && xmlhttp.status !== 200) {
                     retry = true;
                     xmlhttp.abort();
@@ -286,6 +287,7 @@ function resolvePlaybackLink(avPlaybackLink, callback) {
         retry = false;
     xmlhttp.open("HEAD", avPlaybackLink.durl[0].url, true);
     xmlhttp.onreadystatechange = xmlChange;
+    xmlhttp.ontimeout = xmlChange;
     xmlhttp.send();
 }
 
@@ -464,30 +466,6 @@ function setNotFavourite(id) {
     }
     return false;
 }
-chrome.webRequest.onBeforeSendHeaders.addListener(
-	function(details) {
-		var sethdr = {};
-		for (var i = 0; i < details.requestHeaders.length; i++) {
-			var header = details.requestHeaders[i];
-			if (header.name.substr(0,7) == 'sethdr-') {
-				sethdr[header.name.substr(7)] = header.value;
-			}
-		}
-		for (var i = 0; i < details.requestHeaders.length; i++) {
-			var header = details.requestHeaders[i];
-			if (sethdr[header.name]) {
-				header.value = sethdr[header.name];
-				delete sethdr[header.name];
-			}
-		}
-		for (var k in sethdr) {
-			details.requestHeaders.push({name:k, value:sethdr[k]});
-		}
-		return {requestHeaders: details.requestHeaders};
-	},
-	{urls: ["http://play.youku.com/*"]},
-	["blocking", "requestHeaders"]
-);
 
 chrome.runtime.onConnect.addListener(function (port) {Live.treasure.port=port});
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {

@@ -1109,6 +1109,7 @@ return check; }
 					ABPInst.btnFull.className = "button ABP-FullScreen icon-screen-full";
 					ABPInst.btnFull.tooltip("浏览器全屏");
 				}
+				ABPInst.btnProp.click();
 			}
 			document.addEventListener("fullscreenchange", fullscreenChangeHandler, false);
 			document.addEventListener("webkitfullscreenchange", fullscreenChangeHandler, false);

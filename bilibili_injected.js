@@ -440,10 +440,6 @@
 							}
 						}
 					});
-				/*$('.ABP-Comment-List-Container').bind('DOMSubtreeModified', function () {
-					return chrome.runtime.sendMessage({ command: "playHdFlv" });
-					$('.ABP-Comment-List-Container').unbind('DOMSubtreeModified');
-				});*/
 				var int = setInterval(function() {
 				    if (biliHelper.cmtLoaded) {
 				        clearInterval(int);
@@ -454,7 +450,7 @@
 				}, 300);
 				},
 				html5hd: function() {
-					this.set('html5');
+					this.set('html5hd');
 					$('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + biliHelper.videoPic + '" autobuffer preload="auto" crossorigin="anonymous"><source src="' + biliHelper.playbackUrls[0].url + '" type="video/mp4"></video></div>');
 					var abp = ABP.create(document.getElementById("bilibili_helper_html5_player"), {
 						src: {
