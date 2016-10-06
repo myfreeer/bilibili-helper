@@ -2,7 +2,6 @@
 	if ($("html").hasClass("bilibili-helper")) return false;
 	var adModeOn = false;
 	var biliHelper = new Object();
-	var cmtLoaded = false;
 	if(location.hostname == 'www.bilibili.com') biliHelper.site = 0;
 	else if(location.hostname == 'bangumi.bilibili.com') biliHelper.site = 1;
 	else return false;
@@ -252,8 +251,6 @@
 			}
 			if (biliHelper.playbackUrls && biliHelper.playbackUrls.length == 1) {
 				biliHelper.mainBlock.switcherSection.find('a[type="html5"]').removeClass('hidden');
-				biliHelper.mainBlock.switcherSection.find('a[type="html5hd"]').removeClass('hidden');
-				biliHelper.mainBlock.switcherSection.find('a[type="html5ld"]').removeClass('hidden');
 			}
 			$('#loading-notice').fadeOut(300);
 			if (biliHelper.favorHTML5 && localStorage.getItem('bilimac_player_type') != 'force' && biliHelper.cid && biliHelper.playbackUrls && biliHelper.playbackUrls.length == 1 && biliHelper.playbackUrls[0].url.indexOf('m3u8') < 0) {
@@ -441,127 +438,6 @@
 							}
 						}
 					});
-				var interval = setInterval(function() {
-				    if (biliHelper.cmtLoaded) {
-				        clearInterval(interval);
-				        chrome.runtime.sendMessage({
-				            command: "playHdFlv",
-				        });
-				    }
-				}, 300);
-				},
-				html5hd: function() {
-					this.set('html5hd');
-					$('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + biliHelper.videoPic + '" autobuffer preload="auto" crossorigin="anonymous"><source src="' + biliHelper.playbackUrls[0].url + '" type="video/mp4"></video></div>');
-					var abp = ABP.create(document.getElementById("bilibili_helper_html5_player"), {
-						src: {
-							playlist: [{
-								video: document.getElementById("bilibili_helper_html5_player_video"),
-								comments: "http://comment.bilibili.com/" + biliHelper.cid + ".xml"
-							}]
-						},
-						width: "100%",
-						height: "100%",
-						config: biliHelper.playerConfig
-					});
-					abp.playerUnit.addEventListener("wide", function() {
-						$("#bofqi").addClass("wide");
-					});
-					abp.playerUnit.addEventListener("normal", function() {
-						$("#bofqi").removeClass("wide");
-					});
-					abp.playerUnit.addEventListener("sendcomment", function(e) {
-						var commentId = e.detail.id,
-							commentData = e.detail;
-						delete e.detail.id;
-						chrome.runtime.sendMessage({
-							command: "sendComment",
-							avid: biliHelper.avid,
-							cid: biliHelper.cid,
-							page: biliHelper.page + biliHelper.pageOffset,
-							comment: commentData
-						}, function(response) {
-							response.tmp_id = commentId;
-							abp.commentCallback(response);
-						});
-					});
-					abp.playerUnit.addEventListener("saveconfig", function(e) {
-						chrome.runtime.sendMessage({
-							command: "savePlayerConfig",
-							config: e.detail
-						});
-					});
-					var bofqiHeight = 0;
-					$(window).scroll(function() {
-						if (bofqiHeight != $("#bofqi").width()) {
-							bofqiHeight = $("#bofqi").width();
-							if (abp && abp.cmManager) {
-								abp.cmManager.setBounds();
-							}
-						}
-					});
-				},
-				html5ld: function() {
-				    this.set('html5ld');
-				    chrome.runtime.sendMessage({
-				        command: "getLowResVideo",
-				        avid: biliHelper.avid,
-				        pg: biliHelper.page + biliHelper.pageOffset
-				    }, function(response) {
-				        if (typeof response.fails !== 'undefined') {
-				            console.error(response.msg);
-				            biliHelper.switcher.set('html5');
-				            return false;
-				        };
-				        $('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + response.img + '" autobuffer preload="auto" crossorigin="anonymous"><source src="' + response.link + '" type="video/mp4"></video></div>');
-				        var abp = ABP.create(document.getElementById("bilibili_helper_html5_player"), {
-				            src: {
-				                playlist: [{
-				                    video: document.getElementById("bilibili_helper_html5_player_video"),
-				                    comments: response.comment
-				                }]
-				            },
-				            width: "100%",
-				            height: "100%",
-				            config: biliHelper.playerConfig
-				        });
-				        abp.playerUnit.addEventListener("wide", function() {
-				            $("#bofqi").addClass("wide");
-				        });
-				        abp.playerUnit.addEventListener("normal", function() {
-				            $("#bofqi").removeClass("wide");
-				        });
-				        abp.playerUnit.addEventListener("sendcomment", function(e) {
-				            var commentId = e.detail.id,
-				                commentData = e.detail;
-				            delete e.detail.id;
-				            chrome.runtime.sendMessage({
-				                command: "sendComment",
-				                avid: biliHelper.avid,
-				                cid: biliHelper.cid,
-				                page: biliHelper.page + biliHelper.pageOffset,
-				                comment: commentData
-				            }, function(response) {
-				                response.tmp_id = commentId;
-				                abp.commentCallback(response);
-				            });
-				        });
-				        abp.playerUnit.addEventListener("saveconfig", function(e) {
-				            chrome.runtime.sendMessage({
-				                command: "savePlayerConfig",
-				                config: e.detail
-				            });
-				        });
-				        var bofqiHeight = 0;
-				        $(window).scroll(function() {
-				            if (bofqiHeight != $("#bofqi").width()) {
-				                bofqiHeight = $("#bofqi").width();
-				                if (abp && abp.cmManager) {
-				                    abp.cmManager.setBounds();
-				                }
-				            }
-				        });
-				    })
 				},
 				bilimac: function() {
 					this.set('bilimac');
@@ -605,7 +481,7 @@
 				biliHelper.mainBlock.append(biliHelper.mainBlock.redirectSection);
 			}
 			biliHelper.mainBlock.switcherSection = $('<div class="section switcher"><h3>播放器切换</h3><p></p></div>');
-			biliHelper.mainBlock.switcherSection.find('p').append($('<a class="b-btn w" type="original">原始播放器</a><a class="b-btn w hidden" type="bilimac">Mac 客户端</a><a class="b-btn w hidden" type="swf">SWF 播放器</a><a class="b-btn w hidden" type="iframe">Iframe 播放器</a><a class="b-btn w hidden" type="html5">HTML5 (超清)</a><a class="b-btn w hidden" type="html5hd">HTML5 (高清)</a><a class="b-btn w hidden" type="html5ld">HTML5 (低清)</a>').click(function() {
+			biliHelper.mainBlock.switcherSection.find('p').append($('<a class="b-btn w" type="original">原始播放器</a><a class="b-btn w hidden" type="bilimac">Mac 客户端</a><a class="b-btn w hidden" type="swf">SWF 播放器</a><a class="b-btn w hidden" type="iframe">Iframe 播放器</a><a class="b-btn w hidden" type="html5">HTML5 播放器</a>').click(function() {
 				biliHelper.switcher[$(this).attr('type')]();
 			}));
 			if (biliHelper.redirectUrl) {
@@ -754,7 +630,6 @@
 								});
 							biliHelper.mainBlock.commentSection.find('p').append(assBtn);
 							biliHelper.comments = response.getElementsByTagName('d');
-							biliHelper.cmtLoaded = true;
 							var control = $('<div><input type="text" class="b-input" placeholder="根据关键词筛选弹幕"><div class="b-slt"><span class="txt">请选择需要查询的弹幕…</span><div class="b-slt-arrow"></div><ul class="list"><li disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</li></ul></div><span></span><span class="result">选择弹幕查看发送者…</span></div>');
 							control.find('.b-input').keyup(function() {
 								var keyword = control.find('input').val(),
@@ -899,7 +774,7 @@
 			});
 		}
 		biliHelper.work();
-		window.stop();
+
 		window.addEventListener("hashchange", function() {
 			var hashPage = (/page=([0-9]+)/).exec(document.location.hash);
 			if (hashPage && typeof hashPage == "object" && !isNaN(hashPage[1])) hashPage = parseInt(hashPage[1]);
@@ -910,7 +785,6 @@
 				biliHelper.mainBlock.querySection.html('<h3>弹幕发送者查询</h3><p><span></span>正在加载全部弹幕, 请稍等…</p>');
 				if (biliHelper.mainBlock.commentSection) biliHelper.mainBlock.commentSection.remove();
 				if (biliHelper.mainBlock.errorSection) biliHelper.mainBlock.errorSection.remove();
-				window.stop();
 				biliHelper.work();
 			}
 		}, false);
