@@ -780,8 +780,10 @@ return check; }
 				ABPInst.cmManager.setBounds = function() {
 					if (playerUnit.offsetHeight <= 300 || playerUnit.offsetWidth <= 700) {
 						addClass(playerUnit, "ABP-Mini");
+						ABPInst.proportionalScale = true;
 					} else {
 						removeClass(playerUnit, "ABP-Mini");
+						ABPInst.proportionalScale = ABPInst.btnProp.classList.contains("on");
 					}
 					var actualWidth = ABPInst.videoDiv.offsetWidth,
 						actualHeight = ABPInst.videoDiv.offsetHeight,
@@ -1108,8 +1110,14 @@ return check; }
 					removeClass(playerUnit, "ABP-FullScreen");
 					ABPInst.btnFull.className = "button ABP-FullScreen icon-screen-full";
 					ABPInst.btnFull.tooltip("浏览器全屏");
-				}
-				ABPInst.btnProp.click();
+				};/*
+				if (document.isFullScreen()) {
+				    ABPInst.proportionalScale = false;
+				    ABPInst.cmManager.setBounds();
+				} else {
+				    ABPInst.proportionalScale = ABPInst.btnProp.classList.contains("on");
+				    ABPInst.cmManager.setBounds();
+				};*/
 			}
 			document.addEventListener("fullscreenchange", fullscreenChangeHandler, false);
 			document.addEventListener("webkitfullscreenchange", fullscreenChangeHandler, false);
