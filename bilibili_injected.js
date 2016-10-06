@@ -442,7 +442,7 @@
 						}
 					});
 				var interval = setInterval(function() {
-				    if (typeof abp.commentList == 'object') {
+				    if (abp.commentObjArray) {
 				        clearInterval(interval);
 				        chrome.runtime.sendMessage({
 				            command: "playHdFlv",
