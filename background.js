@@ -18,7 +18,9 @@ var appkey = '85eb6835b0a1034e';
 var appsec = '2ad42749773c441109bdc0191257a664';
 //https://github.com/soimort/you-get/blob/develop/src/you_get/extractors/bilibili.py
 var SECRETKEY_MINILOADER = '1c15888dc316e05a15fdd0a02ed6584f';
-Live.set = function (n, k, v) {
+var use_SECRETKEY_MINILOADER=true;
+
+Live.set = function(n, k, v) {
     if (!window.localStorage || !n) return;
     var storage = window.localStorage;
     if (!storage[n]) storage[n] = JSON.stringify({});
@@ -31,7 +33,7 @@ Live.set = function (n, k, v) {
     }
 };
 
-Live.get = function (n, k, v) {
+Live.get = function(n, k, v) {
     if (!window.localStorage || !n) return;
 
     if (!window.localStorage[n]) {
@@ -45,7 +47,7 @@ Live.get = function (n, k, v) {
     return l[k];
 };
 
-Live.del = function (n, k) {
+Live.del = function(n, k) {
     if (!window.localStorage || n == undefined || window.localStorage[n] == undefined) return;
     if (k == undefined) {
         window.localStorage.removeItem(n);
@@ -60,35 +62,36 @@ Live.notisesIdList = {};
 Live.favouritesIdList = Live.get('favouritesIdList', undefined, []);
 Live.favouritesList = Live.get('favouritesList', undefined, {});
 
-URL.prototype.__defineGetter__('query', function () {
+URL.prototype.__defineGetter__('query', function() {
     var parsed = this.search.substr(1).split('&');
     var parsedObj = {};
-    parsed.forEach(function (elem, iter, arr) {
+    parsed.forEach(function(elem, iter, arr) {
         var vals = arr[iter].split('=');
         parsedObj[vals[0]] = vals[1];
     });
     return parsedObj;
 });
 
-var randomIP = function (fakeip) {
+var randomIP = function(fakeip) {
     var ip_addr = '220.181.111.';
     if (fakeip == 2) ip_addr = '59.152.193.';
     ip_addr += Math.floor(Math.random() * 254 + 1);
     return ip_addr;
-}
+};
 
 function getFileData(url, callback, method) {
     var m = 'GET';
     if (method && (method == 'POST'.toLowerCase() || method == 'GET'.toLowerCase())) m = method;
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.open(m, url, true);
-    xmlhttp.onreadystatechange = function () {
+    xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             if (typeof callback == "function") callback(xmlhttp.responseText);
         } else if (xmlhttp.readyState == 4 && xmlhttp.status > 400) {
             if (typeof callback == "function") callback("{}");
         }
-    }
+    };
+    xmlhttp.ontimeout=xmlhttp.onreadystatechange
     xmlhttp.send();
 }
 
@@ -133,7 +136,7 @@ function compareVersion(a, b) {
 function postFileData(url, data, callback) {
     var encodeData = "",
         append = false;
-    Object.keys(data).forEach(function (key) {
+    Object.keys(data).forEach(function(key) {
         if (!append) {
             append = true;
         } else {
@@ -145,11 +148,12 @@ function postFileData(url, data, callback) {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.open("POST", url, true);
     xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xmlhttp.onreadystatechange = function () {
+    xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             if (typeof callback == "function") callback(xmlhttp.responseText);
         }
-    }
+    };
+    xmlhttp.ontimeout = xmlChange;
     xmlhttp.send(encodeData);
 }
 
@@ -174,9 +178,9 @@ function searchBilibili(info) {
 function notifyAllTabs(message) {
     chrome.windows.getAll({
         populate: true
-    }, function (wins) {
-        wins.forEach(function (win) {
-            win.tabs.forEach(function (tab) {
+    }, function(wins) {
+        wins.forEach(function(win) {
+            win.tabs.forEach(function(tab) {
                 chrome.tabs.sendMessage(tab.id, message);
             });
         });
@@ -201,7 +205,7 @@ function disableAll() {
 
 function checkDynamic() {
     if (getOption("dynamic") == "on") {
-        getFileData("http://api.bilibili.com/x/feed/unread/count?type=0", function (data) {
+        getFileData("http://api.bilibili.com/x/feed/unread/count?type=0", function(data) {
             var dynamic = JSON.parse(data);
             if (typeof dynamic === "object" && dynamic.code == 0 && typeof dynamic.data === "object" &&
                 typeof dynamic.data.all === "number") {
@@ -210,13 +214,13 @@ function checkDynamic() {
                     chrome.browserAction.setBadgeText({
                         text: getOption("updates")
                     });
-                    getFileData("http://api.bilibili.com/x/feed/pull?ps=1&type=0", function (data) {
+                    getFileData("http://api.bilibili.com/x/feed/pull?ps=1&type=0", function(data) {
                         var feed = JSON.parse(data);
                         if (typeof feed === "object" && feed.code == 0 && typeof feed.data === "object" &&
                             typeof feed.data.feeds === "object" && feed.data.feeds.length > 0) {
                             var content = feed.data.feeds[0];
                             if (content.ctime != parseInt(getOption("lastDyn"))) {
-                                if (notification) chrome.notifications.clear("bh-" + notification, function () {});
+                                if (notification) chrome.notifications.clear("bh-" + notification, function() {});
                                 notification = content.ctime;
                                 var message = chrome.i18n.getMessage('followingUpdateMessage').replace('%n', dynamic.data.all).replace('%uploader', content.source.uname).replace('%title', content.addition.title),
                                     icon = content.addition.pic ? content.addition.pic : "imgs/icon-256.png";
@@ -232,7 +236,7 @@ function checkDynamic() {
                                     }, {
                                         title: chrome.i18n.getMessage('notificationShowAll')
                                     }]
-                                }, function () {});
+                                }, function() {});
                                 setOption("lastDyn", content.ctime);
                             }
                         }
@@ -254,17 +258,17 @@ function resolvePlaybackLink(avPlaybackLink, callback) {
         return false;
     }
     if (typeof avPlaybackLink.durl[0].backup_url == 'object' &&
-    avPlaybackLink.durl[0].backup_url.length && avPlaybackLink.durl[0].url.indexOf('hd.mp4') < 0) {
-      avPlaybackLink.durl[0].backup_url.forEach(function(url) {
-        if (url.indexOf('hd.mp4') > -1) {
-          avPlaybackLink.durl[0].url = url;
-        }
-      })
+        avPlaybackLink.durl[0].backup_url.length && avPlaybackLink.durl[0].url.indexOf('hd.mp4') < 0) {
+        avPlaybackLink.durl[0].backup_url.forEach(function(url) {
+            if (url.indexOf('hd.mp4') > -1) {
+                avPlaybackLink.durl[0].url = url;
+            }
+        });
     }
     var xmlhttp = new XMLHttpRequest(),
-        xmlChange = function () {
+        xmlChange = function() {
             if (xmlhttp.readyState == 2) {
-            	console.log(xmlhttp);
+                console.log(xmlhttp);
                 if (!retry && xmlhttp.status !== 200) {
                     retry = true;
                     xmlhttp.abort();
@@ -288,6 +292,7 @@ function resolvePlaybackLink(avPlaybackLink, callback) {
     xmlhttp.open("HEAD", avPlaybackLink.durl[0].url, true);
     xmlhttp.onreadystatechange = xmlChange;
     xmlhttp.ontimeout = xmlChange;
+    //xmlhttp.timeout = 2000;
     xmlhttp.send();
 }
 
@@ -303,13 +308,13 @@ function getVideoInfo(avid, page, isbangumi, callback) {
     bangumi = isbangumi;
     resetVideoHostList();
     if (isbangumi) {
-        getFileData("http://bangumi.bilibili.com/web_api/episode/get_source?episode_id=" + avid, function (result) {
+        getFileData("http://bangumi.bilibili.com/web_api/episode/get_source?episode_id=" + avid, function(result) {
             result = JSON.parse(result)['result'];
             avid = result.aid;
-            getFileData("http://api.bilibili.com/view?type=json&appkey=8e9fc618fbd41e28&id=" + avid + "&page=" + page + "&batch=true", function (avInfo) {
+            getFileData("http://api.bilibili.com/view?type=json&appkey=8e9fc618fbd41e28&id=" + avid + "&page=" + page + "&batch=true", function(avInfo) {
                 avInfo = JSON.parse(avInfo);
                 if (typeof avInfo.code != "undefined" && avInfo.code == -503) {
-                    setTimeout(function () {
+                    setTimeout(function() {
                         getVideoInfo(avid, page, isbangumi, callback);
                     }, 1000);
                 } else {
@@ -341,13 +346,13 @@ function getVideoInfo(avid, page, isbangumi, callback) {
                             bangumi: false
                         };
                         if (typeof avInfo.bangumi == "object") {
-                            getFileData("http://api.bilibili.cn/sp?spid=" + avInfo.spid, function (spInfo) {
+                            getFileData("http://api.bilibili.cn/sp?spid=" + avInfo.spid, function(spInfo) {
                                 spInfo = JSON.parse(spInfo);
                                 if (spInfo.isbangumi == 1) {
                                     viCache[avid + '-' + page].bangumi = {
                                         cover: spInfo.cover,
                                         desc: spInfo.description
-                                    }
+                                    };
                                 }
                                 callback(viCache[avid + '-' + page]);
                             });
@@ -359,10 +364,10 @@ function getVideoInfo(avid, page, isbangumi, callback) {
             });
         });
     } else
-        getFileData("http://api.bilibili.com/view?type=json&appkey=8e9fc618fbd41e28&id=" + avid + "&page=" + page + "&batch=true", function (avInfo) {
+        getFileData("http://api.bilibili.com/view?type=json&appkey=8e9fc618fbd41e28&id=" + avid + "&page=" + page + "&batch=true", function(avInfo) {
             avInfo = JSON.parse(avInfo);
             if (typeof avInfo.code != "undefined" && avInfo.code == -503) {
-                setTimeout(function () {
+                setTimeout(function() {
                     getVideoInfo(avid, page, isbangumi, callback);
                 }, 1000);
             } else {
@@ -394,13 +399,13 @@ function getVideoInfo(avid, page, isbangumi, callback) {
                         bangumi: false
                     };
                     if (typeof avInfo.bangumi == "object") {
-                        getFileData("http://api.bilibili.cn/sp?spid=" + avInfo.spid, function (spInfo) {
+                        getFileData("http://api.bilibili.cn/sp?spid=" + avInfo.spid, function(spInfo) {
                             spInfo = JSON.parse(spInfo);
                             if (spInfo.isbangumi == 1) {
                                 viCache[avid + '-' + page].bangumi = {
                                     cover: spInfo.cover,
                                     desc: spInfo.description
-                                }
+                                };
                             }
                             callback(viCache[avid + '-' + page]);
                         });
@@ -416,11 +421,11 @@ function getVideoInfo(avid, page, isbangumi, callback) {
 function checkSecurePlayer() {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.open("HEAD", "https://static-s.bilibili.com/play.swf", true);
-    xmlhttp.onreadystatechange = function () {
+    xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             secureAvailable = xmlhttp.getResponseHeader('Content-Type') == 'application/x-shockwave-flash';
         }
-    }
+    };
     xmlhttp.send();
 }
 
@@ -456,7 +461,7 @@ function setFavourite(upInfo) {
 }
 
 function setNotFavourite(id) {
-    var index = Live.favouritesIdList.indexOf(id)
+    var index = Live.favouritesIdList.indexOf(id);
     if (index != -1) {
         Live.favouritesIdList.splice(index, 1);
         delete Live.favouritesList[id];
@@ -467,8 +472,10 @@ function setNotFavourite(id) {
     return false;
 }
 
-chrome.runtime.onConnect.addListener(function (port) {Live.treasure.port=port});
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+chrome.runtime.onConnect.addListener(function(port) {
+    Live.treasure.port = port;
+});
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     switch (request.command) {
         case "init":
             sendResponse({
@@ -588,10 +595,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             });
             return true;
         case "playHdFlv":
-            chrome.tabs.executeScript(sender.tab.id, {file: "bundle.js"});
+            chrome.tabs.executeScript(sender.tab.id, {
+                file: "bundle.js"
+            });
             return true;
         case "getVideoInfo":
-            getVideoInfo(request.avid, request.pg, request.isBangumi, function (avInfo) {
+            getVideoInfo(request.avid, request.pg, request.isBangumi, function(avInfo) {
                 sendResponse({
                     videoInfo: avInfo
                 });
@@ -599,41 +608,41 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             return true;
         case "getDownloadLink":
             var url = {
-                download: getOption("dlquality") == 'flv' ? "http://interface.bilibili.com/playurl?&cid=" + request.cid + "&from=miniplay&otype=json&player=1&sign=" + md5("cid=" + request.cid + "&from=miniplay&otype=json&player=1" + SECRETKEY_MINILOADER) : "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + appsec),
-                playback: "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" +  appsec)
+                download: getOption("dlquality") == 'flv' && use_SECRETKEY_MINILOADER ? "http://interface.bilibili.com/playurl?&cid=" + request.cid + "&from=miniplay&otype=json&player=1&sign=" + md5("cid=" + request.cid + "&from=miniplay&otype=json&player=1" + SECRETKEY_MINILOADER) : "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + appsec),
+                playback: "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + appsec)
             };
             if (request.cidHack && request.cidHack != locale) {
                 cidHackType[request.cid] = request.cidHack;
             }
-            getFileData(url["download"], function (avDownloadLink) {
+            getFileData(url["download"], function(avDownloadLink) {
                 avDownloadLink = JSON.parse(avDownloadLink);
                 if (getOption("dlquality") == 'mp4') {
                     if (avDownloadLink)
-                        resolvePlaybackLink(avDownloadLink, function (avRealPlaybackLink) {
+                        resolvePlaybackLink(avDownloadLink, function(avRealPlaybackLink) {
                             sendResponse({
                                 download: avDownloadLink,
                                 playback: avRealPlaybackLink,
                                 dlquality: getOption("dlquality"),
                                 rel_search: getOption("rel_search")
                             });
-                        })
+                        });
                 } else {
-                    getFileData(url["playback"], function (avPlaybackLink) {
+                    getFileData(url["playback"], function(avPlaybackLink) {
                         avPlaybackLink = JSON.parse(avPlaybackLink);
-                        resolvePlaybackLink(avPlaybackLink, function (avRealPlaybackLink) {
+                        resolvePlaybackLink(avPlaybackLink, function(avRealPlaybackLink) {
                             sendResponse({
                                 download: avDownloadLink,
                                 playback: avRealPlaybackLink,
                                 dlquality: getOption("dlquality"),
                                 rel_search: getOption("rel_search")
                             });
-                        })
+                        });
                     });
                 }
             });
             return true;
         case "getMyInfo":
-            getFileData("http://api.bilibili.com/myinfo", function (myinfo) {
+            getFileData("http://api.bilibili.com/myinfo", function(myinfo) {
                 myinfo = JSON.parse(myinfo);
                 if (typeof myinfo.code == undefined) myinfo.code = 200;
                 sendResponse({
@@ -644,7 +653,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             return true;
         case "searchVideo":
             var keyword = request.keyword;
-            getFileData("http://api.bilibili.com/search?type=json&appkey=8e9fc618fbd41e28&keyword=" + encodeURIComponent(keyword) + "&page=1&order=ranklevel", function (searchResult) {
+            getFileData("http://api.bilibili.com/search?type=json&appkey=8e9fc618fbd41e28&keyword=" + encodeURIComponent(keyword) + "&page=1&order=ranklevel", function(searchResult) {
                 searchResult = JSON.parse(searchResult);
                 if (searchResult.code == 0) {
                     sendResponse({
@@ -661,7 +670,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             });
             return true;
         case "checkComment":
-            getFileData("http://www.bilibili.com/feedback/arc-" + request.avid + "-1.html", function (commentData) {
+            getFileData("http://www.bilibili.com/feedback/arc-" + request.avid + "-1.html", function(commentData) {
                 var test = commentData.indexOf('<div class="no_more">');
                 if (test >= 0) {
                     sendResponse({
@@ -686,7 +695,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             request.comment.cid = request.cid;
             postFileData("http://interface.bilibili.com/dmpost?cid=" + request.cid +
                 "&aid=" + request.avid + "&pid=" + request.page, request.comment,
-                function (result) {
+                function(result) {
                     result = parseInt(result);
                     if (result < 0) {
                         sendResponse({
@@ -701,9 +710,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     }
                 });
             return true;
-         case 'getCommentFilter':
-             sendResponse(bkg_page.getOption('danmaku_filter'));
-             return true;
+        case 'getCommentFilter':
+            sendResponse(bkg_page.getOption('danmaku_filter'));
+            return true;
         case "getTVReward":
             var rewardStr = '',
                 lost = "很遗憾，此次您没有中奖";
@@ -736,8 +745,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                         buttons: [{
                             title: chrome.i18n.getMessage('notificationGetTv')
                         }]
-                    }, function (id) {
-                        setTimeout(function () {
+                    }, function(id) {
+                        setTimeout(function() {
                             chrome.notifications.clear(id);
                         }, 10000);
                     });
@@ -747,8 +756,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                     title: '小电视抽奖结果',
                     isClickable: false,
                     message: '在直播间:' + data.roomId + ' 抽到' + rewardStr
-                }, function (id) {
-                    setTimeout(function () {
+                }, function(id) {
+                    setTimeout(function() {
                         chrome.notifications.clear(id);
                     }, 10000);
                 });
@@ -758,8 +767,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 title: '直播间:' + data.roomId,
                 message: rewardStr,
                 isClickable: false
-            }, function (id) {
-                setTimeout(function () {
+            }, function(id) {
+                setTimeout(function() {
                     chrome.notifications.clear(id);
                 }, 10000);
             });
@@ -795,16 +804,16 @@ if (window.navigator.userAgent.indexOf('Windows') < 0) {
 chrome.alarms.create("checkDynamic", {
     periodInMinutes: 10
 });
+
 function getLocale() {
     locale = 1;
 }
 
-function checkVersion() {
-}
+function checkVersion() {}
 
 getLocale();
 
-chrome.alarms.onAlarm.addListener(function (alarm) {
+chrome.alarms.onAlarm.addListener(function(alarm) {
     switch (alarm.name) {
         case "checkDynamic":
             checkDynamic();
@@ -814,7 +823,7 @@ chrome.alarms.onAlarm.addListener(function (alarm) {
     }
 });
 
-chrome.notifications.onButtonClicked.addListener(function (notificationId, index) {
+chrome.notifications.onButtonClicked.addListener(function(notificationId, index) {
     if (Live.notisesIdList[notificationId] != undefined) {
         if (index === 0) {
             chrome.tabs.create({
@@ -840,7 +849,7 @@ chrome.notifications.onButtonClicked.addListener(function (notificationId, index
     }
 });
 
-chrome.webRequest.onBeforeRequest.addListener(function (details) {
+chrome.webRequest.onBeforeRequest.addListener(function(details) {
     chrome.tabs.sendMessage(details.tabId, {
         command: "error"
     });
@@ -848,11 +857,11 @@ chrome.webRequest.onBeforeRequest.addListener(function (details) {
     urls: ["http://comment.bilibili.com/1272.xml"]
 });
 
-chrome.webRequest.onBeforeRequest.addListener(function (details) {
+chrome.webRequest.onBeforeRequest.addListener(function(details) {
     if (secureAvailable) {
         return {
             redirectUrl: "https://static-s.bilibili.com/play.swf"
-        }
+        };
     } else {
         return {};
     };
@@ -860,15 +869,15 @@ chrome.webRequest.onBeforeRequest.addListener(function (details) {
     urls: ["http://static.hdslb.com/play.swf"]
 }, ["blocking"]);
 
-chrome.webRequest.onBeforeRequest.addListener(function (details) {
+chrome.webRequest.onBeforeRequest.addListener(function(details) {
     return {
         cancel: true
-    }
+    };
 }, {
     urls: ["http://tajs.qq.com/stats*"]
 }, ["blocking"]);
 
-chrome.webRequest.onBeforeSendHeaders.addListener(function (details) {
+chrome.webRequest.onBeforeSendHeaders.addListener(function(details) {
     var query = new URL(details.url).query;
     var ip = randomIP(cidHackType[query['cid']] == 2 ? 2 : 1);
     if (locale != cidHackType[query['cid']]) {
@@ -878,7 +887,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function (details) {
         }, {
             name: 'Client-IP',
             value: ip
-        })
+        });
     }
     return {
         requestHeaders: details.requestHeaders
@@ -889,7 +898,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function (details) {
 
 function receivedHeaderModifier(details) {
     var hasCORS = false;
-    details.responseHeaders.forEach(function (v) {
+    details.responseHeaders.forEach(function(v) {
         if (v.name.toLowerCase() == "access-control-allow-origin") {
             hasCORS = true;
         }
@@ -908,7 +917,7 @@ function receivedHeaderModifier(details) {
     return {
         responseHeaders: details.responseHeaders
     };
-};
+}
 
 function resetVideoHostList() {
     if (chrome.webRequest.onHeadersReceived.hasListener(receivedHeaderModifier)) {
@@ -919,7 +928,7 @@ function resetVideoHostList() {
     }, ["responseHeaders", "blocking"]);
 }
 
-chrome.webRequest.onHeadersReceived.addListener(function (details) {
+chrome.webRequest.onHeadersReceived.addListener(function(details) {
     var headers = details.responseHeaders;
     if (details.statusLine.indexOf("HTTP/1.1 302") == 0 && getOption("replace") == "on") {
         for (var i = 0; i < headers.length; i++) {
@@ -965,8 +974,8 @@ function each(obj, fn) {
 }
 Live.notise = {
     page: 1,
-    userMode: function () {
-        return getCookie("DedeUserID")
+    userMode: function() {
+        return getCookie("DedeUserID");
     }(),
     hasMore: !1,
     list: [],
@@ -975,20 +984,20 @@ Live.notise = {
     heart: {},
     roomIdList: {},
     cacheList: {},
-    getList: function (d) {
+    getList: function(d) {
         var url = "http://live.bilibili.com/feed/getList/" + Live.notise.page;
-        var callback = function (t) {
+        var callback = function(t) {
             t = t.substr(1, t.length - 3);
             t = JSON.parse(t);
             var roomIdList = {},
                 newList = [];
-            each(t.data.list, function (i) {
+            each(t.data.list, function(i) {
                 roomIdList[t.data.list[i].roomid] = t.data.list[i];
             });
 
             if (1 == Live.notise.page) Live.notise.cacheList = roomIdList;
             else {
-                each(roomIdList, function (i) {
+                each(roomIdList, function(i) {
                     Live.notise.cacheList[i] = roomIdList[i];
                 });
             }
@@ -999,7 +1008,7 @@ Live.notise = {
                     if (Live.notise.roomIdList[q] == undefined) newList.push(Live.notise.cacheList[q]);
 
                 if (newList.length) {
-                    each(newList, function (i) {
+                    each(newList, function(i) {
                         if (Live.favouritesIdList.indexOf(parseInt(newList[i].roomid)) != -1) {
                             var data = newList[i],
                                 myNotificationID = null;
@@ -1014,31 +1023,31 @@ Live.notise = {
                                 }, {
                                     title: chrome.i18n.getMessage('notificationShowAll')
                                 }]
-                            }, function (id) {
+                            }, function(id) {
                                 Live.notisesIdList[id] = data;
-                                setTimeout(function () {
+                                setTimeout(function() {
                                     chrome.notifications.clear(id);
                                     delete Live.notisesIdList[id];
                                 }, 10000);
                             });
                         }
-                    })
+                    });
                 }
                 Live.notise.roomIdList = Live.notise.cacheList;
                 Live.notise.cacheList = {};
             }
-        }
+        };
         var type = Live.notise.userMode ? "POST" : "GET";
 
         getFileData(url, callback, type);
     },
-    heartBeat: function () {
-        getFileData("http://live.bilibili.com/feed/heartBeat/heartBeat", function (data) {
+    heartBeat: function() {
+        getFileData("http://live.bilibili.com/feed/heartBeat/heartBeat", function(data) {
             data = JSON.parse(data);
             Live.notise.do(data);
         }, 'POST');
     },
-    do: function (data) {
+    do: function(data) {
         if (data.data) {
             Live.notise.feedMode = data.data.open;
             if (0 == data.code) {
@@ -1054,7 +1063,7 @@ Live.notise = {
             }
         }
     },
-    init: function () {
+    init: function() {
         Live.notise.count = 0;
         Live.notise.hasMore = !1;
         Live.notise.list = [];
@@ -1065,7 +1074,7 @@ Live.notise = {
         Live.notise.cacheList = {};
         Live.notise.heartBeat();
         Live.notise.getList();
-        Live.notise.intervalNum = setInterval(function () {
+        Live.notise.intervalNum = setInterval(function() {
             Live.notise.heartBeat();
             if (Live.notise.hasMore) {
                 Live.notise.page++;
@@ -1077,9 +1086,9 @@ Live.notise = {
 if (getOption("liveNotification") == "on") {
     Live.notise.init();
 }
-chrome.runtime.onConnect.addListener(function (port) {
-    port.onMessage.addListener(function (request, sender, sendResponse) {
-        console.log(request.json)
+chrome.runtime.onConnect.addListener(function(port) {
+    port.onMessage.addListener(function(request, sender, sendResponse) {
+        console.log(request.json);
         if (!request.cmd) return false;
     });
 });
@@ -1105,263 +1114,271 @@ chrome.runtime.onConnect.addListener(function (port) {
 
 /*global unescape, define, module */
 
-;(function ($) {
-  'use strict'
+;
+(function($) {
+    'use strict';
 
-  /*
-  * Add integers, wrapping at 2^32. This uses 16-bit operations internally
-  * to work around bugs in some JS interpreters.
-  */
-  function safe_add (x, y) {
-    var lsw = (x & 0xFFFF) + (y & 0xFFFF)
-    var msw = (x >> 16) + (y >> 16) + (lsw >> 16)
-    return (msw << 16) | (lsw & 0xFFFF)
-  }
-
-  /*
-  * Bitwise rotate a 32-bit number to the left.
-  */
-  function bit_rol (num, cnt) {
-    return (num << cnt) | (num >>> (32 - cnt))
-  }
-
-  /*
-  * These functions implement the four basic operations the algorithm uses.
-  */
-  function md5_cmn (q, a, b, x, s, t) {
-    return safe_add(bit_rol(safe_add(safe_add(a, q), safe_add(x, t)), s), b)
-  }
-  function md5_ff (a, b, c, d, x, s, t) {
-    return md5_cmn((b & c) | ((~b) & d), a, b, x, s, t)
-  }
-  function md5_gg (a, b, c, d, x, s, t) {
-    return md5_cmn((b & d) | (c & (~d)), a, b, x, s, t)
-  }
-  function md5_hh (a, b, c, d, x, s, t) {
-    return md5_cmn(b ^ c ^ d, a, b, x, s, t)
-  }
-  function md5_ii (a, b, c, d, x, s, t) {
-    return md5_cmn(c ^ (b | (~d)), a, b, x, s, t)
-  }
-
-  /*
-  * Calculate the MD5 of an array of little-endian words, and a bit length.
-  */
-  function binl_md5 (x, len) {
-    /* append padding */
-    x[len >> 5] |= 0x80 << (len % 32)
-    x[(((len + 64) >>> 9) << 4) + 14] = len
-
-    var i
-    var olda
-    var oldb
-    var oldc
-    var oldd
-    var a = 1732584193
-    var b = -271733879
-    var c = -1732584194
-    var d = 271733878
-
-    for (i = 0; i < x.length; i += 16) {
-      olda = a
-      oldb = b
-      oldc = c
-      oldd = d
-
-      a = md5_ff(a, b, c, d, x[i], 7, -680876936)
-      d = md5_ff(d, a, b, c, x[i + 1], 12, -389564586)
-      c = md5_ff(c, d, a, b, x[i + 2], 17, 606105819)
-      b = md5_ff(b, c, d, a, x[i + 3], 22, -1044525330)
-      a = md5_ff(a, b, c, d, x[i + 4], 7, -176418897)
-      d = md5_ff(d, a, b, c, x[i + 5], 12, 1200080426)
-      c = md5_ff(c, d, a, b, x[i + 6], 17, -1473231341)
-      b = md5_ff(b, c, d, a, x[i + 7], 22, -45705983)
-      a = md5_ff(a, b, c, d, x[i + 8], 7, 1770035416)
-      d = md5_ff(d, a, b, c, x[i + 9], 12, -1958414417)
-      c = md5_ff(c, d, a, b, x[i + 10], 17, -42063)
-      b = md5_ff(b, c, d, a, x[i + 11], 22, -1990404162)
-      a = md5_ff(a, b, c, d, x[i + 12], 7, 1804603682)
-      d = md5_ff(d, a, b, c, x[i + 13], 12, -40341101)
-      c = md5_ff(c, d, a, b, x[i + 14], 17, -1502002290)
-      b = md5_ff(b, c, d, a, x[i + 15], 22, 1236535329)
-
-      a = md5_gg(a, b, c, d, x[i + 1], 5, -165796510)
-      d = md5_gg(d, a, b, c, x[i + 6], 9, -1069501632)
-      c = md5_gg(c, d, a, b, x[i + 11], 14, 643717713)
-      b = md5_gg(b, c, d, a, x[i], 20, -373897302)
-      a = md5_gg(a, b, c, d, x[i + 5], 5, -701558691)
-      d = md5_gg(d, a, b, c, x[i + 10], 9, 38016083)
-      c = md5_gg(c, d, a, b, x[i + 15], 14, -660478335)
-      b = md5_gg(b, c, d, a, x[i + 4], 20, -405537848)
-      a = md5_gg(a, b, c, d, x[i + 9], 5, 568446438)
-      d = md5_gg(d, a, b, c, x[i + 14], 9, -1019803690)
-      c = md5_gg(c, d, a, b, x[i + 3], 14, -187363961)
-      b = md5_gg(b, c, d, a, x[i + 8], 20, 1163531501)
-      a = md5_gg(a, b, c, d, x[i + 13], 5, -1444681467)
-      d = md5_gg(d, a, b, c, x[i + 2], 9, -51403784)
-      c = md5_gg(c, d, a, b, x[i + 7], 14, 1735328473)
-      b = md5_gg(b, c, d, a, x[i + 12], 20, -1926607734)
-
-      a = md5_hh(a, b, c, d, x[i + 5], 4, -378558)
-      d = md5_hh(d, a, b, c, x[i + 8], 11, -2022574463)
-      c = md5_hh(c, d, a, b, x[i + 11], 16, 1839030562)
-      b = md5_hh(b, c, d, a, x[i + 14], 23, -35309556)
-      a = md5_hh(a, b, c, d, x[i + 1], 4, -1530992060)
-      d = md5_hh(d, a, b, c, x[i + 4], 11, 1272893353)
-      c = md5_hh(c, d, a, b, x[i + 7], 16, -155497632)
-      b = md5_hh(b, c, d, a, x[i + 10], 23, -1094730640)
-      a = md5_hh(a, b, c, d, x[i + 13], 4, 681279174)
-      d = md5_hh(d, a, b, c, x[i], 11, -358537222)
-      c = md5_hh(c, d, a, b, x[i + 3], 16, -722521979)
-      b = md5_hh(b, c, d, a, x[i + 6], 23, 76029189)
-      a = md5_hh(a, b, c, d, x[i + 9], 4, -640364487)
-      d = md5_hh(d, a, b, c, x[i + 12], 11, -421815835)
-      c = md5_hh(c, d, a, b, x[i + 15], 16, 530742520)
-      b = md5_hh(b, c, d, a, x[i + 2], 23, -995338651)
-
-      a = md5_ii(a, b, c, d, x[i], 6, -198630844)
-      d = md5_ii(d, a, b, c, x[i + 7], 10, 1126891415)
-      c = md5_ii(c, d, a, b, x[i + 14], 15, -1416354905)
-      b = md5_ii(b, c, d, a, x[i + 5], 21, -57434055)
-      a = md5_ii(a, b, c, d, x[i + 12], 6, 1700485571)
-      d = md5_ii(d, a, b, c, x[i + 3], 10, -1894986606)
-      c = md5_ii(c, d, a, b, x[i + 10], 15, -1051523)
-      b = md5_ii(b, c, d, a, x[i + 1], 21, -2054922799)
-      a = md5_ii(a, b, c, d, x[i + 8], 6, 1873313359)
-      d = md5_ii(d, a, b, c, x[i + 15], 10, -30611744)
-      c = md5_ii(c, d, a, b, x[i + 6], 15, -1560198380)
-      b = md5_ii(b, c, d, a, x[i + 13], 21, 1309151649)
-      a = md5_ii(a, b, c, d, x[i + 4], 6, -145523070)
-      d = md5_ii(d, a, b, c, x[i + 11], 10, -1120210379)
-      c = md5_ii(c, d, a, b, x[i + 2], 15, 718787259)
-      b = md5_ii(b, c, d, a, x[i + 9], 21, -343485551)
-
-      a = safe_add(a, olda)
-      b = safe_add(b, oldb)
-      c = safe_add(c, oldc)
-      d = safe_add(d, oldd)
+    /*
+     * Add integers, wrapping at 2^32. This uses 16-bit operations internally
+     * to work around bugs in some JS interpreters.
+     */
+    function safe_add(x, y) {
+        var lsw = (x & 0xFFFF) + (y & 0xFFFF);
+        var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+        return (msw << 16) | (lsw & 0xFFFF);
     }
-    return [a, b, c, d]
-  }
 
-  /*
-  * Convert an array of little-endian words to a string
-  */
-  function binl2rstr (input) {
-    var i
-    var output = ''
-    var length32 = input.length * 32
-    for (i = 0; i < length32; i += 8) {
-      output += String.fromCharCode((input[i >> 5] >>> (i % 32)) & 0xFF)
+    /*
+     * Bitwise rotate a 32-bit number to the left.
+     */
+    function bit_rol(num, cnt) {
+        return (num << cnt) | (num >>> (32 - cnt));
     }
-    return output
-  }
 
-  /*
-  * Convert a raw string to an array of little-endian words
-  * Characters >255 have their high-byte silently ignored.
-  */
-  function rstr2binl (input) {
-    var i
-    var output = []
-    output[(input.length >> 2) - 1] = undefined
-    for (i = 0; i < output.length; i += 1) {
-      output[i] = 0
+    /*
+     * These functions implement the four basic operations the algorithm uses.
+     */
+    function md5_cmn(q, a, b, x, s, t) {
+        return safe_add(bit_rol(safe_add(safe_add(a, q), safe_add(x, t)), s), b);
     }
-    var length8 = input.length * 8
-    for (i = 0; i < length8; i += 8) {
-      output[i >> 5] |= (input.charCodeAt(i / 8) & 0xFF) << (i % 32)
+
+    function md5_ff(a, b, c, d, x, s, t) {
+        return md5_cmn((b & c) | ((~b) & d), a, b, x, s, t);
     }
-    return output
-  }
 
-  /*
-  * Calculate the MD5 of a raw string
-  */
-  function rstr_md5 (s) {
-    return binl2rstr(binl_md5(rstr2binl(s), s.length * 8))
-  }
-
-  /*
-  * Calculate the HMAC-MD5, of a key and some data (raw strings)
-  */
-  function rstr_hmac_md5 (key, data) {
-    var i
-    var bkey = rstr2binl(key)
-    var ipad = []
-    var opad = []
-    var hash
-    ipad[15] = opad[15] = undefined
-    if (bkey.length > 16) {
-      bkey = binl_md5(bkey, key.length * 8)
+    function md5_gg(a, b, c, d, x, s, t) {
+        return md5_cmn((b & d) | (c & (~d)), a, b, x, s, t);
     }
-    for (i = 0; i < 16; i += 1) {
-      ipad[i] = bkey[i] ^ 0x36363636
-      opad[i] = bkey[i] ^ 0x5C5C5C5C
+
+    function md5_hh(a, b, c, d, x, s, t) {
+        return md5_cmn(b ^ c ^ d, a, b, x, s, t);
     }
-    hash = binl_md5(ipad.concat(rstr2binl(data)), 512 + data.length * 8)
-    return binl2rstr(binl_md5(opad.concat(hash), 512 + 128))
-  }
 
-  /*
-  * Convert a raw string to a hex string
-  */
-  function rstr2hex (input) {
-    var hex_tab = '0123456789abcdef'
-    var output = ''
-    var x
-    var i
-    for (i = 0; i < input.length; i += 1) {
-      x = input.charCodeAt(i)
-      output += hex_tab.charAt((x >>> 4) & 0x0F) +
-      hex_tab.charAt(x & 0x0F)
+    function md5_ii(a, b, c, d, x, s, t) {
+        return md5_cmn(c ^ (b | (~d)), a, b, x, s, t);
     }
-    return output
-  }
 
-  /*
-  * Encode a string as utf-8
-  */
-  function str2rstr_utf8 (input) {
-    return unescape(encodeURIComponent(input))
-  }
+    /*
+     * Calculate the MD5 of an array of little-endian words, and a bit length.
+     */
+    function binl_md5(x, len) {
+        /* append padding */
+        x[len >> 5] |= 0x80 << (len % 32);
+        x[(((len + 64) >>> 9) << 4) + 14] = len;
 
-  /*
-  * Take string arguments and return either raw or hex encoded strings
-  */
-  function raw_md5 (s) {
-    return rstr_md5(str2rstr_utf8(s))
-  }
-  function hex_md5 (s) {
-    return rstr2hex(raw_md5(s))
-  }
-  function raw_hmac_md5 (k, d) {
-    return rstr_hmac_md5(str2rstr_utf8(k), str2rstr_utf8(d))
-  }
-  function hex_hmac_md5 (k, d) {
-    return rstr2hex(raw_hmac_md5(k, d))
-  }
+        var i;
+        var olda;
+        var oldb;
+        var oldc;
+        var oldd;
+        var a = 1732584193;
+        var b = -271733879;
+        var c = -1732584194;
+        var d = 271733878;
 
-  function md5 (string, key, raw) {
-    if (!key) {
-      if (!raw) {
-        return hex_md5(string)
-      }
-      return raw_md5(string)
+        for (i = 0; i < x.length; i += 16) {
+            olda = a;
+            oldb = b;
+            oldc = c;
+            oldd = d;
+
+            a = md5_ff(a, b, c, d, x[i], 7, -680876936);
+            d = md5_ff(d, a, b, c, x[i + 1], 12, -389564586);
+            c = md5_ff(c, d, a, b, x[i + 2], 17, 606105819);
+            b = md5_ff(b, c, d, a, x[i + 3], 22, -1044525330);
+            a = md5_ff(a, b, c, d, x[i + 4], 7, -176418897);
+            d = md5_ff(d, a, b, c, x[i + 5], 12, 1200080426);
+            c = md5_ff(c, d, a, b, x[i + 6], 17, -1473231341);
+            b = md5_ff(b, c, d, a, x[i + 7], 22, -45705983);
+            a = md5_ff(a, b, c, d, x[i + 8], 7, 1770035416);
+            d = md5_ff(d, a, b, c, x[i + 9], 12, -1958414417);
+            c = md5_ff(c, d, a, b, x[i + 10], 17, -42063);
+            b = md5_ff(b, c, d, a, x[i + 11], 22, -1990404162);
+            a = md5_ff(a, b, c, d, x[i + 12], 7, 1804603682);
+            d = md5_ff(d, a, b, c, x[i + 13], 12, -40341101);
+            c = md5_ff(c, d, a, b, x[i + 14], 17, -1502002290);
+            b = md5_ff(b, c, d, a, x[i + 15], 22, 1236535329);
+
+            a = md5_gg(a, b, c, d, x[i + 1], 5, -165796510);
+            d = md5_gg(d, a, b, c, x[i + 6], 9, -1069501632);
+            c = md5_gg(c, d, a, b, x[i + 11], 14, 643717713);
+            b = md5_gg(b, c, d, a, x[i], 20, -373897302);
+            a = md5_gg(a, b, c, d, x[i + 5], 5, -701558691);
+            d = md5_gg(d, a, b, c, x[i + 10], 9, 38016083);
+            c = md5_gg(c, d, a, b, x[i + 15], 14, -660478335);
+            b = md5_gg(b, c, d, a, x[i + 4], 20, -405537848);
+            a = md5_gg(a, b, c, d, x[i + 9], 5, 568446438);
+            d = md5_gg(d, a, b, c, x[i + 14], 9, -1019803690);
+            c = md5_gg(c, d, a, b, x[i + 3], 14, -187363961);
+            b = md5_gg(b, c, d, a, x[i + 8], 20, 1163531501);
+            a = md5_gg(a, b, c, d, x[i + 13], 5, -1444681467);
+            d = md5_gg(d, a, b, c, x[i + 2], 9, -51403784);
+            c = md5_gg(c, d, a, b, x[i + 7], 14, 1735328473);
+            b = md5_gg(b, c, d, a, x[i + 12], 20, -1926607734);
+
+            a = md5_hh(a, b, c, d, x[i + 5], 4, -378558);
+            d = md5_hh(d, a, b, c, x[i + 8], 11, -2022574463);
+            c = md5_hh(c, d, a, b, x[i + 11], 16, 1839030562);
+            b = md5_hh(b, c, d, a, x[i + 14], 23, -35309556);
+            a = md5_hh(a, b, c, d, x[i + 1], 4, -1530992060);
+            d = md5_hh(d, a, b, c, x[i + 4], 11, 1272893353);
+            c = md5_hh(c, d, a, b, x[i + 7], 16, -155497632);
+            b = md5_hh(b, c, d, a, x[i + 10], 23, -1094730640);
+            a = md5_hh(a, b, c, d, x[i + 13], 4, 681279174);
+            d = md5_hh(d, a, b, c, x[i], 11, -358537222);
+            c = md5_hh(c, d, a, b, x[i + 3], 16, -722521979);
+            b = md5_hh(b, c, d, a, x[i + 6], 23, 76029189);
+            a = md5_hh(a, b, c, d, x[i + 9], 4, -640364487);
+            d = md5_hh(d, a, b, c, x[i + 12], 11, -421815835);
+            c = md5_hh(c, d, a, b, x[i + 15], 16, 530742520);
+            b = md5_hh(b, c, d, a, x[i + 2], 23, -995338651);
+
+            a = md5_ii(a, b, c, d, x[i], 6, -198630844);
+            d = md5_ii(d, a, b, c, x[i + 7], 10, 1126891415);
+            c = md5_ii(c, d, a, b, x[i + 14], 15, -1416354905);
+            b = md5_ii(b, c, d, a, x[i + 5], 21, -57434055);
+            a = md5_ii(a, b, c, d, x[i + 12], 6, 1700485571);
+            d = md5_ii(d, a, b, c, x[i + 3], 10, -1894986606);
+            c = md5_ii(c, d, a, b, x[i + 10], 15, -1051523);
+            b = md5_ii(b, c, d, a, x[i + 1], 21, -2054922799);
+            a = md5_ii(a, b, c, d, x[i + 8], 6, 1873313359);
+            d = md5_ii(d, a, b, c, x[i + 15], 10, -30611744);
+            c = md5_ii(c, d, a, b, x[i + 6], 15, -1560198380);
+            b = md5_ii(b, c, d, a, x[i + 13], 21, 1309151649);
+            a = md5_ii(a, b, c, d, x[i + 4], 6, -145523070);
+            d = md5_ii(d, a, b, c, x[i + 11], 10, -1120210379);
+            c = md5_ii(c, d, a, b, x[i + 2], 15, 718787259);
+            b = md5_ii(b, c, d, a, x[i + 9], 21, -343485551);
+
+            a = safe_add(a, olda);
+            b = safe_add(b, oldb);
+            c = safe_add(c, oldc);
+            d = safe_add(d, oldd);
+        }
+        return [a, b, c, d];
     }
-    if (!raw) {
-      return hex_hmac_md5(key, string)
-    }
-    return raw_hmac_md5(key, string)
-  }
 
-  if (typeof define === 'function' && define.amd) {
-    define(function () {
-      return md5
-    })
-  } else if (typeof module === 'object' && module.exports) {
-    module.exports = md5
-  } else {
-    $.md5 = md5
-  }
-}(this))
+    /*
+     * Convert an array of little-endian words to a string
+     */
+    function binl2rstr(input) {
+        var i;
+        var output = '';
+        var length32 = input.length * 32;
+        for (i = 0; i < length32; i += 8) {
+            output += String.fromCharCode((input[i >> 5] >>> (i % 32)) & 0xFF);
+        }
+        return output;
+    }
+
+    /*
+     * Convert a raw string to an array of little-endian words
+     * Characters >255 have their high-byte silently ignored.
+     */
+    function rstr2binl(input) {
+        var i;
+        var output = [];
+        output[(input.length >> 2) - 1] = undefined;
+        for (i = 0; i < output.length; i += 1) {
+            output[i] = 0;
+        }
+        var length8 = input.length * 8;
+        for (i = 0; i < length8; i += 8) {
+            output[i >> 5] |= (input.charCodeAt(i / 8) & 0xFF) << (i % 32);
+        }
+        return output;
+    }
+
+    /*
+     * Calculate the MD5 of a raw string
+     */
+    function rstr_md5(s) {
+        return binl2rstr(binl_md5(rstr2binl(s), s.length * 8));
+    }
+
+    /*
+     * Calculate the HMAC-MD5, of a key and some data (raw strings)
+     */
+    function rstr_hmac_md5(key, data) {
+        var i;
+        var bkey = rstr2binl(key);
+        var ipad = [];
+        var opad = [];
+        var hash;
+        ipad[15] = opad[15] = undefined;
+        if (bkey.length > 16) {
+            bkey = binl_md5(bkey, key.length * 8);
+        }
+        for (i = 0; i < 16; i += 1) {
+            ipad[i] = bkey[i] ^ 0x36363636;
+            opad[i] = bkey[i] ^ 0x5C5C5C5C;
+        }
+        hash = binl_md5(ipad.concat(rstr2binl(data)), 512 + data.length * 8);
+        return binl2rstr(binl_md5(opad.concat(hash), 512 + 128));
+    }
+
+    /*
+     * Convert a raw string to a hex string
+     */
+    function rstr2hex(input) {
+        var hex_tab = '0123456789abcdef';
+        var output = '';
+        var x;
+        var i;
+        for (i = 0; i < input.length; i += 1) {
+            x = input.charCodeAt(i);
+            output += hex_tab.charAt((x >>> 4) & 0x0F) +
+                hex_tab.charAt(x & 0x0F);
+        }
+        return output;
+    }
+
+    /*
+     * Encode a string as utf-8
+     */
+    function str2rstr_utf8(input) {
+        return unescape(encodeURIComponent(input));
+    }
+
+    /*
+     * Take string arguments and return either raw or hex encoded strings
+     */
+    function raw_md5(s) {
+        return rstr_md5(str2rstr_utf8(s));
+    }
+
+    function hex_md5(s) {
+        return rstr2hex(raw_md5(s));
+    }
+
+    function raw_hmac_md5(k, d) {
+        return rstr_hmac_md5(str2rstr_utf8(k), str2rstr_utf8(d));
+    }
+
+    function hex_hmac_md5(k, d) {
+        return rstr2hex(raw_hmac_md5(k, d));
+    }
+
+    function md5(string, key, raw) {
+        if (!key) {
+            if (!raw) {
+                return hex_md5(string);
+            }
+            return raw_md5(string);
+        }
+        if (!raw) {
+            return hex_hmac_md5(key, string);
+        }
+        return raw_hmac_md5(key, string);
+    }
+
+    if (typeof define === 'function' && define.amd) {
+        define(function() {
+            return md5;
+        });
+    } else if (typeof module === 'object' && module.exports) {
+        module.exports = md5;
+    } else {
+        $.md5 = md5;
+    }
+}(this));
