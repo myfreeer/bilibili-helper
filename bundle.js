@@ -922,7 +922,8 @@ window.stop();
 						}
 					}
 					xhr.onerror = () => {
-						setTimeout(() => request(i), 2000);
+						xhr.abort();
+						setTimeout(() => request(i), 500);
 					}
 	
 					xhr.onload = () => {
@@ -4102,4 +4103,3 @@ resize();
 
 /***/ }
 /******/ ]);
-//# sourceMappingURL=bundle.js.map

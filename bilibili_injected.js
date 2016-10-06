@@ -441,9 +441,9 @@
 							}
 						}
 					});
-				var int = setInterval(function() {
+				var interval = setInterval(function() {
 				    if (biliHelper.cmtLoaded) {
-				        clearInterval(int);
+				        clearInterval(interval);
 				        chrome.runtime.sendMessage({
 				            command: "playHdFlv",
 				        });
