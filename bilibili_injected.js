@@ -442,7 +442,7 @@
 						}
 					});
 				var interval = setInterval(function() {
-				    if (biliHelper.cmtLoaded) {
+				    if (typeof abp.commentList == 'object') {
 				        clearInterval(interval);
 				        chrome.runtime.sendMessage({
 				            command: "playHdFlv",
