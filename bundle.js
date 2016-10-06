@@ -294,6 +294,12 @@ window.stop();
 					console.log('getVideosResult:', res);
 					if (res.src.length == 1 && res.src[0].match('mp4')) {
 						nanobar.go(100);
+						let bbtn=document.getElementsByClassName('b-btn');
+						let html5btn;
+						for (let i in bbtn) {
+							if (typeof bbtn[i].getAttribute == 'function') if (bbtn[i].getAttribute('type') == "html5hd") html5btn = bbtn[i];
+						};
+						if (html5btn) html5btn.click();
 						return console.log('only mp4 available');
 					};
 					if (res) {
