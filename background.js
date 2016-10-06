@@ -268,7 +268,7 @@ function resolvePlaybackLink(avPlaybackLink, callback) {
     var xmlhttp = new XMLHttpRequest(),
         xmlChange = function() {
             if (xmlhttp.readyState == 2) {
-                console.log(xmlhttp);
+                //console.log(xmlhttp);
                 if (!retry && xmlhttp.status !== 200) {
                     retry = true;
                     xmlhttp.abort();
@@ -598,6 +598,33 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             chrome.tabs.executeScript(sender.tab.id, {
                 file: "bundle.js"
             });
+            return true;
+        case "getLowResVideo":
+            //fetch('http://api.bilibili.com/playurl?&aid='+request.avid+'&page='+request.pg+'&platform=html5').then;
+            try {
+                getFileData('http://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5', function(avDownloadLink) {
+                    avDownloadLink = JSON.parse(avDownloadLink);
+                    if (avDownloadLink.durl[0].url.match('mp4')) {
+                        var cid = avDownloadLink.cid.match(/\/[0-9]+\.xml/)[0];
+                        cid = cid.substring(1, cid.length - 4);
+                        sendResponse({
+                            link: avDownloadLink.durl[0].url,
+                            cid: cid,
+                            img: avDownloadLink.img,
+                            comment: avDownloadLink.cid,
+                            length: avDownloadLink.durl[0].length,
+                            size: avDownloadLink.durl[0].size,
+                            src: avDownloadLink
+                        });
+                    };
+                });
+            } catch (e) {
+                sendResponse({
+                    fails: 1,
+                    msg: e
+                });
+                console.error(e);
+            };
             return true;
         case "getVideoInfo":
             getVideoInfo(request.avid, request.pg, request.isBangumi, function(avInfo) {
