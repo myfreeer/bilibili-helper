@@ -595,7 +595,7 @@ return check; }
 			commentList: null,
 			commentListContainer: null,
 			lastSelectedComment: null,
-			commentCoolDown: 10000,
+			commentCoolDown: 5000,
 			commentScale: ABP.playerConfig.scale ? ABP.playerConfig.scale : 1,
 			proportionalScale: ABP.playerConfig.prop,
 			defaults: {

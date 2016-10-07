@@ -370,6 +370,7 @@
 				set: function(newMode) {
 					biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + this.current + '"]').addClass('w');
 					biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + newMode + '"]').removeClass('w');
+					if (checkFinished) clearInterval(checkFinished);
 					this.current = newMode;
 				},
 				original: function() {
@@ -449,6 +450,17 @@
 				        });
 				    }
 				}, 300);
+				var lastTime;
+				var checkFinished = setInterval(function() {
+					if (abp.video.currentTime !== lastTime){
+						lastTime = abp.video.currentTime;
+					} else {
+						if (abp.video.duration - abp.video.currentTime < 0.05) {
+							abp.video.currentTime = 0;
+							if (!abp.video.loop) abp.video.click();
+						};
+					};
+				}, 500);
 				},
 				html5hd: function() {
 					this.set('html5hd');
