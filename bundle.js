@@ -923,7 +923,7 @@ window.stop();
 					}
 					xhr.onerror = () => {
 						xhr.abort();
-						setTimeout(() => request(i), 500);
+						setTimeout(() => request(i), 300);
 					}
 	
 					xhr.onload = () => {
@@ -1279,7 +1279,7 @@ window.stop();
 				tryPrefetch(5.0);
 				setInterval(() => {
 					tryPrefetch();
-				}, 1500);
+				}, 500);
 			});
 		});
 	
@@ -1343,7 +1343,7 @@ window.stop();
 	
 		skip(len) {
 			if (this.pos >= this.buf.byteLength)
-				console.error('EOF');
+				throw new Error('EOF');
 			this.pos += len;
 		}
 	}
