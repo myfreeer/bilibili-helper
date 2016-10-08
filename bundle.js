@@ -921,10 +921,14 @@ window.stop();
 							xhr.setRequestHeader('Range', range);
 						}
 					}
+					
 					xhr.onerror = () => {
 						xhr.abort();
-						setTimeout(() => request(i), 300);
+						setTimeout(() => request(i), 100);
 					}
+					
+					xhr.ontimeout = xhr.onerror;
+					//xhr.timeout=10000;
 	
 					xhr.onload = () => {
 						let segbuf = new Uint8Array(xhr.response);
@@ -2675,16 +2679,7 @@ window.stop();
 	const SECRETKEY_MINILOADER = '1c15888dc316e05a15fdd0a02ed6584f';
 	let interfaceUrl = (cid, ts) => `cid=${cid}&player=1&ts=${ts}`;
 	let calcSign = (cid, ts) => md5(`${interfaceUrl(cid,ts)}${SECRETKEY_MINILOADER}`);
-	
-	exports.calcSign = calcSign;
-	exports.testUrl = url => url.match('bilibili.com/')
-	
-	exports.getVideos = (url) => {
-		return fetch(url, {credentials: 'include'}).then(res => res.text()).then(res => {
-			let cid = res.match(/cid=(\d+)/);
-			if (cid)
-				return cid[1];
-		}).then(function(cid) {
+	let getVideosByCid = function(cid) {
 			if (!cid)
 				return;
 	
@@ -2703,7 +2698,23 @@ window.stop();
 					commentUrl: 'http://comment.bilibili.com/'+cid+'.xml',
 				}
 			})
-		});
+		};
+	exports.calcSign = calcSign;
+	exports.testUrl = url => url.match('bilibili.com/')
+	
+	exports.getVideos = (url) => {
+		let cid;
+		try {
+			cid=document.getElementsByClassName('section video')[0].lastChild.lastChild.innerText.substring(5);
+			return getVideosByCid(cid)
+		} catch (e) {
+		return fetch(url, {credentials: 'include'}).then(res => res.text()).then(res => {
+			let cid = res.match(/cid=(\d+)/);
+			if (typeof cid == 'undefined') cid=document.getElementsByClassName('section video')[0].lastChild.lastChild.innerText.substring(5);
+			if (cid)
+				return cid[1];
+		}).then(getVideosByCid);
+	}
 	}
 	
 	function pad(num, n) { 
