@@ -1577,7 +1577,7 @@ function AcfunParser(jsond){
  **/
 var filters=[];
 function BilibiliParser(xmlDoc, text, warn){	
-	var formatmode7 = function formatmode7(text) {
+	function formatmode7(text) {
 	    if (text.charAt(0) == '[') switch (text.charAt(text.length - 1)) {
 	        case ']':
 	            return text;

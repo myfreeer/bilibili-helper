@@ -264,7 +264,7 @@
 					}, function(response){
 						try {
 							filters = JSON.parse(response);
-							//console.log(response);
+							console.log(filters);
 						} catch(e) {
 							filters = [];
 							console.warn("Invalid filter record: "+response+"\n"+e);

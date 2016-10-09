@@ -1,4 +1,3 @@
-window.stop();
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -902,6 +901,8 @@ window.stop();
 					let range = ranges[i];
 					let {url,start,end} = range;
 					dbp('fetch:', `bytes=[${start},${end}]`);
+					console.log(start == end);
+					if (start == end) throw new Error('EOF');
 					xhr = new XMLHttpRequest();
 					xhr.open('GET', url);
 					xhr.responseType = 'arraybuffer';
@@ -928,9 +929,11 @@ window.stop();
 					}
 					
 					xhr.ontimeout = xhr.onerror;
-					//xhr.timeout=10000;
+					xhr.timeout=23456;
 	
 					xhr.onload = () => {
+						if (xhr.response.byteLength < 100000 && i+1 < ranges.length) xhr.onerror();
+						if (xhr.response.byteLength < 1 && i+1 == ranges.length) xhr.onerror();
 						let segbuf = new Uint8Array(xhr.response);
 						let cputimeStart = new Date().getTime();
 						let buf = this.transcodeMediaSegments(segbuf, range);
@@ -1191,7 +1194,7 @@ window.stop();
 					time = 0;
 				}
 	
-				if (time < video.currentTime + 60.0)
+				if (time < video.currentTime + 345.0)
 					fetchAndAppend(time, duration);
 			}
 	
