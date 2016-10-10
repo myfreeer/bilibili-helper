@@ -980,19 +980,20 @@
 
 	function getNiceSectionFilename(avid, page, totalPage, idx, numParts) {
 		// TODO inspect the page to get better section name
-		var idName = 'av' + avid + '_',
+		var idName = 'av' + avid,
 			// page/part name is only shown when there are more than one pages/parts
-			pageIdName = (totalPage && (totalPage > 1)) ? ('p' + page + '_') : "",
+			pageIdName = (totalPage && (totalPage > 1)) ? ('p' + page) : "",
 			pageName = "",
-			partIdName = (numParts && (numParts > 1)) ? ('' + idx + '_') : "";
+			partIdName = (numParts && (numParts > 1)) ? ('' + idx) : "";
 
 		// try to find a good page name
 		if (pageIdName) {
 			pageName = $('.player-wrapper #plist > span').text();
-			pageName = pageName.substr(pageName.indexOf('、') + 1) + '_';
+			pageName = pageName.substr(pageName.indexOf('、') + 1);
+			return partIdName ? pageName + '_' + $('div.v-title').text() + '_' + idName +'_' +pageIdName + '_' + partIdName : pageName + '_' + $('div.v-title').text() + '_' + idName +'_' +pageIdName;
 		}
 		// document.title contains other info feeling too much
-		return idName + pageIdName + pageName + partIdName + $('div.v-title').text();
+		return partIdName ? $('div.v-title').text() + '_' + idName  + '_' + partIdName :  $('div.v-title').text() + '_' + idName;
 	}
 
 	// Helper function, return object {url, filename}, options object used by
