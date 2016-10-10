@@ -941,7 +941,7 @@
 					xhr.ontimeout = xhr.onerror;
 					xhr.timeout=1000;
 					xhr.onreadystatechange = () => {
-						//32768 = 256 / 8 * 1024 ,simulating a 256kbps network (hardly to find a network slower than this
+						//32768 = 256 / 8 * 1024 ,simulating a 256kbps network (hardly to find a network slower than this)
 						if (xhr.readyState > 2) xhr.timeout = 1000 + (end - start +1000) / 32768;
 						if (xhr.getResponseHeader('Content-Length') > end - start +1000) xhr.onerror()
 					}
@@ -2509,7 +2509,6 @@
 		if (retries) {
 			return new Promise(function(resolve, reject) {
 				var wrappedFetch = function(n) {
-					opts.mode='cors';
 					fetch(url, opts).then(function(res) {
 						if (!(res.status >= 200 && res.status < 300)) {
 							if (n > 0) {
@@ -2522,7 +2521,7 @@
 						} else {
 							resolve(res);
 						}
-					}).catch(reject);
+					}).catch(() => {wrappedFetch(--n);});
 				}
 				wrappedFetch(retries);
 			});
