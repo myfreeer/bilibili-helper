@@ -256,7 +256,7 @@
 				resetCur();
 			})
 	
-			/*player.onResume.push(() => {
+			player.onResume.push(() => {
 				if (emitter == null) {
 		 			emitter = new FastDamoo({container:player.damoo, fontSize:20});
 					let setDamooOpts = () => {
@@ -278,7 +278,7 @@
 				emitter.synctime(video.currentTime);
 				emitter.suspend()
 				stopUpdate();
-			});*/
+			});
 	
 		});
 	}
@@ -304,7 +304,7 @@
 					if (res) {
 						let ctrl = playVideo(res);
 						ctrl.player.onStarted.push(() => nanobar.go(100));
-						//handleDamoo(res, ctrl.player, seeker, ctrl.media);
+						handleDamoo(res, ctrl.player, seeker, ctrl.media);
 						nanobar.go(60)
 						fulfill(ctrl);
 					} else {

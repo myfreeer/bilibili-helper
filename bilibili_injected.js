@@ -375,6 +375,7 @@
 					biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + this.current + '"]').addClass('w');
 					biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + newMode + '"]').removeClass('w');
 					try{clearInterval(checkFinished);} catch(e){}
+					try{clearInterval(interval);} catch(e){}
 					if (newMode.match('html5')) {
 						biliHelper.mainBlock.speedSection.removeClass('hidden');
 					} else {
@@ -404,10 +405,26 @@
 					});
 				},
 				bilih5: function() {
-					if (document.getElementsByClassName('bgray-btn-wrap')[0].firstChild.innerText.match('HTML5')) {
-					    document.getElementsByClassName('bgray-btn-wrap')[0].firstChild.click();
-					    this.set('bilih5');
-					};
+				    if (document.getElementsByClassName('bgray-btn-wrap')[0].firstChild.innerText.match('HTML5')) {
+				        document.getElementsByClassName('bgray-btn-wrap')[0].firstChild.click();
+				        this.set('bilih5');
+				        var interval = setInterval(function() {
+				            try {
+				                var bilibilivideo = document.getElementsByClassName('bilibili-player-video')[0].firstChild;
+				                if (bilibilivideo.tagName == "VIDEO") {
+				                    biliHelper.mainBlock.speedSection.removeClass('hidden');
+				                    clearInterval(interval);
+				                    biliHelper.mainBlock.speedSection.input.addEventListener("change", function(e) {
+				                        if (Number(biliHelper.mainBlock.speedSection.input.value)) {
+				                            bilibilivideo.playbackRate = Number(biliHelper.mainBlock.speedSection.input.value);
+				                        } else {
+				                            biliHelper.mainBlock.speedSection.input.value = 1.0;
+				                        };
+				                    });
+				                };
+				            } catch (e) {}
+				        }, 500);
+				    };
 				},
 				html5: function() {
 					this.set('html5');
