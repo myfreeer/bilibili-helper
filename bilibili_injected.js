@@ -158,12 +158,16 @@
 		chrome.runtime.sendMessage({
 			command: "getDownloadLink",
 			cid: biliHelper.cid,
+				avid: biliHelper.avid,
+				pg: biliHelper.page,
 			cidHack: forceCidHack || biliHelper.cidHack
 		}, function(response) {
 			var videoDownloadLink = response["download"],
-				videoPlaybackLink = response["playback"];
+				videoPlaybackLink = response["playback"],
+			videoLowResLink = response["lowres"];
 			biliHelper.downloadUrls = [];
 			biliHelper.playbackUrls = [];
+			biliHelper.lowResUrl=videoLowResLink;
 			notifyCidHack();
 			if (typeof videoPlaybackLink == "undefined" || typeof videoPlaybackLink.durl == "undefined" || Number(videoPlaybackLink.code) < 0) {
 				if (typeof videoDownloadLink.message == "string" || videoDownloadLink.result.indexOf("error") >= 0  || typeof videoDownloadLink.error_text == "string") {
@@ -399,6 +403,12 @@
 						$('#bofqi').html('<iframe height="536" width="980" class="player" src="https://secure.bilibili.com/secure,cid=' + biliHelper.cid + '&aid=' + biliHelper.avid + '" scrolling="no" border="0" frameborder="no" framespacing="0" onload="window.securePlayerFrameLoaded=true"></iframe>');
 					});
 				},
+				bilih5: function() {
+					if (document.getElementsByClassName('bgray-btn-wrap')[0].firstChild.innerText.match('HTML5')) {
+					    document.getElementsByClassName('bgray-btn-wrap')[0].firstChild.click();
+					    this.set('bilih5');
+					};
+				},
 				html5: function() {
 					this.set('html5');
 					$('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + biliHelper.videoPic + '" autobuffer preload="auto" crossorigin="anonymous"><source src="' + biliHelper.playbackUrls[0].url + '" type="video/mp4"></video></div>');
@@ -474,7 +484,7 @@
 							if (!abp.video.loop) abp.video.click();
 						};
 					};
-				}, 500);
+				}, 600);
 				},
 				html5hd: function() {
 					this.set('html5hd');
@@ -535,73 +545,63 @@
 					});
 				},
 				html5ld: function() {
+				    console.log(biliHelper.lowResUrl);
+				    $('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + biliHelper.videoPic + '" autobuffer preload="auto" crossorigin="anonymous"><source src="' + biliHelper.lowResUrl.durl[0].url + '" type="video/mp4"></video></div>');
 				    this.set('html5ld');
-				    chrome.runtime.sendMessage({
-				        command: "getLowResVideo",
-				        avid: biliHelper.avid,
-				        pg: biliHelper.page + biliHelper.pageOffset
-				    }, function(response) {
-				        if (typeof response.fails !== 'undefined') {
-				            console.error(response.msg);
-				            biliHelper.switcher.set('html5');
-				            return false;
+				    var abp = ABP.create(document.getElementById("bilibili_helper_html5_player"), {
+				        src: {
+				            playlist: [{
+				                video: document.getElementById("bilibili_helper_html5_player_video"),
+				                comments: "http://comment.bilibili.com/" + biliHelper.cid + ".xml"
+				            }]
+				        },
+				        width: "100%",
+				        height: "100%",
+				        config: biliHelper.playerConfig
+				    });
+				    abp.playerUnit.addEventListener("wide", function() {
+				        $("#bofqi").addClass("wide");
+				    });
+				    abp.playerUnit.addEventListener("normal", function() {
+				        $("#bofqi").removeClass("wide");
+				    });
+				    abp.playerUnit.addEventListener("sendcomment", function(e) {
+				        var commentId = e.detail.id,
+				            commentData = e.detail;
+				        delete e.detail.id;
+				        chrome.runtime.sendMessage({
+				            command: "sendComment",
+				            avid: biliHelper.avid,
+				            cid: biliHelper.cid,
+				            page: biliHelper.page + biliHelper.pageOffset,
+				            comment: commentData
+				        }, function(response) {
+				            response.tmp_id = commentId;
+				            abp.commentCallback(response);
+				        });
+				    });
+				    abp.playerUnit.addEventListener("saveconfig", function(e) {
+				        chrome.runtime.sendMessage({
+				            command: "savePlayerConfig",
+				            config: e.detail
+				        });
+				    });
+				    biliHelper.mainBlock.speedSection.input.addEventListener("change", function(e) {
+				        if (Number(biliHelper.mainBlock.speedSection.input.value)) {
+				            abp.video.playbackRate = Number(biliHelper.mainBlock.speedSection.input.value);
+				        } else {
+				            biliHelper.mainBlock.speedSection.input.value = 1.0;
 				        };
-				        $('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + response.img + '" autobuffer preload="auto" crossorigin="anonymous"><source src="' + response.link + '" type="video/mp4"></video></div>');
-				        var abp = ABP.create(document.getElementById("bilibili_helper_html5_player"), {
-				            src: {
-				                playlist: [{
-				                    video: document.getElementById("bilibili_helper_html5_player_video"),
-				                    comments: response.comment
-				                }]
-				            },
-				            width: "100%",
-				            height: "100%",
-				            config: biliHelper.playerConfig
-				        });
-				        abp.playerUnit.addEventListener("wide", function() {
-				            $("#bofqi").addClass("wide");
-				        });
-				        abp.playerUnit.addEventListener("normal", function() {
-				            $("#bofqi").removeClass("wide");
-				        });
-				        abp.playerUnit.addEventListener("sendcomment", function(e) {
-				            var commentId = e.detail.id,
-				                commentData = e.detail;
-				            delete e.detail.id;
-				            chrome.runtime.sendMessage({
-				                command: "sendComment",
-				                avid: biliHelper.avid,
-				                cid: biliHelper.cid,
-				                page: biliHelper.page + biliHelper.pageOffset,
-				                comment: commentData
-				            }, function(response) {
-				                response.tmp_id = commentId;
-				                abp.commentCallback(response);
-				            });
-				        });
-				        abp.playerUnit.addEventListener("saveconfig", function(e) {
-				            chrome.runtime.sendMessage({
-				                command: "savePlayerConfig",
-				                config: e.detail
-				            });
-				        });
-				        biliHelper.mainBlock.speedSection.input.addEventListener("change", function(e) {
-						if(Number(biliHelper.mainBlock.speedSection.input.value)){
-							abp.video.playbackRate = Number(biliHelper.mainBlock.speedSection.input.value);
-						} else {
-							biliHelper.mainBlock.speedSection.input.value = 1.0;
-						};
-				        });
-				        var bofqiHeight = 0;
-				        $(window).scroll(function() {
-				            if (bofqiHeight != $("#bofqi").width()) {
-				                bofqiHeight = $("#bofqi").width();
-				                if (abp && abp.cmManager) {
-				                    abp.cmManager.setBounds();
-				                }
+				    });
+				    var bofqiHeight = 0;
+				    $(window).scroll(function() {
+				        if (bofqiHeight != $("#bofqi").width()) {
+				            bofqiHeight = $("#bofqi").width();
+				            if (abp && abp.cmManager) {
+				                abp.cmManager.setBounds();
 				            }
-				        });
-				    })
+				        }
+				    });
 				},
 				bilimac: function() {
 					this.set('bilimac');
@@ -649,7 +649,7 @@
 			biliHelper.mainBlock.speedSection.input = biliHelper.mainBlock.speedSection.find('input#bilibili_helper_html5_video_speed.b-input')[0];
 			biliHelper.mainBlock.speedSection.input.step = 0.1;
 			biliHelper.mainBlock.switcherSection = $('<div class="section switcher"><h3>播放器切换</h3><p></p></div>');
-			biliHelper.mainBlock.switcherSection.find('p').append($('<a class="b-btn w" type="original">原始播放器</a><a class="b-btn w hidden" type="bilimac">Mac 客户端</a><a class="b-btn w hidden" type="swf">SWF 播放器</a><a class="b-btn w hidden" type="iframe">Iframe 播放器</a><a class="b-btn w hidden" type="html5">HTML5 (超清)</a><a class="b-btn w hidden" type="html5hd">HTML5 (高清)</a><a class="b-btn w hidden" type="html5ld">HTML5 (低清)</a>').click(function() {
+			biliHelper.mainBlock.switcherSection.find('p').append($('<a class="b-btn w" type="original">原始播放器</a><a class="b-btn w" type="bilih5">原始HTML5</a><a class="b-btn w hidden" type="bilimac">Mac 客户端</a><a class="b-btn w hidden" type="swf">SWF 播放器</a><a class="b-btn w hidden" type="iframe">Iframe 播放器</a><a class="b-btn w hidden" type="html5">HTML5 (超清)</a><a class="b-btn w hidden" type="html5hd">HTML5 (高清)</a><a class="b-btn w hidden" type="html5ld">HTML5 (低清)</a>').click(function() {
 				biliHelper.switcher[$(this).attr('type')]();
 			}));
 			if (biliHelper.redirectUrl) {

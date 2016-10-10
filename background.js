@@ -153,7 +153,6 @@ function postFileData(url, data, callback) {
             if (typeof callback == "function") callback(xmlhttp.responseText);
         }
     };
-    xmlhttp.ontimeout = xmlChange;
     xmlhttp.send(encodeData);
 }
 
@@ -275,6 +274,8 @@ function resolvePlaybackLink(avPlaybackLink, callback) {
                     xmlhttp = new XMLHttpRequest();
                     xmlhttp.open("GET", avPlaybackLink.durl[0].url, true);
                     xmlhttp.onreadystatechange = xmlChange;
+                    xmlhttp.ontimeout = xmlChange;
+                    xmlhttp.timeout = 2000;
                     xmlhttp.send();
                 }
                 var url = xmlhttp.responseURL || avPlaybackLink.durl[0].url;
@@ -292,7 +293,6 @@ function resolvePlaybackLink(avPlaybackLink, callback) {
     xmlhttp.open("HEAD", avPlaybackLink.durl[0].url, true);
     xmlhttp.onreadystatechange = xmlChange;
     xmlhttp.ontimeout = xmlChange;
-    //xmlhttp.timeout = 2000;
     xmlhttp.send();
 }
 
@@ -599,7 +599,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                 file: "bundle.js"
             });
             return true;
-        case "getLowResVideo":
+/*        case "getLowResVideo":
             //fetch('http://api.bilibili.com/playurl?&aid='+request.avid+'&page='+request.pg+'&platform=html5').then;
             try {
                 getFileData('http://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5', function(avDownloadLink) {
@@ -625,7 +625,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                 });
                 console.error(e);
             };
-            return true;
+            return true;*/
         case "getVideoInfo":
             getVideoInfo(request.avid, request.pg, request.isBangumi, function(avInfo) {
                 sendResponse({
@@ -636,7 +636,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         case "getDownloadLink":
             var url = {
                 download: getOption("dlquality") == 'flv' && use_SECRETKEY_MINILOADER ? "http://interface.bilibili.com/playurl?&cid=" + request.cid + "&from=miniplay&otype=json&player=1&sign=" + md5("cid=" + request.cid + "&from=miniplay&otype=json&player=1" + SECRETKEY_MINILOADER) : "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + appsec),
-                playback: "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + appsec)
+                playback: "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + appsec),
+                lowres: 'http://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5'
             };
             if (request.cidHack && request.cidHack != locale) {
                 cidHackType[request.cid] = request.cidHack;
@@ -645,23 +646,31 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                 avDownloadLink = JSON.parse(avDownloadLink);
                 if (getOption("dlquality") == 'mp4') {
                     if (avDownloadLink)
-                        resolvePlaybackLink(avDownloadLink, function(avRealPlaybackLink) {
-                            sendResponse({
-                                download: avDownloadLink,
-                                playback: avRealPlaybackLink,
-                                dlquality: getOption("dlquality"),
-                                rel_search: getOption("rel_search")
+                        getFileData(url["lowres"], function(avLowResLink) {
+                            avLowResLink = JSON.parse(avLowResLink);
+                            resolvePlaybackLink(avDownloadLink, function(avRealPlaybackLink) {
+                                sendResponse({
+                                    download: avDownloadLink,
+                                    playback: avRealPlaybackLink,
+                                    lowres: avLowResLink,
+                                    dlquality: getOption("dlquality"),
+                                    rel_search: getOption("rel_search")
+                                });
                             });
                         });
                 } else {
                     getFileData(url["playback"], function(avPlaybackLink) {
                         avPlaybackLink = JSON.parse(avPlaybackLink);
-                        resolvePlaybackLink(avPlaybackLink, function(avRealPlaybackLink) {
-                            sendResponse({
-                                download: avDownloadLink,
-                                playback: avRealPlaybackLink,
-                                dlquality: getOption("dlquality"),
-                                rel_search: getOption("rel_search")
+                        getFileData(url["lowres"], function(avLowResLink) {
+                            avLowResLink = JSON.parse(avLowResLink);
+                            resolvePlaybackLink(avPlaybackLink, function(avRealPlaybackLink) {
+                                sendResponse({
+                                    download: avDownloadLink,
+                                    playback: avRealPlaybackLink,
+                                    lowres: avLowResLink,
+                                    dlquality: getOption("dlquality"),
+                                    rel_search: getOption("rel_search")
+                                });
                             });
                         });
                     });

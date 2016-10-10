@@ -256,7 +256,7 @@
 				resetCur();
 			})
 	
-			player.onResume.push(() => {
+			/*player.onResume.push(() => {
 				if (emitter == null) {
 		 			emitter = new FastDamoo({container:player.damoo, fontSize:20});
 					let setDamooOpts = () => {
@@ -278,7 +278,7 @@
 				emitter.synctime(video.currentTime);
 				emitter.suspend()
 				stopUpdate();
-			});
+			});*/
 	
 		});
 	}
@@ -303,7 +303,7 @@
 					};
 					if (res) {
 						let ctrl = playVideo(res);
-						ctrl.player.onStarted.push(() => nanobar.go(100));
+						//ctrl.player.onStarted.push(() => nanobar.go(100));
 						handleDamoo(res, ctrl.player, seeker, ctrl.media);
 						nanobar.go(60)
 						fulfill(ctrl);
@@ -768,8 +768,19 @@
 		probeOneByOne() {
 			let url = this.urls[this.probeIdx];
 			return this.fetchInitSegment(url).then(flvhdr => {
-				if (flvhdr == null)
-					return Promise.reject(new Error('probe '+url+' failed'));
+				if (flvhdr == null) {
+				    let bbtn = document.getElementsByClassName('b-btn');
+				    let html5btn;
+				    for (let i in bbtn) {
+				        if (typeof bbtn[i].getAttribute == 'function')
+				            if (bbtn[i].getAttribute('type') == "html5hd") html5btn = bbtn[i];
+				    };
+				    if (html5btn) {
+				        html5btn.click();
+				        if (document.getElementsByClassName('nanobar')[0].firstChild.className == "bar") document.getElementsByClassName('nanobar')[0].remove();
+				    };
+				    return Promise.reject(new Error('probe ' + url + ' failed'));
+				};
 				let stream = flvhdr;
 	
 				this.streams.push(stream);
@@ -930,7 +941,7 @@
 					xhr.ontimeout = xhr.onerror;
 					xhr.timeout=23456;
 					xhr.onreadystatechange = () => {
-						if (xhr.getResponseHeader('Content-Length') > end - start +1) xhr.onerror()
+						if (xhr.getResponseHeader('Content-Length') > end - start +1000) xhr.onerror()
 					}
 	
 					xhr.onload = () => {
