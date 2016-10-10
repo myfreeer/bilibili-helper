@@ -303,8 +303,8 @@
 					};
 					if (res) {
 						let ctrl = playVideo(res);
-						//ctrl.player.onStarted.push(() => nanobar.go(100));
-						handleDamoo(res, ctrl.player, seeker, ctrl.media);
+						ctrl.player.onStarted.push(() => nanobar.go(100));
+						//handleDamoo(res, ctrl.player, seeker, ctrl.media);
 						nanobar.go(60)
 						fulfill(ctrl);
 					} else {
