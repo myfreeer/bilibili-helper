@@ -901,7 +901,6 @@
 					let range = ranges[i];
 					let {url,start,end} = range;
 					dbp('fetch:', `bytes=[${start},${end}]`);
-					console.log(start == end);
 					if (start == end) throw new Error('EOF');
 					xhr = new XMLHttpRequest();
 					xhr.open('GET', url);
@@ -930,10 +929,13 @@
 					
 					xhr.ontimeout = xhr.onerror;
 					xhr.timeout=23456;
+					xhr.onreadystatechange = () => {
+						if (xhr.getResponseHeader('Content-Length') > end - start +1) xhr.onerror()
+					}
 	
 					xhr.onload = () => {
-						if (xhr.response.byteLength < 100000 && i+1 < ranges.length) xhr.onerror();
-						if (xhr.response.byteLength < 1 && i+1 == ranges.length) xhr.onerror();
+						//if (xhr.response.byteLength < 100000 && i+1 < ranges.length) xhr.onerror();
+						if (xhr.response.byteLength < end - start && i+1 <= ranges.length) xhr.onerror();
 						let segbuf = new Uint8Array(xhr.response);
 						let cputimeStart = new Date().getTime();
 						let buf = this.transcodeMediaSegments(segbuf, range);
