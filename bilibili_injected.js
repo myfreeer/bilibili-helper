@@ -236,11 +236,11 @@
 						// register a callback that can talk to extension background
 						$bhDownLink.click(function(e) {
 							e.preventDefault();
-							chrome.runtime.sendMessage({
-								command: 'requestForDownload',
-								url: $(e.target).attr('href'),
-								filename: $(e.target).data('download')
-							});
+							var mainProcessBar=$('<div class="progress-bar" style="overflow: hidden;left: 5px;background: #949494;width: calc(100% - 10px);height: 6px;border-radius: 6px;"></div>');
+							var processBar=$('<div class="dload" style="width: 0%;background: #00a8d8;height: 6px;border-radius: 6px;"></div>');
+							mainProcessBar.append(processBar);
+							biliHelper.mainBlock.downloaderSection.append(mainProcessBar);
+							biliHelper.requestForDownload($(e.target).attr('href'), processBar[0], $bhDownLink.text, $(e.target).data('download'));
 						});
 					}
 				}
@@ -369,6 +369,36 @@
 				biliHelper.copyright = true;
 			}
 			biliHelper.copyright = false;
+			biliHelper.requestForDownload = function(url, processbar, text, filename) {
+			    xhr = new XMLHttpRequest();
+			    xhr.open('GET', url);
+			    xhr.responseType = 'blob';
+			    //var originalText = text.innerText;
+			    xhr.onerror = function() {
+			        xhr.abort();
+			        setTimeout(requestForDownload(url, processbar, text, filename), 150);
+			    };
+			    xhr.ontimeout = xhr.onerror;
+			    xhr.onprogress = function(evt) {
+			        if (evt.lengthComputable) {
+			        	console.log(processbar);
+			            var percentComplete = evt.loaded * 100 / evt.total;
+			           // text.innerText = Math.round(percentComplete) + '%';
+			            processbar.style.width = percentComplete + '%';
+			            if (percentComplete == 100) {}
+			        }
+			    };
+			    xhr.onload = function() {
+			        var downUrl = window.URL.createObjectURL(xhr.response);
+			        chrome.runtime.sendMessage({
+			            command: 'requestForDownload',
+			            url: downUrl,
+			            filename: filename
+			        });
+			        //text.innerText = originalText;
+			    };
+			    xhr.send();
+			};
 			biliHelper.switcher = {
 				current: "original",
 				set: function(newMode) {
