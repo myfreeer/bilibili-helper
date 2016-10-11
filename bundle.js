@@ -174,6 +174,10 @@
 			src:res.src,
 			duration:res.duration,
 		});
+			for (let i in res.src) {
+				let linktodl=document.getElementById('bili_helper_down_link_' + i.toString());
+				if (linktodl) linktodl.setAttribute('href',res.src[i]);
+			};
 			console.log({
 			video:player.video,
 			src:res.src,
@@ -939,10 +943,10 @@
 					}
 					
 					xhr.ontimeout = xhr.onerror;
-					xhr.timeout=1000;
+					xhr.timeout=2500;
 					xhr.onreadystatechange = () => {
 						//32768 = 256 / 8 * 1024 ,simulating a 256kbps network (hardly to find a network slower than this)
-						if (xhr.readyState > 2) xhr.timeout = 1000 + (end - start +1000) / 32768;
+						if (xhr.readyState > 2) xhr.timeout += (end - start +1000) / 32768;
 						if (xhr.getResponseHeader('Content-Length') > end - start +1000) xhr.onerror()
 					}
 	
