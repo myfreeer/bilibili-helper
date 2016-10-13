@@ -764,7 +764,7 @@
 					}
 				});
 			}
-			return fetch(url, {headers: {Range: 'bytes=0-5000000'}, retries: 1024}).then(res => {
+			return fetch(url, {headers: {Range: 'bytes=0-5000000'}, retries: 128}).then(res => {
 				return pump(res.body.getReader())
 			});
 		}
@@ -943,7 +943,7 @@
 					}
 					
 					xhr.ontimeout = xhr.onerror;
-					xhr.timeout=2500;
+					xhr.timeout=2000;
 					xhr.onreadystatechange = () => {
 						//32768 = 256 / 8 * 1024 ,simulating a 256kbps network (hardly to find a network slower than this)
 						if (xhr.readyState > 2) xhr.timeout += (end - start +1000) / 32768;
@@ -2518,7 +2518,7 @@
 							if (n > 0) {
 								setTimeout(function() {
 									wrappedFetch(--n);
-								}, 1000);
+								}, 300);
 							} else {
 								reject(new Error('try to death'));
 							}

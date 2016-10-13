@@ -226,7 +226,7 @@
 								getNiceSectionFilename(biliHelper.avid,
 									biliHelper.page, biliHelper.totalPage,
 									i, biliHelper.downloadUrls.length)),
-							$bhDownLink = $('<a class="b-btn w" rel="noreferrer"></a>')
+							$bhDownLink = $('<a class="b-btn w" rel="noreferrer" id="bili_helper_down_link_' + parseInt(i) + '"></a>')
 							.text('分段 ' + (parseInt(i) + 1))
 							// Set download attribute to better file name. When use "Save As" dialog, this value gets respected even the target is not from the same origin.
 							.data('download', downloadOptions.filename)
@@ -990,8 +990,10 @@
 		if (pageIdName) {
 			pageName = $('.player-wrapper #plist > span').text();
 			pageName = pageName.substr(pageName.indexOf('、') + 1);
+			if(!partIdName) document.title = pageName + '_' + $('div.v-title').text() + '_' + idName +'_' +pageIdName;
 			return partIdName ? pageName + '_' + $('div.v-title').text() + '_' + idName +'_' +pageIdName + '_' + partIdName : pageName + '_' + $('div.v-title').text() + '_' + idName +'_' +pageIdName;
 		}
+		if(!partIdName) document.title = $('div.v-title').text() + '_' + idName;
 		// document.title contains other info feeling too much
 		return partIdName ? $('div.v-title').text() + '_' + idName  + '_' + partIdName :  $('div.v-title').text() + '_' + idName;
 	}

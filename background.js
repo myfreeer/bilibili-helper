@@ -91,7 +91,8 @@ function getFileData(url, callback, method) {
             if (typeof callback == "function") callback("{}");
         }
     };
-    xmlhttp.ontimeout=xmlhttp.onreadystatechange
+    xmlhttp.ontimeout = xmlhttp.onreadystatechange;
+    xmlhttp.onerror = xmlhttp.onreadystatechange;
     xmlhttp.send();
 }
 
@@ -275,6 +276,7 @@ function resolvePlaybackLink(avPlaybackLink, callback) {
                     xmlhttp.open("GET", avPlaybackLink.durl[0].url, true);
                     xmlhttp.onreadystatechange = xmlChange;
                     xmlhttp.ontimeout = xmlChange;
+                    xmlhttp.onerror = xmlChange;
                     xmlhttp.timeout = 2000;
                     xmlhttp.send();
                 }
@@ -293,6 +295,7 @@ function resolvePlaybackLink(avPlaybackLink, callback) {
     xmlhttp.open("HEAD", avPlaybackLink.durl[0].url, true);
     xmlhttp.onreadystatechange = xmlChange;
     xmlhttp.ontimeout = xmlChange;
+    xmlhttp.onerror = xmlChange;
     xmlhttp.send();
 }
 
