@@ -690,6 +690,7 @@
 					$('.v1-bangumi-info-operate .v1-app-btn').after(biliHelper.helperBlock);
 				}
 			}
+			setTimeout(window.stop, 5000);
 			$(document).ready(biliHelperFunc);
 		});
 	}

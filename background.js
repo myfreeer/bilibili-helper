@@ -81,6 +81,7 @@ var randomIP = function(fakeip) {
 
 function getFileData(url, callback, method) {
     var m = 'GET';
+    var retry = 0;
     if (method && (method == 'POST'.toLowerCase() || method == 'GET'.toLowerCase())) m = method;
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.open(m, url, true);
@@ -91,8 +92,12 @@ function getFileData(url, callback, method) {
             if (typeof callback == "function") callback("{}");
         }
     };
-    xmlhttp.ontimeout = xmlhttp.onreadystatechange;
-    xmlhttp.onerror = xmlhttp.onreadystatechange;
+    xmlhttp.onerror = function() {
+        xmlhttp.abort();
+        if (retry < 3) xmlhttp.send();
+        retry += 1;
+    };
+    xmlhttp.ontimeout = xmlhttp.onerror;
     xmlhttp.send();
 }
 
