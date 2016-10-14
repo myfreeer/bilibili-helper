@@ -939,11 +939,12 @@
 					
 					xhr.onerror = () => {
 						xhr.abort();
+						xhr.timeout = 5100;
 						setTimeout(() => request(i), 150);
 					}
 					
 					xhr.ontimeout = xhr.onerror;
-					xhr.timeout=2000;
+					xhr.timeout = 2000;
 					xhr.onreadystatechange = () => {
 						//32768 = 256 / 8 * 1024 ,simulating a 256kbps network (hardly to find a network slower than this)
 						if (xhr.readyState > 2) xhr.timeout += (end - start +1000) / 32768;
