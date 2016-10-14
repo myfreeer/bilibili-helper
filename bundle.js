@@ -915,6 +915,7 @@
 				let request = i => {
 					let range = ranges[i];
 					let {url,start,end} = range;
+					const xhrTimeout = 1500;
 					dbp('fetch:', `bytes=[${start},${end}]`);
 					if (start == end) throw new Error('EOF');
 					xhr = new XMLHttpRequest();
@@ -939,16 +940,16 @@
 					
 					xhr.onerror = () => {
 						xhr.abort();
-						xhr.timeout = 5100;
+						xhr.timeout = xhrTimeout + 3500;
 						setTimeout(() => request(i), 150);
 					}
 					
 					xhr.ontimeout = xhr.onerror;
-					xhr.timeout = 2000;
+					xhr.timeout = xhrTimeout;
 					xhr.onreadystatechange = () => {
 						//32768 = 256 / 8 * 1024 ,simulating a 256kbps network (hardly to find a network slower than this)
-						if (xhr.readyState > 2) xhr.timeout += (end - start +1000) / 32768;
-						if (xhr.getResponseHeader('Content-Length') > end - start +1000) xhr.onerror()
+						if (xhr.readyState > 2) xhr.timeout = xhrTimeout + (end - start + 1000) / 32768;
+						if (xhr.getResponseHeader('Content-Length') > end - start + 1000) xhr.onerror()
 					}
 	
 					xhr.onload = () => {
