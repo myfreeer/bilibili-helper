@@ -690,8 +690,7 @@
 					$('.v1-bangumi-info-operate .v1-app-btn').after(biliHelper.helperBlock);
 				}
 			}
-			setTimeout(window.stop, 5000);
-			$(document).ready(biliHelperFunc);
+			biliHelperFunc();
 		});
 	}
 
@@ -961,7 +960,7 @@
 			});
 		}
 		biliHelper.work();
-		window.stop();
+		//window.stop();
 		window.addEventListener("hashchange", function() {
 			var hashPage = (/page=([0-9]+)/).exec(document.location.hash);
 			if (hashPage && typeof hashPage == "object" && !isNaN(hashPage[1])) hashPage = parseInt(hashPage[1]);

@@ -44,6 +44,14 @@ var BinArray = (function(){
 	return BinArray;
 })();
 
+var hexToReverse = function (h) {
+    var r = 0, g = 0, b = 0;
+    r = 255 - parseInt(h[0],16)*16 - parseInt(h[1],16);
+    g = 255 - parseInt(h[2],16)*16 - parseInt(h[3],16);
+    b = 255 - parseInt(h[4],16)*16 - parseInt(h[5],16);
+    return (r < 16 ? "0" + r.toString(16).toUpperCase() : r.toString(16).toUpperCase()) + (g < 16 ? "0" + g.toString(16).toUpperCase() : g.toString(16).toUpperCase()) + (b < 16 ? "0" + b.toString(16).toUpperCase() : b.toString(16).toUpperCase());
+};
+
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -443,6 +451,9 @@ var CoreComment = (function () {
             var color = c.toString(16);
             color = color.length >= 6 ? color : new Array(6 - color.length + 1).join("0") + color;
             this.dom.style.color = "#" + color;
+            var reversedColor = "#" + hexToReverse(color);
+            var textShadow = '-1px -1px 0 ' + reversedColor + ',1px 1px 0 ' + reversedColor +',1px -1px 0 ' + reversedColor + ',-1px 1px 0 ' + reversedColor;
+            this.dom.style.textShadow = textShadow;
             if (this._color === 0) {
                 this.dom.className = this.parent.options.global.className + " rshadow";
             }
@@ -884,6 +895,9 @@ var CoreComment = (function () {
             var color = c.toString(16);
             color = color.length >= 6 ? color : new Array(6 - color.length + 1).join("0") + color;
             this.dom.style.color = "#" + color;
+            var reversedColor = "#" + hexToReverse(color);
+            var textShadow = '-0.7px -0.7px 0 ' + reversedColor + ',0.7px 0.7px 0 ' + reversedColor +',0.7px -0.7px 0 ' + reversedColor + ',-0.7px 0.7px 0 ' + reversedColor;
+            this.dom.style.textShadow = textShadow;
             if (this._color === 0) {
                 this.dom.className = this.parent.options.global.className + " rshadow";
             }

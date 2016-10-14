@@ -942,7 +942,7 @@
 						xhr.abort();
 						xhr.timeout = xhrTimeout + 3500;
 						setTimeout(() => request(i), 150);
-						console.log(xhr);
+						//console.log(xhr);
 					}
 					
 					xhr.ontimeout = xhr.onerror;
@@ -972,7 +972,7 @@
 						}
 					}
 	
-				try{xhr.send();} catch(e) {xhr.onerror();}
+					try{xhr.send();} catch(e) {xhr.onerror();}
 				}
 	
 				request(0);
