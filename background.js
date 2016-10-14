@@ -89,7 +89,7 @@ function getFileData(url, callback, method) {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
             if (typeof callback == "function") callback(xmlhttp.responseText);
         } else if (xmlhttp.readyState == 4 && xmlhttp.status > 400) {
-            if (typeof callback == "function") callback("{}");
+            if (typeof callback == "function" && retry > 2) callback("{}");
         }
     };
     xmlhttp.onerror = function() {
