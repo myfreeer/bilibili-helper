@@ -72,7 +72,7 @@ $(document).ready(function() {
 	});
 	$('#go_favorite').click(function() {
 		chrome.tabs.create({
-			url: bkg_page.getOption("indexversion") == "old" ? "http://member.bilibili.com/#favorite_manage" : http://space.bilibili.com/#!/favlist
+			url: bkg_page.getOption("indexversion") == "old" ? "http://member.bilibili.com/#favorite_manage" : "http://space.bilibili.com/#!/favlist"
 		});
 		return false;
 	});
