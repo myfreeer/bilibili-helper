@@ -98,6 +98,7 @@ function getFileData(url, callback, method) {
         retry += 1;
     };
     xmlhttp.ontimeout = xmlhttp.onerror;
+    xmlhttp.timeout = 3000;
     xmlhttp.send();
 }
 
@@ -301,6 +302,7 @@ function resolvePlaybackLink(avPlaybackLink, callback) {
     xmlhttp.onreadystatechange = xmlChange;
     xmlhttp.ontimeout = xmlChange;
     xmlhttp.onerror = xmlChange;
+    xmlhttp.timeout = 3000;
     xmlhttp.send();
 }
 
