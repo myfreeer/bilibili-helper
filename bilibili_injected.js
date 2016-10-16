@@ -162,6 +162,7 @@
 				pg: biliHelper.page,
 			cidHack: forceCidHack || biliHelper.cidHack
 		}, function(response) {
+			if (Object.keys(response).length === 0) return finishUp(forceCidHack);
 			var videoDownloadLink = response["download"],
 				videoPlaybackLink = response["playback"],
 			videoLowResLink = response["lowres"];

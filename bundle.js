@@ -711,6 +711,7 @@
 	let flvdemux = __webpack_require__(/*! ./flvdemux */ 2)
 	let mp4mux = __webpack_require__(/*! ./mp4mux */ 3)
 	let fetch = __webpack_require__(/*! ./http */ 4).fetch;
+	const cacheTimeLength = 360;
 	
 	let app = {}
 	
@@ -1220,7 +1221,7 @@
 					time = 0;
 				}
 	
-				if (time < video.currentTime + 345.0)
+				if (time < video.currentTime + cacheTimeLength +1 && time < video.duration)
 					fetchAndAppend(time, duration);
 			}
 	
@@ -1258,6 +1259,8 @@
 		}
 	
 		video.addEventListener('seeking', debounce(() => {
+		//	let time = buffered.length > 0 ? buffered.end(buffered.length-1) : 0;
+		//	if (time - video.currentTime < cacheTimeLength) tryPrefetch();
 			if (!currentTimeIsBuffered()) {
 				dbp('seeking(not buffered):', video.currentTime);
 				clearBufferAndPrefetch();
