@@ -873,6 +873,7 @@
 			return choose;
 		}
 	
+	
 		fetchMediaSegmentsByIndex(indexStart, indexEnd) {
 			let ranges = [];
 			let totalSize = 0;
@@ -915,7 +916,9 @@
 				let request = i => {
 					let range = ranges[i];
 					let {url,start,end} = range;
-					const xhrTimeout = 1500;
+					let xhrTimeout = 1500;
+				//	if (size > end && size - end < 512*1024) end = size;
+				//	console.log(end,start,size);
 					dbp('fetch:', `bytes=[${start},${end}]`);
 					if (start == end) throw new Error('EOF');
 					xhr = new XMLHttpRequest();
@@ -949,7 +952,8 @@
 					xhr.timeout = xhrTimeout;
 					xhr.onreadystatechange = () => {
 						//32768 = 256 / 8 * 1024 ,simulating a 256kbps network (hardly to find a network slower than this)
-						if (xhr.readyState > 2) xhr.timeout = xhrTimeout + (end - start) / 32768 + 1000;
+						if (xhr.readyState == 3) xhr.timeout = xhrTimeout + (end - start) / 32768 + 1000;
+						//size = parseInt(xhr.getResponseHeader('Content-Range').match(/(\d+$)/));
 						if (xhr.getResponseHeader('Content-Length') > end - start + 1000) xhr.onerror();
 					}
 	
@@ -1276,8 +1280,9 @@
 			sourceBuffer = mediaSource.addSourceBuffer(codecType);
 			self.sourceBuffer = sourceBuffer;
 	
-			sourceBuffer.addEventListener('error', () => dbp('sourceBuffer: error'));
+			sourceBuffer.addEventListener('error', (e) => {dbp('sourceBuffer: error', e);clearInterval(interval)});
 			sourceBuffer.addEventListener('abort', () => dbp('sourceBuffer: abort'));
+			let interval;
 			sourceBuffer.addEventListener('updateend', () => {
 				//dbp('sourceBuffer: updateend')
 				sourceBufferOnUpdateend();
@@ -1306,7 +1311,7 @@
 	
 			video.addEventListener('loadedmetadata', () => {
 				tryPrefetch(5.0);
-				setInterval(() => {
+				interval = setInterval(() => {
 					tryPrefetch();
 				}, 1000);
 			});
