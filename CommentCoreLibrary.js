@@ -443,7 +443,7 @@ var CoreComment = (function () {
             var color = c.toString(16);
             color = color.length >= 6 ? color : new Array(6 - color.length + 1).join("0") + color;
             this.dom.style.color = "#" + color;
-            var reversedColor = (((parseInt(color[0], 16) * 16 + parseInt(color[1], 16)) * 0.299 + (parseInt(color[2], 16) * 16 - parseInt(color[3], 16)) * 0.587 + (parseInt(color[4], 16) * 16 - parseInt(color[5], 16)) * 0.214)) < 0x48 ? '#FFFFFF' : '#000000';
+            var reversedColor = (((parseInt(color[0], 16) * 16 + parseInt(color[1], 16)) * 0.2126 + (parseInt(color[2], 16) * 16 - parseInt(color[3], 16)) * 0.7152 + (parseInt(color[4], 16) * 16 - parseInt(color[5], 16)) * 0.0722)) < 0x48 ? '#FFFFFF' : '#000000';
             var textShadow = '-0.6px -0.6px 0 ' + reversedColor + ',0.6px 0.6px 0 ' + reversedColor +',0.6px -0.6px 0 ' + reversedColor + ',-0.6px 0.6px 0 ' + reversedColor;
             this.dom.style.textShadow = textShadow;
             if (this._color === 0) {
