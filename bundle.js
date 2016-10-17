@@ -712,6 +712,8 @@
 	let mp4mux = __webpack_require__(/*! ./mp4mux */ 3)
 	let fetch = __webpack_require__(/*! ./http */ 4).fetch;
 	const cacheTimeLength = 360;
+	let xhrTimeout = 1500;
+	const firstxhrTimeout = xhrTimeout;
 	
 	let app = {}
 	
@@ -917,7 +919,6 @@
 				let request = i => {
 					let range = ranges[i];
 					let {url,start,end} = range;
-					let xhrTimeout = 1500;
 				//	if (size > end && size - end < 512*1024) end = size;
 				//	console.log(end,start,size);
 					dbp('fetch:', `bytes=[${start},${end}]`);
@@ -944,7 +945,8 @@
 					
 					xhr.onerror = () => {
 						xhr.abort();
-						xhr.timeout = xhrTimeout + 3500;
+						xhrTimeout = firstxhrTimeout + 3500;
+						xhr.timeout = xhrTimeout;
 						setTimeout(() => request(i), 150);
 						//console.log(xhr);
 					}
@@ -959,6 +961,7 @@
 					}
 	
 					xhr.onload = () => {
+						xhrTimeout = firstxhrTimeout;
 						//if (xhr.response.byteLength < 100000 && i+1 < ranges.length) xhr.onerror();
 						if (xhr.response.byteLength < end - start && i+1 <= ranges.length) xhr.onerror();
 						let segbuf = new Uint8Array(xhr.response);
