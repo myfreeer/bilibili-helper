@@ -154,6 +154,20 @@
 		}
 	});
 
+	biliHelper.fails = function() {
+		if (typeof biliHelper.downloadUrls !== "object" || !biliHelper.downloadUrls.length) {
+				if (biliHelper.replacePlayer && !biliHelper.redirectUrl && !biliHelper.genPage) {
+					biliHelper.switcher.swf();
+				} else {
+					biliHelper.switcher.original();
+				}
+					biliHelper.favorHTML5 = false;
+		} else {
+					biliHelper.switcher.html5();
+					biliHelper.mainBlock.switcherSection.find('a[type="html5"]').removeClass('hidden');
+		};
+	};
+
 	var finishUp = function(forceCidHack) {
 		chrome.runtime.sendMessage({
 			command: "getDownloadLink",
@@ -162,6 +176,7 @@
 				pg: biliHelper.page,
 			cidHack: forceCidHack || biliHelper.cidHack
 		}, function(response) {
+			if (!response) return finishUp(forceCidHack);
 			if (Object.keys(response).length === 0) return finishUp(forceCidHack);
 			var videoDownloadLink = response["download"],
 				videoPlaybackLink = response["playback"],
@@ -194,16 +209,11 @@
 						videoDownloadLink = videoPlaybackLink;
 					}
 				}
-				biliHelper.error = '错误: ' + videoDownloadLink.message + ' ' + videoDownloadLink.error_text + ' ' + videoPlaybackLink.result;
+				biliHelper.error = '错误: ' + videoPlaybackLink.message + ' ' + videoPlaybackLink.error_text + ' ' + videoPlaybackLink.result;
 				var errorMessage = biliHelper.error || "视频地址获取失败";
 				biliHelper.mainBlock.errorSection = $('<div class="section error"><p><span>' + parseSafe(biliHelper.error) + '</span></p></div>');
 				biliHelper.mainBlock.append(biliHelper.mainBlock.errorSection);
-				if (biliHelper.replacePlayer && !biliHelper.redirectUrl && !biliHelper.genPage) {
-					biliHelper.switcher.swf();
-				} else {
-					biliHelper.switcher.original();
-				}
-					biliHelper.favorHTML5 = false;
+				setTimeout(biliHelper.fails, 500);
 			}
 			if (typeof videoDownloadLink.durl["url"] === "undefined") {
 				biliHelper.downloadUrls = videoDownloadLink.durl;
@@ -429,7 +439,8 @@
 				},
 				html5: function() {
 					this.set('html5');
-					$('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + biliHelper.videoPic + '" autobuffer preload="auto" crossorigin="anonymous"><source src="' + biliHelper.playbackUrls[0].url + '" type="video/mp4"></video></div>');
+					var html5VideoUrl = typeof biliHelper.playbackUrls == 'undefined' ? 'https://static-s.bilibili.com/error.mp4' : biliHelper.playbackUrls[0].url;
+					$('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + biliHelper.videoPic + '" autobuffer preload="auto" crossorigin="anonymous"><source src="' + html5VideoUrl + '" type="video/mp4"></video></div>');
 					var abp = ABP.create(document.getElementById("bilibili_helper_html5_player"), {
 						src: {
 							playlist: [{
