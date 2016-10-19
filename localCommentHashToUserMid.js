@@ -129,6 +129,12 @@ function crc32b(str) {
     return lpad((CRC32.bstr(str) >>> 0).toString(16), 8, '0');
 }
 
+/* Usage: checkCommentHash(String hash, int maximumMid)
+ * argument hash in required, maximumMid is optional
+ * maximumMid would be 60000000 if not set
+ * the return value would be mid, or false if process fails
+ * Not designed to be multi-threaded, nor asynchronous
+ */
 function checkCommentHash(hash) {
     var maximumMid = arguments.length > 1 && arguments[1] !== undefined && typeof arguments[1] == 'number' ? arguments[1] : 60000000; //the larger, the slower
     if (!hash) return false;
@@ -139,4 +145,25 @@ function checkCommentHash(hash) {
         }
     }
     return false;
+}
+
+/* Create a Database in browser (NOT recommanded)
+ * This Example will create a stringified array and download it
+ * Usage: createLocalDatabase(int end, int start, bool returnArray)
+ * Default value: end=100, start=0, returnArray=false
+ */
+function createLocalDatabase() {
+    var end = arguments.length > 0 && arguments[0] !== undefined && typeof arguments[0] == 'number' ? arguments[0] : 100;
+    var start = arguments.length > 1 && arguments[1] !== undefined && typeof arguments[1] == 'number' ? arguments[1] : 0;
+    var returnArray = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+    var array = new Array(end - start);
+    for (let i = start; i < end; i++) array[i - end] = crc32b(i.toString());
+    var blob = new Blob([JSON.stringify(array)], {
+        type: "application/octet-stream;",
+    });
+    var a = window.document.createElement('a');
+    a.href = window.URL.createObjectURL(blob);
+    document.body.appendChild(a);
+    a.click();
+    if (returnArray) return array;
 }
