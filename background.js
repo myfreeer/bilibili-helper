@@ -94,6 +94,7 @@ function getFileData(url, callback, method) {
     };
     xmlhttp.onerror = function() {
         xmlhttp.abort();
+        xmlhttp.open(m, url, true);
         if (retry < 3) xmlhttp.send();
         retry += 1;
     };
