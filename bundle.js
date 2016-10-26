@@ -731,6 +731,20 @@
 		return res;
 	}
 	
+	let fails = msg => {
+	    if (msg) console.warn(msg);
+	    let bbtn = document.getElementsByClassName('b-btn');
+	    let html5btn;
+	    for (let i in bbtn) {
+	        if (typeof bbtn[i].getAttribute == 'function')
+	            if (bbtn[i].getAttribute('type') == "html5hd") html5btn = bbtn[i];
+	    };
+	    if (html5btn) {
+	        html5btn.click();
+	        if (document.getElementsByClassName('nanobar')[0].firstChild.className == "bar") document.getElementsByClassName('nanobar')[0].remove();
+	    };
+	};
+
 	class Streams {
 		constructor({urls,fakeDuration}) {
 			if (fakeDuration == null)
@@ -776,16 +790,7 @@
 			let url = this.urls[this.probeIdx];
 			return this.fetchInitSegment(url).then(flvhdr => {
 				if (flvhdr == null) {
-				    let bbtn = document.getElementsByClassName('b-btn');
-				    let html5btn;
-				    for (let i in bbtn) {
-				        if (typeof bbtn[i].getAttribute == 'function')
-				            if (bbtn[i].getAttribute('type') == "html5hd") html5btn = bbtn[i];
-				    };
-				    if (html5btn) {
-				        html5btn.click();
-				        if (document.getElementsByClassName('nanobar')[0].firstChild.className == "bar") document.getElementsByClassName('nanobar')[0].remove();
-				    };
+				    fails();
 				    return Promise.reject(new Error('probe ' + url + ' failed'));
 				};
 				let stream = flvhdr;
@@ -1286,7 +1291,7 @@
 			sourceBuffer = mediaSource.addSourceBuffer(codecType);
 			self.sourceBuffer = sourceBuffer;
 	
-			sourceBuffer.addEventListener('error', (e) => {dbp('sourceBuffer: error', e);clearInterval(interval)});
+			sourceBuffer.addEventListener('error', (e) => {dbp('sourceBuffer: error', e);fails();clearInterval(interval)});
 			sourceBuffer.addEventListener('abort', () => dbp('sourceBuffer: abort'));
 			let interval;
 			sourceBuffer.addEventListener('updateend', () => {
