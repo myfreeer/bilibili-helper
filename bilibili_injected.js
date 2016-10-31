@@ -440,7 +440,7 @@
 				html5: function() {
 					this.set('html5');
 					var html5VideoUrl = typeof biliHelper.playbackUrls == 'undefined' ? 'https://static-s.bilibili.com/error.mp4' : biliHelper.playbackUrls[0].url;
-					$('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + biliHelper.videoPic + '" autobuffer preload="auto" crossorigin="anonymous"><source src="' + html5VideoUrl + '" type="video/mp4"></video></div>');
+					$('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + biliHelper.videoPic + '" crossorigin="anonymous"><source src="' + html5VideoUrl + '" type="video/mp4"></video></div>');
 					var abp = ABP.create(document.getElementById("bilibili_helper_html5_player"), {
 						src: {
 							playlist: [{
@@ -502,7 +502,7 @@
 				            command: "playHdFlv",
 				        });
 				    }
-				}, 300);
+				}, 500);
 				var lastTime;
 				var checkFinished = setInterval(function() {
 					if (abp.video.currentTime !== lastTime){
@@ -878,15 +878,15 @@
 												displayUserInfo(uid, JSON.parse(data));
 												return false;
 											}
-											$.getJSON('http://api.bilibili.com/userinfo?mid=' + uid + '&type=json', function(data) {
+											$.getJSON('http://api.bilibili.com/cardrich?mid=' + uid + '&type=jsonp', function(data) {
 												if (data.code == 0) {
 													sessionStorage.setItem('user/' + uid, JSON.stringify({
-														name: data.name,
+														name: data.data.card.name,
 														level_info: {
-															current_level: data.level_info.current_level
+															current_level: data.data.card.level_info.current_level
 														}
 													}));
-													displayUserInfo(uid, data);
+													displayUserInfo(uid, data.data.card);
 												}
 											});
 										}
