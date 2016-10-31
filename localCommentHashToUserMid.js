@@ -149,7 +149,7 @@ function createLocalDatabase() {
     var returnArray = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
     var typedArray = Uint32Array || Array
     var array = new typedArray(end - start);
-    for (let i = start; i < end; i++) array[i - end] = CRC32.bstr(i.toString());
+    for (let i = start; i < end; i++) array[i - start] = CRC32.bstr(i.toString());
     var blob = new Blob([JSON.stringify(array)], {
         type: "application/octet-stream;",
     });
