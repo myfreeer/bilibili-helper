@@ -1,6 +1,7 @@
 /* crc32.js (C) 2014-present SheetJS -- http://sheetjs.com */
 /* vim: set ts=2: */
 /*exported CRC32 */
+// https://github.com/SheetJS/js-crc32
 var CRC32;
 (function(factory) {
     /*jshint ignore:start */
@@ -118,17 +119,6 @@ var CRC32;
     CRC32.str = crc32_str;
 }));
 
-function lpad(s /*:string*/ , len /*:number*/ , chr /*:?string*/ ) /*:string*/ {
-    var L /*:number*/ = len - s.length,
-        C /*:string*/ = chr || " ";
-    if (L <= 0) return s;
-    return new Array(L + 1).join(C) + s;
-}
-
-function crc32b(str) {
-    return lpad((CRC32.bstr(str) >>> 0).toString(16), 8, '0');
-}
-
 /* Usage: checkCommentHash(String hash, int maximumMid)
  * argument hash in required, maximumMid is optional
  * maximumMid would be 60000000 if not set
@@ -138,9 +128,10 @@ function crc32b(str) {
 function checkCommentHash(hash) {
     var maximumMid = arguments.length > 1 && arguments[1] !== undefined && typeof arguments[1] == 'number' ? arguments[1] : 60000000; //the larger, the slower
     if (!hash) return false;
-    var mid;
+    var hashint = parseInt(hash, 16);
+    if (!hashint) return false;
     for (var i = 1; i < maximumMid + 1; i++) {
-        if (crc32b(i.toString()) == hash) {
+        if ((CRC32.bstr(i.toString()) >>> 0) === hashint) {
             return i;
         }
     }
@@ -156,8 +147,9 @@ function createLocalDatabase() {
     var end = arguments.length > 0 && arguments[0] !== undefined && typeof arguments[0] == 'number' ? arguments[0] : 100;
     var start = arguments.length > 1 && arguments[1] !== undefined && typeof arguments[1] == 'number' ? arguments[1] : 0;
     var returnArray = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-    var array = new Array(end - start);
-    for (let i = start; i < end; i++) array[i - end] = crc32b(i.toString());
+    var typedArray = Uint32Array || Array
+    var array = new typedArray(end - start);
+    for (let i = start; i < end; i++) array[i - end] = CRC32.bstr(i.toString());
     var blob = new Blob([JSON.stringify(array)], {
         type: "application/octet-stream;",
     });
