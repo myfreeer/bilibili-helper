@@ -2,27 +2,9 @@
 /* vim: set ts=2: */
 /*exported CRC32 */
 // https://github.com/SheetJS/js-crc32
-var CRC32;
-(function(factory) {
-    /*jshint ignore:start */
-    if (typeof DO_NOT_EXPORT_CRC === 'undefined') {
-        if ('object' === typeof exports) {
-            factory(exports);
-        } else if ('function' === typeof define && define.amd) {
-            define(function() {
-                var module = {};
-                factory(module);
-                return module;
-            });
-        } else {
-            factory(CRC32 = {});
-        }
-    } else {
-        factory(CRC32 = {});
-    }
-    /*jshint ignore:end */
-}(function(CRC32) {
-    CRC32.version = '1.0.1';
+var CRC32 = {};
+(function(CRC32) {
+    //CRC32.version = '1.0.1';
     /* see perf/crc32table.js */
     /*global Int32Array */
     function signed_crc_table() {
@@ -58,66 +40,9 @@ var CRC32;
         return C ^ -1;
     }
 
-    function crc32_buf(buf, seed) {
-        if (buf.length > 10000) return crc32_buf_8(buf, seed);
-        var C = seed ^ -1,
-            L = buf.length - 3;
-        for (var i = 0; i < L;) {
-            C = (C >>> 8) ^ T[(C ^ buf[i++]) & 0xFF];
-            C = (C >>> 8) ^ T[(C ^ buf[i++]) & 0xFF];
-            C = (C >>> 8) ^ T[(C ^ buf[i++]) & 0xFF];
-            C = (C >>> 8) ^ T[(C ^ buf[i++]) & 0xFF];
-        }
-        while (i < L + 3) C = (C >>> 8) ^ T[(C ^ buf[i++]) & 0xFF];
-        return C ^ -1;
-    }
-
-    function crc32_buf_8(buf, seed) {
-        var C = seed ^ -1,
-            L = buf.length - 7;
-        for (var i = 0; i < L;) {
-            C = (C >>> 8) ^ T[(C ^ buf[i++]) & 0xFF];
-            C = (C >>> 8) ^ T[(C ^ buf[i++]) & 0xFF];
-            C = (C >>> 8) ^ T[(C ^ buf[i++]) & 0xFF];
-            C = (C >>> 8) ^ T[(C ^ buf[i++]) & 0xFF];
-            C = (C >>> 8) ^ T[(C ^ buf[i++]) & 0xFF];
-            C = (C >>> 8) ^ T[(C ^ buf[i++]) & 0xFF];
-            C = (C >>> 8) ^ T[(C ^ buf[i++]) & 0xFF];
-            C = (C >>> 8) ^ T[(C ^ buf[i++]) & 0xFF];
-        }
-        while (i < L + 7) C = (C >>> 8) ^ T[(C ^ buf[i++]) & 0xFF];
-        return C ^ -1;
-    }
-
-    function crc32_str(str, seed) {
-        var C = seed ^ -1;
-        for (var i = 0, L = str.length, c, d; i < L;) {
-            c = str.charCodeAt(i++);
-            if (c < 0x80) {
-                C = (C >>> 8) ^ T[(C ^ c) & 0xFF];
-            } else if (c < 0x800) {
-                C = (C >>> 8) ^ T[(C ^ (192 | ((c >> 6) & 31))) & 0xFF];
-                C = (C >>> 8) ^ T[(C ^ (128 | (c & 63))) & 0xFF];
-            } else if (c >= 0xD800 && c < 0xE000) {
-                c = (c & 1023) + 64;
-                d = str.charCodeAt(i++) & 1023;
-                C = (C >>> 8) ^ T[(C ^ (240 | ((c >> 8) & 7))) & 0xFF];
-                C = (C >>> 8) ^ T[(C ^ (128 | ((c >> 2) & 63))) & 0xFF];
-                C = (C >>> 8) ^ T[(C ^ (128 | ((d >> 6) & 15) | ((c & 3) << 4))) & 0xFF];
-                C = (C >>> 8) ^ T[(C ^ (128 | (d & 63))) & 0xFF];
-            } else {
-                C = (C >>> 8) ^ T[(C ^ (224 | ((c >> 12) & 15))) & 0xFF];
-                C = (C >>> 8) ^ T[(C ^ (128 | ((c >> 6) & 63))) & 0xFF];
-                C = (C >>> 8) ^ T[(C ^ (128 | (c & 63))) & 0xFF];
-            }
-        }
-        return C ^ -1;
-    }
-    CRC32.table = T;
+    //CRC32.table = T;
     CRC32.bstr = crc32_bstr;
-    CRC32.buf = crc32_buf;
-    CRC32.str = crc32_str;
-}));
+})(CRC32);
 
 /* Usage: checkCommentHash(String hash, int maximumMid)
  * argument hash in required, maximumMid is optional
@@ -142,6 +67,10 @@ function checkCommentHash(hash) {
  * This Example will create a stringified array and download it
  * Usage: createLocalDatabase(int end, int start, bool returnArray)
  * Default value: end=100, start=0, returnArray=false
+ * Speed test:
+   var t0 = performance.now();
+   createLocalDatabase(1000000);
+   console.log("Call to createLocalDatabase took " + (performance.now() - t0) + " milliseconds.");
  */
 function createLocalDatabase() {
     var end = arguments.length > 0 && arguments[0] !== undefined && typeof arguments[0] == 'number' ? arguments[0] : 100;
@@ -157,5 +86,6 @@ function createLocalDatabase() {
     a.href = window.URL.createObjectURL(blob);
     document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     if (returnArray) return array;
 }
