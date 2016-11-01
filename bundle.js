@@ -1205,7 +1205,8 @@
 						fetching = null;
 					}
 					if (segbuf) {
-						doaction(() => sourceBuffer.appendBuffer(segbuf));
+						try{doaction(() => sourceBuffer.appendBuffer(segbuf));}
+						catch(e){console.warn(e);clearBufferAndPrefetch();}
 					}
 				});
 			}
