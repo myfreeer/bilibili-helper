@@ -969,7 +969,9 @@
 						xhrTimeout = firstxhrTimeout;
 						//if (xhr.response.byteLength < 100000 && i+1 < ranges.length) xhr.onerror();
 						if (xhr.response.byteLength < end - start && i+1 <= ranges.length) xhr.onerror();
-						let segbuf = new Uint8Array(xhr.response);
+						let segbuf;
+						try{segbuf = new Uint8Array(xhr.response);} catch(e){console.warn(e);return xhr.onerror();}
+						if (!segbuf) return xhr.onerror();
 						let cputimeStart = new Date().getTime();
 						let buf = this.transcodeMediaSegments(segbuf, range);
 						let cputimeEnd = new Date().getTime();
