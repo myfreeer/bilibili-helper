@@ -45,7 +45,7 @@ var CRC32 = {};
 })(CRC32);
 
 /* Usage: checkCommentHash(String hash, int maximumMid)
- * argument hash in required, maximumMid is optional
+ * argument hash is required, maximumMid is optional
  * maximumMid would be 60000000 if not set
  * the return value would be mid, or false if process fails
  * Not designed to be multi-threaded, nor asynchronous
@@ -63,7 +63,7 @@ function checkCommentHash(hash) {
     return false;
 }
 
-/* Create a Database in browser (NOT recommanded)
+/* Create a Array Database in browser (NOT recommanded)
  * This Example will create a stringified array and download it
  * Usage: createLocalDatabase(int end, int start, bool returnArray)
  * Default value: end=100, start=0, returnArray=false
@@ -90,11 +90,15 @@ function createLocalDatabase() {
     if (returnArray) return array;
 }
 
+/* Create a IndexedDB in browser (NOT recommanded)
+ * This Example will create a IndexedDB
+ * Usage: createLocalIndexedDB(int end, int start)
+ * Default value: end=100, start=0
+ */
 function createLocalIndexedDB() {
     if (!("indexedDB" in window)) return false;
     var end = arguments.length > 0 && arguments[0] !== undefined && typeof arguments[0] == 'number' ? arguments[0] : 100;
     var start = arguments.length > 1 && arguments[1] !== undefined && typeof arguments[1] == 'number' ? arguments[1] : 0;
-    var returnArray = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
     var openRequest = indexedDB.open("localCommentHash", 1);
     var db;
 
@@ -112,7 +116,6 @@ function createLocalIndexedDB() {
         var t = db.transaction(["localCommentHash"], "readwrite");
         var store = t.objectStore("localCommentHash");
         for (let i = start; i < end; i++) store.put(i, CRC32.bstr(i.toString()) >>> 0);
-        if (returnArray) return store;
     };
 
     openRequest.onerror = function(e) {
@@ -121,13 +124,17 @@ function createLocalIndexedDB() {
     };
 }
 
+/* Query hash from a IndexedDB created by createLocalIndexedDB
+ * Usage: queryLocalIndexedDB(String hash, function callback)
+ * argument hash and callback is required
+ */
 function queryLocalIndexedDB(hash, callback) {
     if (!("indexedDB" in window)) return false;
     hash = parseInt(hash, 16);
     if (!hash) return false;
     if (typeof callback !== "function") return false;
     var openRequest = indexedDB.open("localCommentHash", 1);
-    var db, mid;
+    var db;
 
     openRequest.onsuccess = function(e) {
         console.log("Success!");
@@ -143,5 +150,6 @@ function queryLocalIndexedDB(hash, callback) {
     openRequest.onerror = function(e) {
         console.log("Error");
         console.dir(e);
+        callback(e);
     };
 }
