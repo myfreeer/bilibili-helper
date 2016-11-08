@@ -89,3 +89,61 @@ function createLocalDatabase() {
     document.body.removeChild(a);
     if (returnArray) return array;
 }
+
+function createLocalIndexedDB() {
+    if (!("indexedDB" in window)) return false;
+    var end = arguments.length > 0 && arguments[0] !== undefined && typeof arguments[0] == 'number' ? arguments[0] : 100;
+    var start = arguments.length > 1 && arguments[1] !== undefined && typeof arguments[1] == 'number' ? arguments[1] : 0;
+    var returnArray = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+    var openRequest = indexedDB.open("localCommentHash", 1);
+    var db;
+
+    openRequest.onupgradeneeded = function(e) {
+        console.log("Upgrading...");
+        db = e.target.result;
+        db.createObjectStore("localCommentHash", {
+            autoIncrement: false
+        });
+    };
+
+    openRequest.onsuccess = function(e) {
+        console.log("Success!");
+        db = e.target.result;
+        var t = db.transaction(["localCommentHash"], "readwrite");
+        var store = t.objectStore("localCommentHash");
+        for (let i = start; i < end; i++) store.put({
+            "mid": i
+        }, CRC32.bstr(i.toString()) >>> 0);
+        if (returnArray) return store;
+    };
+
+    openRequest.onerror = function(e) {
+        console.log("Error");
+        console.dir(e);
+    };
+}
+
+function queryLocalIndexedDB(hash, callback) {
+    if (!("indexedDB" in window)) return false;
+    hash = parseInt(hash, 16);
+    if (!hash) return false;
+    if (typeof callback !== "function") return false;
+    var openRequest = indexedDB.open("localCommentHash", 1);
+    var db, mid;
+
+    openRequest.onsuccess = function(e) {
+        console.log("Success!");
+        db = e.target.result;
+        db.transaction(["localCommentHash"], "readonly")
+            .objectStore("localCommentHash")
+            .get(hash)
+            .onsuccess = function(e) {
+                callback(e.target.result.mid);
+            };
+    };
+
+    openRequest.onerror = function(e) {
+        console.log("Error");
+        console.dir(e);
+    };
+}
