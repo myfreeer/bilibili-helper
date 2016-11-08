@@ -176,7 +176,11 @@
 		});
 			for (let i in res.src) {
 				let linktodl=document.getElementById('bili_helper_down_link_' + i.toString());
-				if (linktodl) linktodl.setAttribute('href',res.src[i]);
+				let ratetodl, ratetodl2;
+				if (linktodl && linktodl.href && linktodl.href.match(/rate=([0-9]+)/) && linktodl.href.match(/rate=([0-9]+)/)[1]) ratetodl = parseInt(linktodl.href.match(/rate=([0-9]+)/)[1]);
+				if (res.src[i] && res.src[i].match(/rate=([0-9]+)/) && res.src[i].match(/rate=([0-9]+)/)[1]) ratetodl2 = parseInt(res.src[i].match(/rate=([0-9]+)/)[1]);
+				if (linktodl && ratetodl && ratetodl2 && (ratetodl2 == 0 || ratetodl2 > ratetodl)) linktodl.setAttribute('href',res.src[i]);
+				if (linktodl && linktodl.href && ratetodl && ratetodl2 && (ratetodl == 0 || ratetodl > ratetodl2)) res.src[i] = linktodl.href;
 			};
 			console.log({
 			video:player.video,
@@ -296,6 +300,9 @@
 				seeker.getVideos(url).then(res => {
 					console.log('getVideosResult:', res);
 					if (res.src.length == 1 && res.src[0].match('mp4')) {
+						let secdown = document.getElementsByClassName("section downloder");
+						if (secdown && secdown.length && secdown.length === 1 && secdown[0].childNodes && secdown[0].childNodes.length === 2 && secdown[0].childNodes[1] && secdown[0].childNodes[1].childNodes.length === 3 && secdown[0].childNodes[1].childNodes[0].id === "bili_helper_down_link_0" && secdown[0].childNodes[1].childNodes[0].href && secdown[0].childNodes[1].childNodes[0].href.match('flv')) res.src[0] = secdown[0].childNodes[1].childNodes[0].href;
+						else{
 						nanobar.go(100);
 						let bbtn=document.getElementsByClassName('b-btn');
 						let html5btn;
@@ -304,7 +311,7 @@
 						};
 						if (html5btn) html5btn.click();
 						return console.log('only mp4 available');
-					};
+					}};
 					if (res) {
 						let ctrl = playVideo(res);
 						ctrl.player.onStarted.push(() => nanobar.go(100));
