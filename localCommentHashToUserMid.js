@@ -111,9 +111,7 @@ function createLocalIndexedDB() {
         db = e.target.result;
         var t = db.transaction(["localCommentHash"], "readwrite");
         var store = t.objectStore("localCommentHash");
-        for (let i = start; i < end; i++) store.put({
-            "mid": i
-        }, CRC32.bstr(i.toString()) >>> 0);
+        for (let i = start; i < end; i++) store.put(i, CRC32.bstr(i.toString()) >>> 0);
         if (returnArray) return store;
     };
 
@@ -138,7 +136,7 @@ function queryLocalIndexedDB(hash, callback) {
             .objectStore("localCommentHash")
             .get(hash)
             .onsuccess = function(e) {
-                callback(e.target.result.mid);
+                callback(e.target.result);
             };
     };
 
