@@ -181,7 +181,7 @@
 				if (res.src[i] && res.src[i].match && res.src[i].match(/rate=([0-9]+)/) && res.src[i].match(/rate=([0-9]+)/)[1]) ratetodl2 = parseInt(res.src[i].match(/rate=([0-9]+)/)[1]);
 				if (linktodl && ratetodl && ratetodl2 && (ratetodl2 == 0 || ratetodl2 > ratetodl)) linktodl.setAttribute('href',res.src[i]);
 				if (linktodl && linktodl.href && ratetodl && ratetodl2 && (ratetodl == 0 || ratetodl > ratetodl2)) res.src[i] = linktodl.href;
-				if (res.src[i] && res.src[i].match && res.src[i].match(/rate=10$/)) return playUrl(location.href, retry++);
+				if (res.src[i] && res.src[i].match && res.src[i].match(/rate=10$/)) return playUrl(location.href, ++retry);
 			};
 			console.log({
 			video:player.video,
