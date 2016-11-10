@@ -159,7 +159,7 @@
 		return found[0];
 	}
 	
-	let playVideo = res => {
+	let playVideo = (res, retry = 0) => {
 		let player;
 		if (document.getElementById('bilibili_helper_html5_player_video')) {
 		    let v = document.getElementById('bilibili_helper_html5_player_video');
@@ -178,9 +178,10 @@
 				let linktodl=document.getElementById('bili_helper_down_link_' + i.toString());
 				let ratetodl, ratetodl2;
 				if (linktodl && linktodl.href && linktodl.href.match(/rate=([0-9]+)/) && linktodl.href.match(/rate=([0-9]+)/)[1]) ratetodl = parseInt(linktodl.href.match(/rate=([0-9]+)/)[1]);
-				if (res.src[i] && res.src[i].match(/rate=([0-9]+)/) && res.src[i].match(/rate=([0-9]+)/)[1]) ratetodl2 = parseInt(res.src[i].match(/rate=([0-9]+)/)[1]);
+				if (res.src[i] && res.src[i].match && res.src[i].match(/rate=([0-9]+)/) && res.src[i].match(/rate=([0-9]+)/)[1]) ratetodl2 = parseInt(res.src[i].match(/rate=([0-9]+)/)[1]);
 				if (linktodl && ratetodl && ratetodl2 && (ratetodl2 == 0 || ratetodl2 > ratetodl)) linktodl.setAttribute('href',res.src[i]);
 				if (linktodl && linktodl.href && ratetodl && ratetodl2 && (ratetodl == 0 || ratetodl > ratetodl2)) res.src[i] = linktodl.href;
+				if (res.src[i] && res.src[i].match && res.src[i].match(/rate=10$/)) return playUrl(location.href, retry++);
 			};
 			console.log({
 			video:player.video,
@@ -291,7 +292,7 @@
 		});
 	}
 	
-	let playUrl = url => {
+	let playUrl = (url, retry = 0) => {
 		return new Promise((fulfill, reject) => {
 			let seeker = getSeeker(url)
 			if (seeker) {
@@ -299,7 +300,7 @@
 				nanobar.go(30);
 				seeker.getVideos(url).then(res => {
 					console.log('getVideosResult:', res);
-					if (res.src.length == 1 && res.src[0].match('mp4')) {
+					if ((res.src.length == 1 && res.src[0].match('mp4')) || retry > 4) {
 						let secdown = document.getElementsByClassName("section downloder");
 						if (secdown && secdown.length && secdown.length === 1 && secdown[0].childNodes && secdown[0].childNodes.length === 2 && secdown[0].childNodes[1] && secdown[0].childNodes[1].childNodes.length === 3 && secdown[0].childNodes[1].childNodes[0].id === "bili_helper_down_link_0" && secdown[0].childNodes[1].childNodes[0].href && secdown[0].childNodes[1].childNodes[0].href.match('flv')) res.src[0] = secdown[0].childNodes[1].childNodes[0].href;
 						else{
@@ -313,7 +314,7 @@
 						return console.log('only mp4 available');
 					}};
 					if (res) {
-						let ctrl = playVideo(res);
+						let ctrl = playVideo(res, retry);
 						ctrl.player.onStarted.push(() => nanobar.go(100));
 						handleDamoo(res, ctrl.player, seeker, ctrl.media);
 						nanobar.go(60)
