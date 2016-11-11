@@ -975,7 +975,7 @@
 	
 					xhr.onload = () => {
 						xhrTimeout = firstxhrTimeout;
-						//if (xhr.response.byteLength < 100000 && i+1 < ranges.length) xhr.onerror();
+						if (!xhr.response) return xhr.onerror();
 						if (xhr.response.byteLength < end - start && i+1 <= ranges.length) xhr.onerror();
 						let segbuf;
 						try{segbuf = new Uint8Array(xhr.response);} catch(e){console.warn(e);return xhr.onerror();}
