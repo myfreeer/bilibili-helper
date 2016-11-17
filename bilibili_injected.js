@@ -510,7 +510,7 @@
 					} else {
 						if ((abp.video.duration - abp.video.currentTime) / abp.video.currentTime < 0.001 && !abp.video.paused) {
 							abp.video.currentTime = 0;
-							if (!abp.video.loop) abp.video.click();
+							if (!abp.video.loop) abp.video.pause();
 						};
 					};
 				}, 600);
