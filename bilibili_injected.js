@@ -169,8 +169,10 @@
 	};
 
 	var finishUp = function(forceCidHack) {
-		var token;
-		if(document.body && document.body.innerHTML.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/) && document.body.innerHTML.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/)[1]) token = document.body.innerHTML.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/)[1];
+		var token = sessionStorage.getItem('token');
+		if (document.body && document.body.innerHTML.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/) && document.body.innerHTML.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/)[1]) token = document.body.innerHTML.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/)[1];
+		if (token) sessionStorage.setItem('token', token);
+		if (!token) $.get('http://www.bilibili.com/video/av1/', function(data) {if (data.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/) && data.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/)[1]) sessionStorage.setItem('token', data.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/)[1])});
 		chrome.runtime.sendMessage({
 			command: "getDownloadLink",
 			cid: biliHelper.cid,
