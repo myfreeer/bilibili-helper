@@ -397,6 +397,7 @@
 					} else {
 						biliHelper.mainBlock.speedSection.addClass('hidden');
 					};
+					biliHelper.mainBlock.speedSection.res.innerText = "";
 					biliHelper.mainBlock.speedSection.input.onchange = null;
 					biliHelper.mainBlock.speedSection.input.value = 1.0;
 					this.current = newMode;
@@ -423,10 +424,10 @@
 				bilih5: function() {
 				    this.set('bilih5');
 				    $('#bofqi').html('<div class="player"><div id="bilibiliPlayer"></div></div>');
-				    $.getScript("http://static.hdslb.com/player/js/bilibiliPlayer.min.js", function(){
-				    	var script = document.createElement('script');
-				    	script.appendChild(document.createTextNode("var player = new bilibiliPlayer({aid: "+biliHelper.avid+",cid: "+biliHelper.cid+",autoplay: false,as_wide: false,player_type: 0,pre_ad: 0,lastplaytime: null,enable_ssl: 1,extra_params: null,p: "+biliHelper.page+"})"));
-				    	document.getElementsByTagName('head')[0].appendChild(script);
+				    $.getScript("https://static.hdslb.com/player/js/bilibiliPlayer.min.js", function() {
+				        var script = document.createElement('script');
+				        script.appendChild(document.createTextNode("var player = new bilibiliPlayer({aid: " + biliHelper.avid + ",cid: " + biliHelper.cid + ",autoplay: false,as_wide: false,player_type: 0,pre_ad: 0,lastplaytime: null,enable_ssl: 1,extra_params: null,p: " + biliHelper.page + "})"));
+				        document.getElementsByTagName('head')[0].appendChild(script);
 				    });
 				    var interval = setInterval(function() {
 				        try {
@@ -439,6 +440,25 @@
 				                        bilibilivideo.playbackRate = Number(biliHelper.mainBlock.speedSection.input.value);
 				                    } else {
 				                        biliHelper.mainBlock.speedSection.input.value = 1.0;
+				                    };
+				                });
+				                bilibilivideo.addEventListener("loadedmetadata", function(e) {
+				                    biliHelper.mainBlock.speedSection.res.innerText = bilibilivideo.videoWidth + "x" + bilibilivideo.videoHeight;
+				                });
+				                biliHelper.mainBlock.speedSection.rotate.addEventListener("change", function(e) {
+				                    if (biliHelper.mainBlock.speedSection.mirror.className === "b-btn") {
+				                        bilibilivideo.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg) matrix(-1, 0, 0, 1, 0, 0)';
+				                    } else {
+				                        bilibilivideo.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg)';
+				                    };
+				                });
+				                biliHelper.mainBlock.speedSection.mirror.addEventListener("click", function(e) {
+				                    if (biliHelper.mainBlock.speedSection.mirror.className === "b-btn w") {
+				                        bilibilivideo.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg) matrix(-1, 0, 0, 1, 0, 0)';
+				                        biliHelper.mainBlock.speedSection.mirror.className = "b-btn";
+				                    } else {
+				                        bilibilivideo.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg)';
+				                        biliHelper.mainBlock.speedSection.mirror.className = "b-btn w";
 				                    };
 				                });
 				            };
@@ -487,13 +507,42 @@
 							config: e.detail
 						});
 					});
-					biliHelper.mainBlock.speedSection.input.addEventListener("change", function(e) {
-						if(Number(biliHelper.mainBlock.speedSection.input.value)){
-							abp.video.playbackRate = Number(biliHelper.mainBlock.speedSection.input.value);
-						} else {
-							biliHelper.mainBlock.speedSection.input.value = 1.0;
-						};
-					});
+				    biliHelper.mainBlock.speedSection.input.addEventListener("change", function(e) {
+				        if (Number(biliHelper.mainBlock.speedSection.input.value)) {
+				            abp.video.playbackRate = Number(biliHelper.mainBlock.speedSection.input.value);
+				        } else {
+				            biliHelper.mainBlock.speedSection.input.value = 1.0;
+				        };
+				    });
+				   abp.video.addEventListener("loadedmetadata", function(e) {
+				        biliHelper.mainBlock.speedSection.res.innerText = abp.video.videoWidth + "x" + abp.video.videoHeight;
+				    });
+				    biliHelper.mainBlock.speedSection.rotate.addEventListener("change", function(e) {
+				        if (biliHelper.mainBlock.speedSection.mirror.className==="b-btn") {
+				            abp.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg) matrix(-1, 0, 0, 1, 0, 0)';
+				            abp.video.style.zIndex=0;
+				            document.getElementsByClassName('ABP-Container')[0].style.zIndex=1;
+				            //biliHelper.mainBlock.speedSection.mirror.className = "b-btn";
+				        } else {
+				        	abp.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg)';
+				            abp.video.style.zIndex=0;
+				            document.getElementsByClassName('ABP-Container')[0].style.zIndex=1;
+				            //biliHelper.mainBlock.speedSection.mirror.className = "b-btn w";
+				        };
+				    });
+				    biliHelper.mainBlock.speedSection.mirror.addEventListener("click", function(e) {
+				        if (biliHelper.mainBlock.speedSection.mirror.className==="b-btn w") {
+				            abp.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg) matrix(-1, 0, 0, 1, 0, 0)';
+				            abp.video.style.zIndex=0;
+				            document.getElementsByClassName('ABP-Container')[0].style.zIndex=1;
+				            biliHelper.mainBlock.speedSection.mirror.className = "b-btn";
+				        } else {
+				        	abp.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg)';
+				            abp.video.style.zIndex=0;
+				            document.getElementsByClassName('ABP-Container')[0].style.zIndex=1;
+				            biliHelper.mainBlock.speedSection.mirror.className = "b-btn w";
+				        };
+				    });
 					var bofqiHeight = 0;
 					$(window).scroll(function() {
 						if (bofqiHeight != $("#bofqi").width()) {
@@ -564,13 +613,42 @@
 							config: e.detail
 						});
 					});
-					biliHelper.mainBlock.speedSection.input.addEventListener("change", function(e) {
-						if(Number(biliHelper.mainBlock.speedSection.input.value)){
-							abp.video.playbackRate = Number(biliHelper.mainBlock.speedSection.input.value);
-						} else {
-							biliHelper.mainBlock.speedSection.input.value = 1.0;
-						};
-					});
+				    biliHelper.mainBlock.speedSection.input.addEventListener("change", function(e) {
+				        if (Number(biliHelper.mainBlock.speedSection.input.value)) {
+				            abp.video.playbackRate = Number(biliHelper.mainBlock.speedSection.input.value);
+				        } else {
+				            biliHelper.mainBlock.speedSection.input.value = 1.0;
+				        };
+				    });
+				   abp.video.addEventListener("loadedmetadata", function(e) {
+				        biliHelper.mainBlock.speedSection.res.innerText = abp.video.videoWidth + "x" + abp.video.videoHeight;
+				    });
+				    biliHelper.mainBlock.speedSection.rotate.addEventListener("change", function(e) {
+				        if (biliHelper.mainBlock.speedSection.mirror.className==="b-btn") {
+				            abp.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg) matrix(-1, 0, 0, 1, 0, 0)';
+				            abp.video.style.zIndex=0;
+				            document.getElementsByClassName('ABP-Container')[0].style.zIndex=1;
+				            //biliHelper.mainBlock.speedSection.mirror.className = "b-btn";
+				        } else {
+				        	abp.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg)';
+				            abp.video.style.zIndex=0;
+				            document.getElementsByClassName('ABP-Container')[0].style.zIndex=1;
+				            //biliHelper.mainBlock.speedSection.mirror.className = "b-btn w";
+				        };
+				    });
+				    biliHelper.mainBlock.speedSection.mirror.addEventListener("click", function(e) {
+				        if (biliHelper.mainBlock.speedSection.mirror.className==="b-btn w") {
+				            abp.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg) matrix(-1, 0, 0, 1, 0, 0)';
+				            abp.video.style.zIndex=0;
+				            document.getElementsByClassName('ABP-Container')[0].style.zIndex=1;
+				            biliHelper.mainBlock.speedSection.mirror.className = "b-btn";
+				        } else {
+				        	abp.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg)';
+				            abp.video.style.zIndex=0;
+				            document.getElementsByClassName('ABP-Container')[0].style.zIndex=1;
+				            biliHelper.mainBlock.speedSection.mirror.className = "b-btn w";
+				        };
+				    });
 					var bofqiHeight = 0;
 					$(window).scroll(function() {
 						if (bofqiHeight != $("#bofqi").width()) {
@@ -630,6 +708,35 @@
 				            biliHelper.mainBlock.speedSection.input.value = 1.0;
 				        };
 				    });
+				   abp.video.addEventListener("loadedmetadata", function(e) {
+				        biliHelper.mainBlock.speedSection.res.innerText = abp.video.videoWidth + "x" + abp.video.videoHeight;
+				    });
+				    biliHelper.mainBlock.speedSection.rotate.addEventListener("change", function(e) {
+				        if (biliHelper.mainBlock.speedSection.mirror.className==="b-btn") {
+				            abp.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg) matrix(-1, 0, 0, 1, 0, 0)';
+				            abp.video.style.zIndex=0;
+				            document.getElementsByClassName('ABP-Container')[0].style.zIndex=1;
+				            //biliHelper.mainBlock.speedSection.mirror.className = "b-btn";
+				        } else {
+				        	abp.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg)';
+				            abp.video.style.zIndex=0;
+				            document.getElementsByClassName('ABP-Container')[0].style.zIndex=1;
+				            //biliHelper.mainBlock.speedSection.mirror.className = "b-btn w";
+				        };
+				    });
+				    biliHelper.mainBlock.speedSection.mirror.addEventListener("click", function(e) {
+				        if (biliHelper.mainBlock.speedSection.mirror.className==="b-btn w") {
+				            abp.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg) matrix(-1, 0, 0, 1, 0, 0)';
+				            abp.video.style.zIndex=0;
+				            document.getElementsByClassName('ABP-Container')[0].style.zIndex=1;
+				            biliHelper.mainBlock.speedSection.mirror.className = "b-btn";
+				        } else {
+				        	abp.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg)';
+				            abp.video.style.zIndex=0;
+				            document.getElementsByClassName('ABP-Container')[0].style.zIndex=1;
+				            biliHelper.mainBlock.speedSection.mirror.className = "b-btn w";
+				        };
+				    });
 				    var bofqiHeight = 0;
 				    $(window).scroll(function() {
 				        if (bofqiHeight != $("#bofqi").width()) {
@@ -681,10 +788,14 @@
 				biliHelper.mainBlock.redirectSection = $('<div class="section redirect"><h3>生成页选项</h3><p><a class="b-btn w" href="' + biliHelper.redirectUrl + '">前往原始跳转页</a></p></div>');
 				biliHelper.mainBlock.append(biliHelper.mainBlock.redirectSection);
 			}
-			biliHelper.mainBlock.speedSection = $('<div class="section speed hidden"><h3>视频播放速度</h3><p><span></span>1.0 正常速度，大于1加速，小于1减速<input id="bilibili_helper_html5_video_speed" type="number" class="b-input" placeholder="1.0" value=1.0></p></div>');
+			biliHelper.mainBlock.speedSection = $('<div class="section speed hidden"><h3>视频播放控制</h3><p><span id="bilibili_helper_html5_video_res"></span><a class="b-btn w" id="bilibili_helper_html5_video_mirror">镜像视频</a><br>视频播放速度<input id="bilibili_helper_html5_video_speed" type="number" class="b-input" placeholder="1.0" value=1.0></br>旋转视频<input id="bilibili_helper_html5_video_rotate" type="number" class="b-input" placeholder="0.0" value=0.0></p></div>');
 			biliHelper.mainBlock.append(biliHelper.mainBlock.speedSection);
 			biliHelper.mainBlock.speedSection.input = biliHelper.mainBlock.speedSection.find('input#bilibili_helper_html5_video_speed.b-input')[0];
 			biliHelper.mainBlock.speedSection.input.step = 0.1;
+			biliHelper.mainBlock.speedSection.res = biliHelper.mainBlock.speedSection.find('#bilibili_helper_html5_video_res')[0];
+			biliHelper.mainBlock.speedSection.mirror = biliHelper.mainBlock.speedSection.find('#bilibili_helper_html5_video_mirror')[0];
+			biliHelper.mainBlock.speedSection.rotate = biliHelper.mainBlock.speedSection.find('#bilibili_helper_html5_video_rotate')[0];
+			biliHelper.mainBlock.speedSection.rotate.step = 90;
 			biliHelper.mainBlock.switcherSection = $('<div class="section switcher"><h3>播放器切换</h3><p></p></div>');
 			biliHelper.mainBlock.switcherSection.find('p').append($('<a class="b-btn w" type="original">原始播放器</a><a class="b-btn w" type="bilih5">原始HTML5</a><a class="b-btn w hidden" type="bilimac">Mac 客户端</a><a class="b-btn w hidden" type="swf">SWF 播放器</a><a class="b-btn w hidden" type="iframe">Iframe 播放器</a><a class="b-btn w hidden" type="html5">HTML5 (超清)</a><a class="b-btn w hidden" type="html5hd">HTML5 (高清)</a><a class="b-btn w hidden" type="html5ld">HTML5 (低清)</a>').click(function() {
 				biliHelper.switcher[$(this).attr('type')]();
