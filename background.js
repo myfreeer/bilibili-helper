@@ -8,7 +8,7 @@ var notification = false,
     localeTimeout = null,
     secureAvailable = false,
     updateNotified = false,
-    videoPlaybackHosts = ["http://*.hdslb.com/*", "https://*.hdslb.com/*", "http://*.acgvideo.com/*", "http://*/*.acgvideo.com/*"],
+    videoPlaybackHosts = ["http://*.hdslb.com/*", "https://*.hdslb.com/*", "http://*.acgvideo.com/*", "http://*/*.acgvideo.com/*", "https://*.acgvideo.com/*", "https://*/*.acgvideo.com/*"],
     Live = {};
 bangumi = false;
 var bkg_page = chrome.extension.getBackgroundPage();
@@ -646,9 +646,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             return true;
         case "getDownloadLink":
             var url = {
-                download: getOption("dlquality") == 'flv' && use_SECRETKEY_MINILOADER ? "http://interface.bilibili.com/playurl?&cid=" + request.cid + "&from=miniplay&otype=json&player=1&sign=" + md5("cid=" + request.cid + "&from=miniplay&otype=json&player=1" + SECRETKEY_MINILOADER) : "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + appsec),
-                playback: "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + appsec),
-                lowres: request.token ? 'http://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5&token=' + request.token : 'http://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5'
+                download: getOption("dlquality") == 'flv' && use_SECRETKEY_MINILOADER ? "https://interface.bilibili.com/playurl?&cid=" + request.cid + "&from=miniplay&otype=json&player=1&sign=" + md5("cid=" + request.cid + "&from=miniplay&otype=json&player=1" + SECRETKEY_MINILOADER) : "https://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + appsec),
+                playback: "https://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + appsec),
+                lowres: request.token ? 'https://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5&token=' + request.token : 'https://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5'
             };
             if (request.cidHack && request.cidHack != locale) {
                 cidHackType[request.cid] = request.cidHack;
@@ -923,7 +923,7 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 }, {
     urls: ["http://tajs.qq.com/stats*"]
 }, ["blocking"]);
-
+/*
 chrome.webRequest.onBeforeSendHeaders.addListener(function(details) {
     var query = new URL(details.url).query;
     var ip = randomIP(cidHackType[query['cid']] == 2 ? 2 : 1);
@@ -942,7 +942,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function(details) {
 }, {
     urls: ["http://interface.bilibili.com/playurl?cid*", "http://interface.bilibili.com/playurl?accel=1&cid=*", "http://interface.bilibili.com/playurl?platform=bilihelper*", "http://www.bilibili.com/video/av*", "http://www.bilibili.com/bangumi/*", "http://app.bilibili.com/bangumi/*", "http://www.bilibili.com/search*", "http://*.acgvideo.com/*", "http://www.bilibili.com/api_proxy*", "http://bangumi.bilibili.com/*", "http://interface.bilibili.com/playurl?platform=android*"]
 }, ['requestHeaders', 'blocking']);
-
+*/
 function receivedHeaderModifier(details) {
     var hasCORS = false;
     details.responseHeaders.forEach(function(v) {
@@ -953,12 +953,12 @@ function receivedHeaderModifier(details) {
     if (!hasCORS && !bangumi) {
         details.responseHeaders.push({
             name: "Access-Control-Allow-Origin",
-            value: "http://www.bilibili.com"
+            value: "*://www.bilibili.com"
         });
     } else if (!hasCORS) {
         details.responseHeaders.push({
             name: "Access-Control-Allow-Origin",
-            value: "http://bangumi.bilibili.com"
+            value: "*://bangumi.bilibili.com"
         });
     }
     return {

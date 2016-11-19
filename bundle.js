@@ -2735,14 +2735,14 @@
 				return;
 	
 			let ts = Math.ceil(Date.now()/1000)
-			return fetch(`http://interface.bilibili.com/playurl?${interfaceUrl(cid,ts)}&sign=${calcSign(cid,ts)}`)
+			return fetch(`https://interface.bilibili.com/playurl?${interfaceUrl(cid,ts)}&sign=${calcSign(cid,ts)}`)
 			.then(res => res.text()).then(res => {
 				let parser = new DOMParser();
 				let doc = parser.parseFromString(res, 'text/xml');
 				let array = x => Array.prototype.slice.call(x);
 				let duration = 0.0;
 				array(doc.querySelectorAll('durl > length')).forEach(len => duration += +len.textContent);
-				let src = array(doc.querySelectorAll('durl > url')).map(url => url.textContent );
+				let src = array(doc.querySelectorAll('durl > url')).map(url => url.textContent.replace(/^http:\/\//,"https://"));
 				return {
 					duration: duration/1000.0,
 					src: src,
