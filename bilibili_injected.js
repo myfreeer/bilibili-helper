@@ -446,6 +446,7 @@
 				                    biliHelper.mainBlock.speedSection.res.innerText = bilibilivideo.videoWidth + "x" + bilibilivideo.videoHeight;
 				                });
 				                biliHelper.mainBlock.speedSection.rotate.addEventListener("change", function(e) {
+				                    if (Number(biliHelper.mainBlock.speedSection.rotate.value) % 360 ===0) biliHelper.mainBlock.speedSection.rotate.value = 0;
 				                    if (biliHelper.mainBlock.speedSection.mirror.className === "b-btn") {
 				                        bilibilivideo.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg) matrix(-1, 0, 0, 1, 0, 0)';
 				                    } else {
@@ -518,6 +519,7 @@
 				        biliHelper.mainBlock.speedSection.res.innerText = abp.video.videoWidth + "x" + abp.video.videoHeight;
 				    });
 				    biliHelper.mainBlock.speedSection.rotate.addEventListener("change", function(e) {
+				        if (Number(biliHelper.mainBlock.speedSection.rotate.value) % 360 ===0) biliHelper.mainBlock.speedSection.rotate.value = 0;
 				        if (biliHelper.mainBlock.speedSection.mirror.className==="b-btn") {
 				            abp.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg) matrix(-1, 0, 0, 1, 0, 0)';
 				            abp.video.style.zIndex=0;
@@ -624,6 +626,7 @@
 				        biliHelper.mainBlock.speedSection.res.innerText = abp.video.videoWidth + "x" + abp.video.videoHeight;
 				    });
 				    biliHelper.mainBlock.speedSection.rotate.addEventListener("change", function(e) {
+				        if (Number(biliHelper.mainBlock.speedSection.rotate.value) % 360 ===0) biliHelper.mainBlock.speedSection.rotate.value = 0;
 				        if (biliHelper.mainBlock.speedSection.mirror.className==="b-btn") {
 				            abp.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg) matrix(-1, 0, 0, 1, 0, 0)';
 				            abp.video.style.zIndex=0;
@@ -702,6 +705,7 @@
 				        });
 				    });
 				    biliHelper.mainBlock.speedSection.input.addEventListener("change", function(e) {
+				        if (Number(biliHelper.mainBlock.speedSection.rotate.value) % 360 ===0) biliHelper.mainBlock.speedSection.rotate.value = 0;
 				        if (Number(biliHelper.mainBlock.speedSection.input.value)) {
 				            abp.video.playbackRate = Number(biliHelper.mainBlock.speedSection.input.value);
 				        } else {
