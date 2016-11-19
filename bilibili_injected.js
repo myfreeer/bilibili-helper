@@ -421,26 +421,29 @@
 					});
 				},
 				bilih5: function() {
-				    if (document.getElementsByClassName('bgray-btn-wrap')[0].firstChild.innerText.match('HTML5')) {
-				        document.getElementsByClassName('bgray-btn-wrap')[0].firstChild.click();
-				        this.set('bilih5');
-				        var interval = setInterval(function() {
-				            try {
-				                var bilibilivideo = document.getElementsByClassName('bilibili-player-video')[0].firstChild;
-				                if (bilibilivideo.tagName == "VIDEO") {
-				                    biliHelper.mainBlock.speedSection.removeClass('hidden');
-				                    clearInterval(interval);
-				                    biliHelper.mainBlock.speedSection.input.addEventListener("change", function(e) {
-				                        if (Number(biliHelper.mainBlock.speedSection.input.value)) {
-				                            bilibilivideo.playbackRate = Number(biliHelper.mainBlock.speedSection.input.value);
-				                        } else {
-				                            biliHelper.mainBlock.speedSection.input.value = 1.0;
-				                        };
-				                    });
-				                };
-				            } catch (e) {}
-				        }, 500);
-				    };
+				    this.set('bilih5');
+				    $('#bofqi').html('<div class="player"><div id="bilibiliPlayer"></div></div>');
+				    $.getScript("http://static.hdslb.com/player/js/bilibiliPlayer.min.js", function(){
+				    	var script = document.createElement('script');
+				    	script.appendChild(document.createTextNode("var player = new bilibiliPlayer({aid: "+biliHelper.avid+",cid: "+biliHelper.cid+",autoplay: false,as_wide: false,player_type: 0,pre_ad: 0,lastplaytime: null,enable_ssl: 1,extra_params: null,p: "+biliHelper.page+"})"));
+				    	document.getElementsByTagName('head')[0].appendChild(script);
+				    });
+				    var interval = setInterval(function() {
+				        try {
+				            var bilibilivideo = document.getElementsByClassName('bilibili-player-video')[0].firstChild;
+				            if (bilibilivideo.tagName == "VIDEO") {
+				                biliHelper.mainBlock.speedSection.removeClass('hidden');
+				                clearInterval(interval);
+				                biliHelper.mainBlock.speedSection.input.addEventListener("change", function(e) {
+				                    if (Number(biliHelper.mainBlock.speedSection.input.value)) {
+				                        bilibilivideo.playbackRate = Number(biliHelper.mainBlock.speedSection.input.value);
+				                    } else {
+				                        biliHelper.mainBlock.speedSection.input.value = 1.0;
+				                    };
+				                });
+				            };
+				        } catch (e) {}
+				    }, 500);
 				},
 				html5: function() {
 					this.set('html5');
