@@ -648,7 +648,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             var url = {
                 download: getOption("dlquality") == 'flv' && use_SECRETKEY_MINILOADER ? "http://interface.bilibili.com/playurl?&cid=" + request.cid + "&from=miniplay&otype=json&player=1&sign=" + md5("cid=" + request.cid + "&from=miniplay&otype=json&player=1" + SECRETKEY_MINILOADER) : "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + appsec),
                 playback: "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + appsec),
-                lowres: 'http://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5'
+                lowres: request.token ? 'http://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5' : 'http://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5&token=' + request.token
             };
             if (request.cidHack && request.cidHack != locale) {
                 cidHackType[request.cid] = request.cidHack;

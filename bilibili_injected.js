@@ -169,12 +169,15 @@
 	};
 
 	var finishUp = function(forceCidHack) {
+		var token;
+		if(document.body && document.body.innerHTML.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/) && document.body.innerHTML.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/)[1]) token = document.body.innerHTML.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/)[1];
 		chrome.runtime.sendMessage({
 			command: "getDownloadLink",
 			cid: biliHelper.cid,
 				avid: biliHelper.avid,
 				pg: biliHelper.page,
-			cidHack: forceCidHack || biliHelper.cidHack
+				cidHack: forceCidHack || biliHelper.cidHack,
+				token: token
 		}, function(response) {
 			if (!response) return finishUp(forceCidHack);
 			if (Object.keys(response).length === 0) return finishUp(forceCidHack);
