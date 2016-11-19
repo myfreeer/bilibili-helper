@@ -953,12 +953,12 @@ function receivedHeaderModifier(details) {
     if (!hasCORS && !bangumi) {
         details.responseHeaders.push({
             name: "Access-Control-Allow-Origin",
-            value: "*://www.bilibili.com"
+            value: "*"
         });
     } else if (!hasCORS) {
         details.responseHeaders.push({
             name: "Access-Control-Allow-Origin",
-            value: "*://bangumi.bilibili.com"
+            value: "*"
         });
     }
     return {
