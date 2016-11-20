@@ -569,7 +569,11 @@
 					} else {
 						if ((abp.video.duration - abp.video.currentTime) / abp.video.currentTime < 0.001 && !abp.video.paused) {
 							abp.video.currentTime = 0;
-							if (!abp.video.loop) abp.video.pause();
+							if (!abp.video.loop) {
+							    abp.video.pause();
+							    setTimeout(abp.video.pause, 200);
+							    document.querySelector('.button.ABP-Play.ABP-Pause.icon-pause').className = "button ABP-Play icon-play";
+							}
 						};
 					};
 				}, 600);
