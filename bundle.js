@@ -152,6 +152,17 @@
 	
 	document.head.appendChild(style);
 	mediaSource.debug = true;
+	let fails = e => {
+	    nanobar.go(100);
+	    let bbtn = document.getElementsByClassName('b-btn');
+	    let html5btn;
+	    for (let i in bbtn) {
+	        if (typeof bbtn[i].getAttribute == 'function')
+	            if (bbtn[i].getAttribute('type') == "html5hd") html5btn = bbtn[i];
+	    };
+	    if (html5btn) html5btn.click();
+	    return console.log(e);
+	}
 	
 	let getSeeker = url => {
 		let seekers = [bilibili, youku, tudou];
@@ -180,7 +191,7 @@
 				if (linktodl && linktodl.href && linktodl.href.match(/rate=([0-9]+)/) && linktodl.href.match(/rate=([0-9]+)/)[1]) ratetodl = parseInt(linktodl.href.match(/rate=([0-9]+)/)[1]);
 				if (res.src[i] && res.src[i].match && res.src[i].match(/rate=([0-9]+)/) && res.src[i].match(/rate=([0-9]+)/)[1]) ratetodl2 = parseInt(res.src[i].match(/rate=([0-9]+)/)[1]);
 				if (linktodl && ratetodl && ratetodl2 && (ratetodl2 == 0 || ratetodl2 > ratetodl)) linktodl.setAttribute('href',res.src[i]);
-				if (linktodl && linktodl.href && ratetodl && ratetodl2 && (ratetodl == 0 || ratetodl > ratetodl2)) res.src[i] = linktodl.href;
+				if (linktodl && linktodl.href && ratetodl && ratetodl2 && (ratetodl == 0 || ratetodl > ratetodl2) && !linktodl.href.match('mp4')) res.src[i] = linktodl.href;
 				if (res.src[i] && res.src[i].match && res.src[i].match(/rate=10$/)) return playUrl(location.href, ++retry);
 			};
 			console.log({
@@ -302,17 +313,9 @@
 					console.log('getVideosResult:', res);
 					if ((res.src.length == 1 && res.src[0].match('mp4')) || retry > 4) {
 						let secdown = document.getElementsByClassName("section downloder");
-						if (secdown && secdown.length && secdown.length === 1 && secdown[0].childNodes && secdown[0].childNodes.length === 2 && secdown[0].childNodes[1] && secdown[0].childNodes[1].childNodes.length === 3 && secdown[0].childNodes[1].childNodes[0].id === "bili_helper_down_link_0" && secdown[0].childNodes[1].childNodes[0].href && secdown[0].childNodes[1].childNodes[0].href.match('flv')) res.src[0] = secdown[0].childNodes[1].childNodes[0].href;
-						else{
-						nanobar.go(100);
-						let bbtn=document.getElementsByClassName('b-btn');
-						let html5btn;
-						for (let i in bbtn) {
-							if (typeof bbtn[i].getAttribute == 'function') if (bbtn[i].getAttribute('type') == "html5hd") html5btn = bbtn[i];
-						};
-						if (html5btn) html5btn.click();
-						return console.log('only mp4 available');
-					}};
+						if (secdown && secdown.length && secdown.length === 1 && secdown[0].childNodes && secdown[0].childNodes.length === 2 && secdown[0].childNodes[1] && secdown[0].childNodes[1].childNodes.length === 3 && secdown[0].childNodes[1].childNodes[0].id === "bili_helper_down_link_0" && secdown[0].childNodes[1].childNodes[0].href && secdown[0].childNodes[1].childNodes[0].href.match('.flv')) res.src[0] = secdown[0].childNodes[1].childNodes[0].href;
+						else return fails('only mp4 available');
+					};
 					if (res) {
 						let ctrl = playVideo(res, retry);
 						ctrl.player.onStarted.push(() => nanobar.go(100));
@@ -2742,7 +2745,7 @@
 				let array = x => Array.prototype.slice.call(x);
 				let duration = 0.0;
 				array(doc.querySelectorAll('durl > length')).forEach(len => duration += +len.textContent);
-				let src = array(doc.querySelectorAll('durl > url')).map(url => url.textContent.replace(/^http:\/\//,"https://"));
+				let src = array(doc.querySelectorAll('durl > url')).map(url => url.textContent.match(/^http:\/\/ws.acgvideo.com/) ? url.textContent : url.textContent.replace(/^http:\/\//,"https://"));
 				return {
 					duration: duration/1000.0,
 					src: src,
