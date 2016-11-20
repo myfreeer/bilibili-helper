@@ -388,6 +388,10 @@
 			biliHelper.switcher = {
 				current: "original",
 				set: function(newMode) {
+					if(this.current.match('bilih5')){
+						var biliMenu = document.querySelector('.bilibili-player-setting-menu-wrap');
+						if (biliMenu && biliMenu.lastChild && biliMenu.lastChild.getAttribute('value') === "change_flash") biliMenu.lastChild.click();
+					}
 					biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + this.current + '"]').addClass('w');
 					biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + newMode + '"]').removeClass('w');
 					try{clearInterval(checkFinished);} catch(e){}
@@ -668,8 +672,9 @@
 				},
 				html5ld: function() {
 				    console.log(biliHelper.lowResUrl);
-				    $('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + biliHelper.videoPic + '" autobuffer preload="auto" crossorigin="anonymous"><source src="' + biliHelper.lowResUrl.durl[0].url + '" type="video/mp4"></video></div>');
+				    if (!(biliHelper.lowResUrl && biliHelper.lowResUrl.durl && biliHelper.lowResUrl.durl[0] && biliHelper.lowResUrl.durl[0].url)) return false;
 				    this.set('html5ld');
+				    $('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + biliHelper.videoPic + '" autobuffer preload="auto" crossorigin="anonymous"><source src="' + biliHelper.lowResUrl.durl[0].url + '" type="video/mp4"></video></div>');
 				    var abp = ABP.create(document.getElementById("bilibili_helper_html5_player"), {
 				        src: {
 				            playlist: [{
