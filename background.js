@@ -340,6 +340,7 @@ function getVideoInfo(avid, page, isbangumi, callback) {
                     }
                     if (typeof avInfo.cid == "number") {
                         viCache[avid + '-' + page] = {
+                            avid: avid,
                             mid: avInfo.mid,
                             tid: avInfo.tid,
                             cid: avInfo.cid,
@@ -356,7 +357,7 @@ function getVideoInfo(avid, page, isbangumi, callback) {
                             ts: currTime,
                             bangumi: false
                         };
-                        if (typeof avInfo.bangumi == "object") {
+                        if (typeof avInfo.bangumi == "object" && avInfo.spid) {
                             getFileData("http://api.bilibili.cn/sp?spid=" + avInfo.spid, function(spInfo) {
                                 spInfo = JSON.parse(spInfo);
                                 if (spInfo.isbangumi == 1) {
@@ -409,7 +410,7 @@ function getVideoInfo(avid, page, isbangumi, callback) {
                         ts: currTime,
                         bangumi: false
                     };
-                    if (typeof avInfo.bangumi == "object") {
+                    if (typeof avInfo.bangumi == "object" && avInfo.spid) {
                         getFileData("http://api.bilibili.cn/sp?spid=" + avInfo.spid, function(spInfo) {
                             spInfo = JSON.parse(spInfo);
                             if (spInfo.isbangumi == 1) {

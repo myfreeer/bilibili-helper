@@ -172,8 +172,9 @@
 	
 	let playVideo = (res, retry = 0) => {
 		let player;
-		if (document.getElementById('bilibili_helper_html5_player_video')) {
-		    let v = document.getElementById('bilibili_helper_html5_player_video');
+		let v = document.getElementById('bilibili_helper_html5_player_video');
+		if (v) {
+		    //let v = document.getElementById('bilibili_helper_html5_player_video');
 		    v.parentNode.video = v;
 		    player = v.parentNode;
 		} else {
@@ -3805,7 +3806,7 @@ video.onvolumechange = function() {localStorage.setItem('mama-hd-volume', video.
 		});
 	
 		//document.body.style.margin = 0;
-		if(location.href.match("bilibili.com/video")){
+		if(location.href.match("bilibili.com/video")||location.href.match("bangumi.bilibili.com/anime/v/")){
 			document.getElementById('bofqi').innerHTML='';
 			console.log(document.getElementById('bofqi').appendChild(div));
 			//resize();
