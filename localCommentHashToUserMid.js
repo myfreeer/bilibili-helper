@@ -52,7 +52,7 @@ function checkCommentHash(hash, maximumMid, minimumMid) {
     if (!hashint) return false;
     for (var i = minimumMid; i < maximumMid + 1; i++) {
         if ((CRC32.bstr(i.toString()) >>> 0) === hashint) {
-            return i + minimumMid;
+            return i;
         }
     }
     return false;
