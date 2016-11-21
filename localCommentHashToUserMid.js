@@ -13,14 +13,7 @@ var CRC32 = {};
 
         for (var n = 0; n != 256; ++n) {
             c = n;
-            c = ((c & 1) ? (-306674912 ^ (c >>> 1)) : (c >>> 1));
-            c = ((c & 1) ? (-306674912 ^ (c >>> 1)) : (c >>> 1));
-            c = ((c & 1) ? (-306674912 ^ (c >>> 1)) : (c >>> 1));
-            c = ((c & 1) ? (-306674912 ^ (c >>> 1)) : (c >>> 1));
-            c = ((c & 1) ? (-306674912 ^ (c >>> 1)) : (c >>> 1));
-            c = ((c & 1) ? (-306674912 ^ (c >>> 1)) : (c >>> 1));
-            c = ((c & 1) ? (-306674912 ^ (c >>> 1)) : (c >>> 1));
-            c = ((c & 1) ? (-306674912 ^ (c >>> 1)) : (c >>> 1));
+            for (var x = 0; x < 8; x++) c = ((c & 1) ? (-306674912 ^ (c >>> 1)) : (c >>> 1));
             table[n] = c;
         }
 
@@ -44,20 +37,22 @@ var CRC32 = {};
     CRC32.bstr = crc32_bstr;
 })(CRC32);
 
-/* Usage: checkCommentHash(String hash, int maximumMid)
- * argument hash is required, maximumMid is optional
- * maximumMid would be 60000000 if not set
- * the return value would be mid, or false if process fails
+/* Usage: checkCommentHash(String hash, int maximumMid, int minimumMid)
+ * argument hash is required, maximumMid and minimumMid is optional
+ * maximumMid would be 60000000 if not set, minimumMid would be 0 if not set
+ * the return value would be mid, or -1 for unregistered user or false if process fails
  * Not designed to be multi-threaded, nor asynchronous
  */
-function checkCommentHash(hash) {
-    var maximumMid = arguments.length > 1 && arguments[1] !== undefined && typeof arguments[1] == 'number' ? arguments[1] : 60000000; //the larger, the slower
+function checkCommentHash(hash, maximumMid, minimumMid) {
+    maximumMid = parseInt(maximumMid) ? parseInt(maximumMid) : 60000000; //the larger, the slower
+    minimumMid = parseInt(minimumMid) ? parseInt(minimumMid) : 0;
     if (!hash) return false;
+    if (hash.indexOf('D') == 0) return -1; //old comments sent by unregistered user
     var hashint = parseInt(hash, 16);
     if (!hashint) return false;
-    for (var i = 1; i < maximumMid + 1; i++) {
+    for (var i = minimumMid; i < maximumMid + 1; i++) {
         if ((CRC32.bstr(i.toString()) >>> 0) === hashint) {
-            return i;
+            return i + minimumMid;
         }
     }
     return false;
