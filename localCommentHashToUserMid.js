@@ -39,12 +39,12 @@ var CRC32 = {};
 
 /* Usage: checkCommentHash(String hash, int maximumMid, int minimumMid)
  * argument hash is required, maximumMid and minimumMid is optional
- * maximumMid would be 60000000 if not set, minimumMid would be 0 if not set
+ * maximumMid would be 65000000 if not set, minimumMid would be 0 if not set
  * the return value would be mid, or -1 for unregistered user or false if process fails
  * Not designed to be multi-threaded, nor asynchronous
  */
 function checkCommentHash(hash, maximumMid, minimumMid) {
-    maximumMid = parseInt(maximumMid) ? parseInt(maximumMid) : 60000000; //the larger, the slower
+    maximumMid = parseInt(maximumMid) ? parseInt(maximumMid) : 65000000; //the larger, the slower
     minimumMid = parseInt(minimumMid) ? parseInt(minimumMid) : 0;
     if (!hash) return false;
     if (hash.indexOf('D') == 0) return -1; //old comments sent by unregistered user
