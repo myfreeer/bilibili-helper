@@ -7,36 +7,45 @@ var ABP = {
 * == Licensed Under the MIT License : /LICENSING
 * Copyright (c) 2012 Jim Chen ( CQZ, Jabbany )
 ************************/
-function CommentLoader(url,xcm,callback){
-	if(callback == null)
-		callback = function(){return;};
-	var xmlhttp = null;
-	if (window.XMLHttpRequest){
-		xmlhttp=new XMLHttpRequest();
-	}
-	else{
-		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-	}
-	xmlhttp.open("GET",url,true);
-	xmlhttp.send();
-	var cm = xcm;
-	xmlhttp.onreadystatechange = function(){
-		if (xmlhttp.readyState==4 && xmlhttp.status==200){
-			if(navigator.appName == 'Microsoft Internet Explorer'){
-				var f = new ActiveXObject("Microsoft.XMLDOM");
-				f.async = false;
-				f.loadXML(xmlhttp.responseText);
-				cm.load(BilibiliParser(f));
-				callback();
-			}else{
-				var standarizedXML = xmlhttp.responseXML == null ? (new window.DOMParser()).parseFromString(xmlhttp.responseText, "text/xml") : xmlhttp.responseXML;
-				cm.load(BilibiliParser(standarizedXML));
-				//console.log(standarizedXML);
-				callback();
-			}
-		}
-	}
+function CommentLoader(url, xcm, callback) {
+    if (callback == null)
+        callback = function() {
+            return;
+        };
+    var xmlhttp = null;
+    var retry = 0;
+    if (window.XMLHttpRequest) {
+        xmlhttp = new XMLHttpRequest();
+    } else {
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.open("GET", url, true);
+    xmlhttp.onerror = function() {
+        xmlhttp.abort();
+        if (retry < 3) xmlhttp.send();
+        retry += 1;
+    };
+    xmlhttp.ontimeout = xmlhttp.onerror;
+    xmlhttp.send();
+    var cm = xcm;
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            if (navigator.appName == 'Microsoft Internet Explorer') {
+                var f = new ActiveXObject("Microsoft.XMLDOM");
+                f.async = false;
+                f.loadXML(xmlhttp.responseText);
+                cm.load(BilibiliParser(f));
+                callback();
+            } else {
+                var standarizedXML = xmlhttp.responseXML == null ? (new window.DOMParser()).parseFromString(xmlhttp.responseText, "text/xml") : xmlhttp.responseXML;
+                cm.load(BilibiliParser(standarizedXML));
+                //console.log(standarizedXML);
+                callback();
+            }
+        }
+    }
 }
+
 function createCORSRequest(method, url){
     var xhr = new XMLHttpRequest();
     if ("withCredentials" in xhr){
@@ -595,7 +604,7 @@ return check; }
 			commentList: null,
 			commentListContainer: null,
 			lastSelectedComment: null,
-			commentCoolDown: 10000,
+			commentCoolDown: 5000,
 			commentScale: ABP.playerConfig.scale ? ABP.playerConfig.scale : 1,
 			proportionalScale: ABP.playerConfig.prop,
 			defaults: {
