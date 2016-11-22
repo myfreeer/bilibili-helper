@@ -997,7 +997,7 @@
 						                return;
 						            }
 						            var displayUserInfo = function(uid, data) {
-						                control.find('.result').html('发送者: <a href="http://space.bilibili.com/' + uid + '" target="_blank" card="' + parseSafe(data.name) + '">' + parseSafe(data.name) + '</a><div target="_blank" class="user-info-level l' + parseSafe(data.level_info.current_level) + '"></div>');
+						                control.find('.result').html('发送者: <a href="http://space.bilibili.com/' + uid + '" target="_blank" card="' + parseSafe(data.name) + '" mid="' + uid + '">' + parseSafe(data.name) + '</a><div target="_blank" class="user-info-level l' + parseSafe(data.level_info.current_level) + '"></div>');
 						                var s = document.createElement('script');
 						                s.appendChild(document.createTextNode('UserCard.bind($("#bilibili_helper .query .result"));'));
 						                document.body.appendChild(s);
@@ -1008,7 +1008,7 @@
 						                    control.find('.result').text('查询失败, 发送用户可能已被管理员删除.');
 						                } else {
 						                    var uid = parseSafe(data.data[0].id);
-						                    control.find('.result').html('发送者 UID: <a href="http://space.bilibili.com/' + uid + '" target="_blank">' + uid + '</a>');
+						                    control.find('.result').html('发送者 UID: <a href="http://space.bilibili.com/' + uid + '" target="_blank" mid="' + uid + '">' + uid + '</a>');
 						                    var data = sessionStorage.getItem('user/' + uid);
 						                    if (data) {
 						                        displayUserInfo(uid, JSON.parse(data));
