@@ -1038,7 +1038,7 @@
 						        s.parentNode.removeChild(s);
 						    };
 						    var displayUserInfobyMid = function(mid, hash) {
-						        if (hash && (CRC32.bstr("" + i) >>> 0) === parseInt(hash, 16)) sessionStorage[hash] = mid;
+						        if (hash && (CRC32.bstr("" + mid) >>> 0) === parseInt(hash, 16)) sessionStorage.setItem('hash/' + hash, mid);
 						        if (!mid) return control.find('.result').text('查询失败 :(');
 						        else if (mid === -1) return control.find('.result').text('游客弹幕');
 						        control.find('.result').html('发送者 UID: <a href="http://space.bilibili.com/' + mid + '" target="_blank" mid="' + mid + '">' + mid + '</a>');
@@ -1067,7 +1067,8 @@
 						                            control.find('.result').text('游客弹幕');
 						                            return;
 						                        }
-						                        if (sessionStorage[sender] && (CRC32.bstr("" + sessionStorage[sender]) >>> 0) === parseInt(sender, 16)) return displayUserInfobyMid(sessionStorage[sender]);
+						                        var mid =  sessionStorage.getItem('hash/' + sender);
+						                        if (mid && (CRC32.bstr("" + mid) >>> 0) === parseInt(sender, 16)) return displayUserInfobyMid(mid);
 						                        $.ajaxSetup({timeout: 1000});
 						                        $.get('http://biliquery.typcn.com/api/user/hash/' + sender, function(data) {
 						                            $.ajaxSetup({timeout: 0});
@@ -1076,11 +1077,11 @@
 						                                displayUserInfobyMid(uid, sender);
 						                            } else {
 						                                var uid = parseSafe(data.data[0].id);
-						                                if (uid) displayUserInfobyMid(uid);
+						                                displayUserInfobyMid(uid, sender);
 						                            }
 						                        }, 'json').fail(function() {
 						                            var uid = checkCommentHash(sender, 65E6);
-						                            displayUserInfobyMid(uid);
+						                            displayUserInfobyMid(uid, sender);
 						                        });
 						        }
 						    });
