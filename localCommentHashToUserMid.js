@@ -42,6 +42,10 @@ var CRC32 = {};
  * maximumMid would be 65000000 if not set, minimumMid would be 0 if not set
  * the return value would be mid, or -1 for unregistered user or false if process fails
  * Not designed to be multi-threaded, nor asynchronous
+ * Speed test:
+   var t0 = performance.now();
+   checkCommentHash('444283f9');//should be 40000000
+   console.log("Call to checkCommentHash took " + (performance.now() - t0) + " milliseconds.");
  */
 function checkCommentHash(hash, maximumMid, minimumMid) {
     maximumMid = parseInt(maximumMid) ? parseInt(maximumMid) : 65000000; //the larger, the slower
@@ -51,7 +55,7 @@ function checkCommentHash(hash, maximumMid, minimumMid) {
     var hashint = parseInt(hash, 16);
     if (!hashint) return false;
     for (var i = minimumMid; i < maximumMid + 1; i++) {
-        if ((CRC32.bstr(i.toString()) >>> 0) === hashint) {
+        if ((CRC32.bstr("" + i) >>> 0) === hashint) {
             return i;
         }
     }
@@ -73,7 +77,7 @@ function createLocalDatabase() {
     var returnArray = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
     var typedArray = Uint32Array || Array
     var array = new typedArray(end - start);
-    for (let i = start; i < end; i++) array[i - start] = CRC32.bstr(i.toString());
+    for (let i = start; i < end; i++) array[i - start] = CRC32.bstr("" + i);
     var blob = new Blob([JSON.stringify(array)], {
         type: "application/octet-stream;",
     });
@@ -110,7 +114,7 @@ function createLocalIndexedDB() {
         db = e.target.result;
         var t = db.transaction(["localCommentHash"], "readwrite");
         var store = t.objectStore("localCommentHash");
-        for (let i = start; i < end; i++) store.put(i, CRC32.bstr(i.toString()) >>> 0);
+        for (let i = start; i < end; i++) store.put(i, CRC32.bstr("" + i) >>> 0);
     };
 
     openRequest.onerror = function(e) {
