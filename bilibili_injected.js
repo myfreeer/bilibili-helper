@@ -7,9 +7,51 @@
 	else if(location.hostname == 'bangumi.bilibili.com') biliHelper.site = 1;
 	else return false;
 	var ff_status = {},
-		ff_status_id = 0,
-		ff_embed_stack = null,
-		ff_embed_stack_style = null;
+	    ff_status_id = 0,
+	    ff_embed_stack = null,
+	    ff_embed_stack_style = null;
+
+	var CRC32 = {};
+	(function(CRC32) {
+	    function signed_crc_table() {
+	        var c = 0,
+	            table = new Array(256);
+	        for (var n = 0; n != 256; ++n) {
+	            c = n;
+	            for (var x = 0; x < 8; x++) c = ((c & 1) ? (-306674912 ^ (c >>> 1)) : (c >>> 1));
+	            table[n] = c;
+	        }
+	        return typeof Int32Array !== 'undefined' ? new Int32Array(table) : table;
+	    }
+	    var T = signed_crc_table();
+
+	    function crc32_bstr(bstr, seed) {
+	        var C = seed ^ -1,
+	            L = bstr.length - 1;
+	        for (var i = 0; i < L;) {
+	            C = (C >>> 8) ^ T[(C ^ bstr.charCodeAt(i++)) & 0xFF];
+	            C = (C >>> 8) ^ T[(C ^ bstr.charCodeAt(i++)) & 0xFF];
+	        }
+	        if (i === L) C = (C >>> 8) ^ T[(C ^ bstr.charCodeAt(i)) & 0xFF];
+	        return C ^ -1;
+	    }
+	    CRC32.bstr = crc32_bstr;
+	})(CRC32);
+
+	function checkCommentHash(hash, maximumMid, minimumMid) {
+	    maximumMid = parseInt(maximumMid) ? parseInt(maximumMid) : 65000000;
+	    minimumMid = parseInt(minimumMid) ? parseInt(minimumMid) : 0;
+	    if (!hash) return false;
+	    if (hash.indexOf('D') == 0) return -1;
+	    var hashint = parseInt(hash, 16);
+	    if (!hashint) return false;
+	    for (var i = minimumMid; i < maximumMid + 1; i++) {
+	        if ((CRC32.bstr("" + i) >>> 0) === hashint) {
+	            return i;
+	        }
+	    }
+	    return false;
+	}
 
 	function formatInt(Source, Length) {
 		var strTemp = "";
@@ -801,7 +843,7 @@
 				biliHelper.mainBlock.redirectSection = $('<div class="section redirect"><h3>生成页选项</h3><p><a class="b-btn w" href="' + biliHelper.redirectUrl + '">前往原始跳转页</a></p></div>');
 				biliHelper.mainBlock.append(biliHelper.mainBlock.redirectSection);
 			}
-			biliHelper.mainBlock.speedSection = $('<div class="section speed hidden"><h3>视频播放控制</h3><p><span id="bilibili_helper_html5_video_res"></span><a class="b-btn w" id="bilibili_helper_html5_video_mirror">镜像视频</a><br>视频播放速度<input id="bilibili_helper_html5_video_speed" type="number" class="b-input" placeholder="1.0" value=1.0></br>旋转视频<input id="bilibili_helper_html5_video_rotate" type="number" class="b-input" placeholder="0.0" value=0.0></p></div>');
+			biliHelper.mainBlock.speedSection = $('<div class="section speed hidden"><h3>视频播放控制</h3><p><span id="bilibili_helper_html5_video_res"></span><a class="b-btn w" id="bilibili_helper_html5_video_mirror">镜像视频</a><br>视频播放速度<input id="bilibili_helper_html5_video_speed" type="number" class="b-input" placeholder="1.0" value=1.0></br>旋转视频<input id="bilibili_helper_html5_video_rotate" type="number" class="b-input" placeholder="0" value=0></p></div>');
 			biliHelper.mainBlock.append(biliHelper.mainBlock.speedSection);
 			biliHelper.mainBlock.speedSection.input = biliHelper.mainBlock.speedSection.find('input#bilibili_helper_html5_video_speed.b-input')[0];
 			biliHelper.mainBlock.speedSection.input.step = 0.1;
@@ -988,47 +1030,58 @@
 						        }
 						    });
 						    control.find('.b-input').keyup();
-						    SelectModule.bind(control.find('div.b-slt'), {
-						        onChange: function(item) {
-						            var sender = $(item[0]).data('sender');
-						            control.find('.result').text('查询中…');
-						            if (sender.indexOf('D') == 0) {
-						                control.find('.result').text('游客弹幕');
-						                return;
-						            }
-						            var displayUserInfo = function(uid, data) {
-						                control.find('.result').html('发送者: <a href="http://space.bilibili.com/' + uid + '" target="_blank" card="' + parseSafe(data.name) + '" mid="' + uid + '">' + parseSafe(data.name) + '</a><div target="_blank" class="user-info-level l' + parseSafe(data.level_info.current_level) + '"></div>');
-						                var s = document.createElement('script');
-						                s.appendChild(document.createTextNode('UserCard.bind($("#bilibili_helper .query .result"));'));
-						                document.body.appendChild(s);
-						                s.parentNode.removeChild(s);
-						            }
-						            $.get('http://biliquery.typcn.com/api/user/hash/' + sender, function(data) {
-						                if (!data || data.error != 0 || typeof data.data != 'object' || !data.data[0].id) {
-						                    control.find('.result').text('查询失败, 发送用户可能已被管理员删除.');
-						                } else {
-						                    var uid = parseSafe(data.data[0].id);
-						                    control.find('.result').html('发送者 UID: <a href="http://space.bilibili.com/' + uid + '" target="_blank" mid="' + uid + '">' + uid + '</a>');
-						                    var data = sessionStorage.getItem('user/' + uid);
-						                    if (data) {
-						                        displayUserInfo(uid, JSON.parse(data));
-						                        return false;
+						    var displayUserInfo = function(uid, data) {
+						        control.find('.result').html('发送者: <a href="http://space.bilibili.com/' + uid + '" target="_blank" card="' + parseSafe(data.name) + '" mid="' + uid + '">' + parseSafe(data.name) + '</a><div target="_blank" class="user-info-level l' + parseSafe(data.level_info.current_level) + '"></div>');
+						        var s = document.createElement('script');
+						        s.appendChild(document.createTextNode('UserCard.bind($("#bilibili_helper .query .result"));'));
+						        document.body.appendChild(s);
+						        s.parentNode.removeChild(s);
+						    };
+						    var displayUserInfobyMid = function(mid, hash) {
+						        if (hash && (CRC32.bstr("" + i) >>> 0) === parseInt(hash, 16)) sessionStorage[hash] = mid;
+						        if (!mid) return control.find('.result').text('查询失败 :(');
+						        else if (mid === -1) return control.find('.result').text('游客弹幕');
+						        control.find('.result').html('发送者 UID: <a href="http://space.bilibili.com/' + mid + '" target="_blank" mid="' + mid + '">' + mid + '</a>');
+						        var data = sessionStorage.getItem('user/' + mid);
+						        if (data) {
+						            displayUserInfo(mid, JSON.parse(data));
+						            return false;
+						        }
+						        $.getJSON('http://api.bilibili.com/cardrich?mid=' + mid + '&type=jsonp', function(data) {
+						            if (data.code == 0) {
+						                sessionStorage.setItem('user/' + mid, JSON.stringify({
+						                    name: data.data.card.name,
+						                    level_info: {
+						                        current_level: data.data.card.level_info.current_level
 						                    }
-						                    $.getJSON('http://api.bilibili.com/cardrich?mid=' + uid + '&type=jsonp', function(data) {
-						                        if (data.code == 0) {
-						                            sessionStorage.setItem('user/' + uid, JSON.stringify({
-						                                name: data.data.card.name,
-						                                level_info: {
-						                                    current_level: data.data.card.level_info.current_level
-						                                }
-						                            }));
-						                            displayUserInfo(uid, data.data.card);
+						                }));
+						                displayUserInfo(mid, data.data.card);
+						            }
+						        });
+						    };
+						    SelectModule.bind(control.find('div.b-slt'), {
+						                onChange: function(item) {
+						                        var sender = $(item[0]).data('sender');
+						                        control.find('.result').text('查询中…');
+						                        if (sender.indexOf('D') == 0) {
+						                            control.find('.result').text('游客弹幕');
+						                            return;
 						                        }
-						                    });
-						                }
-						            }, 'json').fail(function() {
-						                control.find('.result').text('查询失败, 无法连接到服务器 :(');
-						            });
+						                        if (sessionStorage[sender] && (CRC32.bstr("" + sessionStorage[sender]) >>> 0) === parseInt(sender, 16)) return displayUserInfobyMid(sessionStorage[sender]);
+						                        $.ajaxSetup({timeout: 1000});
+						                        $.get('http://biliquery.typcn.com/api/user/hash/' + sender, function(data) {
+						                            $.ajaxSetup({timeout: 0});
+						                            if (!data || data.error != 0 || typeof data.data != 'object' || !data.data[0].id) {
+						                                var uid = checkCommentHash(sender, 65E6, 4E7 - 2);
+						                                displayUserInfobyMid(uid, sender);
+						                            } else {
+						                                var uid = parseSafe(data.data[0].id);
+						                                if (uid) displayUserInfobyMid(uid);
+						                            }
+						                        }, 'json').fail(function() {
+						                            var uid = checkCommentHash(sender, 65E6);
+						                            displayUserInfobyMid(uid);
+						                        });
 						        }
 						    });
 						    biliHelper.mainBlock.querySection.find('p').empty().append(control);
