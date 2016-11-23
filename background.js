@@ -605,12 +605,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             else sendResponse({
                 result: "disabled"
             });
-            return true;
+            return true;/*
         case "playHdFlv":
             chrome.tabs.executeScript(sender.tab.id, {
                 file: "bundle.js"
             });
-            return true;
+            return true;*/
 /*        case "getLowResVideo":
             //fetch('http://api.bilibili.com/playurl?&aid='+request.avid+'&page='+request.pg+'&platform=html5').then;
             try {

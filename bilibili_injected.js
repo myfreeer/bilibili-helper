@@ -602,10 +602,11 @@
 					});
 				var interval = setInterval(function() {
 				    if (abp.commentObjArray) {
-				        clearInterval(interval);
+				        clearInterval(interval);/*
 				        chrome.runtime.sendMessage({
 				            command: "playHdFlv",
-				        });
+				        });*/
+				        flv.playUrl(location.href);
 				    }
 				}, 600);
 				var lastTime;
@@ -984,6 +985,7 @@
 						biliHelper.mainBlock.append(biliHelper.mainBlock.commentSection);
 						fetch('http://comment.bilibili.com/' + biliHelper.cid + '.xml').then(res => res.text()).then(res => {
 						    let parser = new DOMParser();
+						    res = res.replace(/[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]/g,"");
 						    let response = parser.parseFromString(res, 'text/xml');
 						    //	$.get('http://comment.bilibili.com/' + biliHelper.cid + '.xml', function(response) {
 						    var assBtn = $('<a class="b-btn w">下载 ASS 格式弹幕</a>').attr('download', downloadFileName.replace('.xml', '.ass')).attr('href', null).click(function(e) {
@@ -1092,16 +1094,17 @@
 				if (biliHelper.genPage) {
 					tagList = "";
 					var alist = "";
-					if (videoInfo.list.length > 1) {
+					if (videoInfo && videoInfo.list && videoInfo.list.length > 1) {
 						alist += "<select id='dedepagetitles' onchange='location.href=this.options[this.selectedIndex].value;'>";
 						videoInfo.list.forEach(function(vPart) {
 							alist += "<option value='/video/av" + biliHelper.avid + "/index_" + parseSafe(vPart.page) + ".html'>" + parseSafe(vPart.page) + "、" + (vPart.part ? vPart.part : ("P" + parseSafe(vPart.page))) + "</option>";
 						});
 						alist += "</select>";
 					}
-					videoInfo.tag.split(",").forEach(function(tag) {
+					if (videoInfo && videoInfo.tag) videoInfo.tag.split(",").forEach(function(tag) {
 						tagList += '<li><a class="tag-val" href="/tag/' + encodeURIComponent(tag) + '/" title="' + tag + '" target="_blank">' + tag + '</a></li>';
 					});
+					if (!videoInfo.tag) videoInfo.tag = "";
 					$.get(chrome.extension.getURL("template.html"), function(template) {
 						var page = template.replace(/__bl_avid/g, biliHelper.avid).replace(/__bl_page/g, biliHelper.page).replace(/__bl_cid/g, biliHelper.cid).replace(/__bl_tid/g, videoInfo.tid).replace(/__bl_mid/g, videoInfo.mid)
 							.replace(/__bl_pic/g, videoInfo.pic).replace(/__bl_title/g, parseSafe(videoInfo.title)).replace(/__bl_sp_title_uri/g, videoInfo.sp_title ? encodeURIComponent(videoInfo.sp_title) : '')

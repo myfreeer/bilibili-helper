@@ -1,4 +1,4 @@
-/******/ (function(modules) { // webpackBootstrap
+/******/var flv = (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -335,7 +335,7 @@
 			}
 		});
 	}
-	
+	exports.playUrl = playUrl;
 	let cmd = {};
 	
 	cmd.youku = youku;
@@ -696,7 +696,7 @@
 	//cmd.testDamoo()
 	
 	if (location.href.substr(0,6) != 'chrome') {
-		playUrl(location.href);
+	//	playUrl(location.href);
 	} else {
 		window.cmd = cmd;
 	}
@@ -2729,7 +2729,7 @@
   \*********************/
 /***/ function(module, exports, __webpack_require__) {
 
-	
+	let fetch = __webpack_require__(/*! ./http */ 4).fetch;
 	var md5 = __webpack_require__(/*! blueimp-md5 */ 7);
 	const SECRETKEY_MINILOADER = '1c15888dc316e05a15fdd0a02ed6584f';
 	let interfaceUrl = (cid, ts) => `cid=${cid}&player=1&ts=${ts}`;
@@ -2758,14 +2758,16 @@
 	exports.testUrl = url => url.match('bilibili.com/')
 	
 	exports.getVideos = (url) => {
-		let cid;
+		let cids;
 		try {
-			cid=document.getElementsByClassName('section video')[0].lastChild.lastChild.innerText.substring(5);
+			cids = document.querySelector('#bilibili_helper > div > div.main > div.section.video.hidden > p > span:nth-child(4)').innerText.match(/cid[:= ]*([0-9]+)/) || document.body.innerHTML.match(/cid[:= ]*([0-9]+)/);
+			let cid = cids[1];
 			return getVideosByCid(cid)
 		} catch (e) {
+			console.log(e);
 		return fetch(url, {credentials: 'include'}).then(res => res.text()).then(res => {
 			let cid = res.match(/cid=(\d+)/);
-			if (typeof cid == 'undefined') cid=document.getElementsByClassName('section video')[0].lastChild.lastChild.innerText.substring(5);
+			if (typeof cid == 'undefined') cid = document.querySelector('#bilibili_helper > div > div.main > div.section.video.hidden > p > span:nth-child(4)').innerText.match(/cid[:= ]*([0-9]+)/) || document.body.innerHTML.match(/cid[:= ]*([0-9]+)/);
 			if (cid)
 				return cid[1];
 		}).then(getVideosByCid);
