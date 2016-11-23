@@ -1119,6 +1119,7 @@ return check; }
 					removeClass(playerUnit, "ABP-FullScreen");
 					ABPInst.btnFull.className = "button ABP-FullScreen icon-screen-full";
 					ABPInst.btnFull.tooltip("浏览器全屏");
+					ABPInst.cmManager.setBounds();
 				};/*
 				if (document.isFullScreen()) {
 				    ABPInst.proportionalScale = false;
@@ -1139,11 +1140,13 @@ return check; }
 					this.className = "button ABP-FullScreen icon-screen-normal";
 					this.tooltip("退出全屏");
 					playerUnit.requestFullScreen();
+					ABPInst.cmManager.setBounds();
 				} else {
 					removeClass(playerUnit, "ABP-FullScreen");
 					this.className = "button ABP-FullScreen icon-screen-full";
 					this.tooltip("浏览器全屏");
 					document.exitFullscreen();
+					ABPInst.cmManager.setBounds();
 				}
 				ABPInst.state.fullscreen = !ABPInst.state.fullscreen;
 				if (ABPInst.cmManager)
