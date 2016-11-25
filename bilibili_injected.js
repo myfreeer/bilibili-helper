@@ -7,51 +7,9 @@
 	else if(location.hostname == 'bangumi.bilibili.com') biliHelper.site = 1;
 	else return false;
 	var ff_status = {},
-	    ff_status_id = 0,
-	    ff_embed_stack = null,
-	    ff_embed_stack_style = null;
-
-	var CRC32 = {};
-	(function(CRC32) {
-	    function signed_crc_table() {
-	        var c = 0,
-	            table = new Array(256);
-	        for (var n = 0; n != 256; ++n) {
-	            c = n;
-	            for (var x = 0; x < 8; x++) c = ((c & 1) ? (-306674912 ^ (c >>> 1)) : (c >>> 1));
-	            table[n] = c;
-	        }
-	        return typeof Int32Array !== 'undefined' ? new Int32Array(table) : table;
-	    }
-	    var T = signed_crc_table();
-
-	    function crc32_bstr(bstr, seed) {
-	        var C = seed ^ -1,
-	            L = bstr.length - 1;
-	        for (var i = 0; i < L;) {
-	            C = (C >>> 8) ^ T[(C ^ bstr.charCodeAt(i++)) & 0xFF];
-	            C = (C >>> 8) ^ T[(C ^ bstr.charCodeAt(i++)) & 0xFF];
-	        }
-	        if (i === L) C = (C >>> 8) ^ T[(C ^ bstr.charCodeAt(i)) & 0xFF];
-	        return C ^ -1;
-	    }
-	    CRC32.bstr = crc32_bstr;
-	})(CRC32);
-
-	function checkCommentHash(hash, maximumMid, minimumMid) {
-	    maximumMid = parseInt(maximumMid) ? parseInt(maximumMid) : 65000000;
-	    minimumMid = parseInt(minimumMid) ? parseInt(minimumMid) : 0;
-	    if (!hash) return false;
-	    if (hash.indexOf('D') == 0) return -1;
-	    var hashint = parseInt(hash, 16);
-	    if (!hashint) return false;
-	    for (var i = minimumMid; i < maximumMid + 1; i++) {
-	        if ((CRC32.bstr("" + i) >>> 0) === hashint) {
-	            return i;
-	        }
-	    }
-	    return false;
-	}
+		ff_status_id = 0,
+		ff_embed_stack = null,
+		ff_embed_stack_style = null;
 
 	function formatInt(Source, Length) {
 		var strTemp = "";
@@ -314,7 +272,6 @@
 			}
 			if (biliHelper.playbackUrls && biliHelper.playbackUrls.length == 1) {
 				biliHelper.mainBlock.switcherSection.find('a[type="html5"]').removeClass('hidden');
-				biliHelper.mainBlock.switcherSection.find('a[type="html5hd"]').removeClass('hidden');
 				biliHelper.mainBlock.switcherSection.find('a[type="html5ld"]').removeClass('hidden');
 			}
 			$('#loading-notice').fadeOut(300);
@@ -514,119 +471,6 @@
 				},
 				html5: function() {
 					this.set('html5');
-					var html5VideoUrl = typeof biliHelper.playbackUrls == 'undefined' ? 'https://static-s.bilibili.com/error.mp4' : biliHelper.playbackUrls[0].url;
-					$('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + biliHelper.videoPic + '" crossorigin="anonymous"><source src="' + html5VideoUrl + '" type="video/mp4"></video></div>');
-					var abp = ABP.create(document.getElementById("bilibili_helper_html5_player"), {
-						src: {
-							playlist: [{
-								video: document.getElementById("bilibili_helper_html5_player_video"),
-								comments: "http://comment.bilibili.com/" + biliHelper.cid + ".xml"
-							}]
-						},
-						width: "100%",
-						height: "100%",
-						config: biliHelper.playerConfig
-					});
-					abp.playerUnit.addEventListener("wide", function() {
-						$("#bofqi").addClass("wide");
-					});
-					abp.playerUnit.addEventListener("normal", function() {
-						$("#bofqi").removeClass("wide");
-					});
-					abp.playerUnit.addEventListener("sendcomment", function(e) {
-						var commentId = e.detail.id,
-							commentData = e.detail;
-						delete e.detail.id;
-						chrome.runtime.sendMessage({
-							command: "sendComment",
-							avid: biliHelper.avid,
-							cid: biliHelper.cid,
-							page: biliHelper.page + biliHelper.pageOffset,
-							comment: commentData
-						}, function(response) {
-							response.tmp_id = commentId;
-							abp.commentCallback(response);
-						});
-					});
-					abp.playerUnit.addEventListener("saveconfig", function(e) {
-						chrome.runtime.sendMessage({
-							command: "savePlayerConfig",
-							config: e.detail
-						});
-					});
-				    biliHelper.mainBlock.speedSection.input.addEventListener("change", function(e) {
-				        if (Number(biliHelper.mainBlock.speedSection.input.value)) {
-				            abp.video.playbackRate = Number(biliHelper.mainBlock.speedSection.input.value);
-				        } else {
-				            biliHelper.mainBlock.speedSection.input.value = 1.0;
-				        };
-				    });
-				   abp.video.addEventListener("loadedmetadata", function(e) {
-				        biliHelper.mainBlock.speedSection.res.innerText = abp.video.videoWidth + "x" + abp.video.videoHeight;
-				    });
-				    biliHelper.mainBlock.speedSection.rotate.addEventListener("change", function(e) {
-				        if (Number(biliHelper.mainBlock.speedSection.rotate.value) % 360 ===0) biliHelper.mainBlock.speedSection.rotate.value = 0;
-				        if (biliHelper.mainBlock.speedSection.mirror.className==="b-btn") {
-				            abp.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg) matrix(-1, 0, 0, 1, 0, 0)';
-				            abp.video.style.zIndex=0;
-				            document.getElementsByClassName('ABP-Container')[0].style.zIndex=1;
-				            //biliHelper.mainBlock.speedSection.mirror.className = "b-btn";
-				        } else {
-				        	abp.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg)';
-				            abp.video.style.zIndex=0;
-				            document.getElementsByClassName('ABP-Container')[0].style.zIndex=1;
-				            //biliHelper.mainBlock.speedSection.mirror.className = "b-btn w";
-				        };
-				    });
-				    biliHelper.mainBlock.speedSection.mirror.addEventListener("click", function(e) {
-				        if (biliHelper.mainBlock.speedSection.mirror.className==="b-btn w") {
-				            abp.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg) matrix(-1, 0, 0, 1, 0, 0)';
-				            abp.video.style.zIndex=0;
-				            document.getElementsByClassName('ABP-Container')[0].style.zIndex=1;
-				            biliHelper.mainBlock.speedSection.mirror.className = "b-btn";
-				        } else {
-				        	abp.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg)';
-				            abp.video.style.zIndex=0;
-				            document.getElementsByClassName('ABP-Container')[0].style.zIndex=1;
-				            biliHelper.mainBlock.speedSection.mirror.className = "b-btn w";
-				        };
-				    });
-					var bofqiHeight = 0;
-					$(window).scroll(function() {
-						if (bofqiHeight != $("#bofqi").width()) {
-							bofqiHeight = $("#bofqi").width();
-							if (abp && abp.cmManager) {
-								abp.cmManager.setBounds();
-							}
-						}
-					});
-				var interval = setInterval(function() {
-				    if (abp.commentObjArray) {
-				        clearInterval(interval);/*
-				        chrome.runtime.sendMessage({
-				            command: "playHdFlv",
-				        });*/
-				        flv.playUrl(location.href);
-				    }
-				}, 600);
-				var lastTime;
-				var checkFinished = setInterval(function() {
-					if (abp.video.currentTime !== lastTime){
-						lastTime = abp.video.currentTime;
-					} else {
-						if ((abp.video.duration - abp.video.currentTime) / abp.video.currentTime < 0.001 && !abp.video.paused) {
-							abp.video.currentTime = 0;
-							if (!abp.video.loop) {
-							    abp.video.pause();
-							    setTimeout(abp.video.pause, 200);
-							    document.querySelector('.button.ABP-Play.ABP-Pause.icon-pause').className = "button ABP-Play icon-play";
-							}
-						};
-					};
-				}, 600);
-				},
-				html5hd: function() {
-					this.set('html5hd');
 					$('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + biliHelper.videoPic + '" autobuffer preload="auto" crossorigin="anonymous"><source src="' + biliHelper.playbackUrls[0].url + '" type="video/mp4"></video></div>');
 					var abp = ABP.create(document.getElementById("bilibili_helper_html5_player"), {
 						src: {
@@ -844,7 +688,7 @@
 				biliHelper.mainBlock.redirectSection = $('<div class="section redirect"><h3>生成页选项</h3><p><a class="b-btn w" href="' + biliHelper.redirectUrl + '">前往原始跳转页</a></p></div>');
 				biliHelper.mainBlock.append(biliHelper.mainBlock.redirectSection);
 			}
-			biliHelper.mainBlock.speedSection = $('<div class="section speed hidden"><h3>视频播放控制</h3><p><span id="bilibili_helper_html5_video_res"></span><a class="b-btn w" id="bilibili_helper_html5_video_mirror">镜像视频</a><br>视频播放速度<input id="bilibili_helper_html5_video_speed" type="number" class="b-input" placeholder="1.0" value=1.0></br>旋转视频<input id="bilibili_helper_html5_video_rotate" type="number" class="b-input" placeholder="0" value=0></p></div>');
+			biliHelper.mainBlock.speedSection = $('<div class="section speed hidden"><h3>视频播放控制</h3><p><span id="bilibili_helper_html5_video_res"></span><a class="b-btn w" id="bilibili_helper_html5_video_mirror">镜像视频</a><br>视频播放速度<input id="bilibili_helper_html5_video_speed" type="number" class="b-input" placeholder="1.0" value=1.0></br>旋转视频<input id="bilibili_helper_html5_video_rotate" type="number" class="b-input" placeholder="0.0" value=0.0></p></div>');
 			biliHelper.mainBlock.append(biliHelper.mainBlock.speedSection);
 			biliHelper.mainBlock.speedSection.input = biliHelper.mainBlock.speedSection.find('input#bilibili_helper_html5_video_speed.b-input')[0];
 			biliHelper.mainBlock.speedSection.input.step = 0.1;
@@ -853,7 +697,7 @@
 			biliHelper.mainBlock.speedSection.rotate = biliHelper.mainBlock.speedSection.find('#bilibili_helper_html5_video_rotate')[0];
 			biliHelper.mainBlock.speedSection.rotate.step = 90;
 			biliHelper.mainBlock.switcherSection = $('<div class="section switcher"><h3>播放器切换</h3><p></p></div>');
-			biliHelper.mainBlock.switcherSection.find('p').append($('<a class="b-btn w" type="original">原始播放器</a><a class="b-btn w" type="bilih5">原始HTML5</a><a class="b-btn w hidden" type="bilimac">Mac 客户端</a><a class="b-btn w hidden" type="swf">SWF 播放器</a><a class="b-btn w hidden" type="iframe">Iframe 播放器</a><a class="b-btn w hidden" type="html5">HTML5 (超清)</a><a class="b-btn w hidden" type="html5hd">HTML5 (高清)</a><a class="b-btn w hidden" type="html5ld">HTML5 (低清)</a>').click(function() {
+			biliHelper.mainBlock.switcherSection.find('p').append($('<a class="b-btn w" type="original">原始播放器</a><a class="b-btn w" type="bilih5">原始HTML5</a><a class="b-btn w hidden" type="bilimac">Mac 客户端</a><a class="b-btn w hidden" type="swf">SWF 播放器</a><a class="b-btn w hidden" type="iframe">Iframe 播放器</a><a class="b-btn w hidden" type="html5">HTML5 (高清)</a><a class="b-btn w hidden" type="html5ld">HTML5 (低清)</a>').click(function() {
 				biliHelper.switcher[$(this).attr('type')]();
 			}));
 			if (biliHelper.redirectUrl) {
@@ -985,7 +829,6 @@
 						biliHelper.mainBlock.append(biliHelper.mainBlock.commentSection);
 						fetch('http://comment.bilibili.com/' + biliHelper.cid + '.xml').then(res => res.text()).then(res => {
 						    let parser = new DOMParser();
-						    res = res.replace(/[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]/g,"");
 						    let response = parser.parseFromString(res, 'text/xml');
 						    //	$.get('http://comment.bilibili.com/' + biliHelper.cid + '.xml', function(response) {
 						    var assBtn = $('<a class="b-btn w">下载 ASS 格式弹幕</a>').attr('download', downloadFileName.replace('.xml', '.ass')).attr('href', null).click(function(e) {
@@ -1032,59 +875,47 @@
 						        }
 						    });
 						    control.find('.b-input').keyup();
-						    var displayUserInfo = function(uid, data) {
-						        control.find('.result').html('发送者: <a href="http://space.bilibili.com/' + uid + '" target="_blank" card="' + parseSafe(data.name) + '" mid="' + uid + '">' + parseSafe(data.name) + '</a><div target="_blank" class="user-info-level l' + parseSafe(data.level_info.current_level) + '"></div>');
-						        var s = document.createElement('script');
-						        s.appendChild(document.createTextNode('UserCard.bind($("#bilibili_helper .query .result"));'));
-						        document.body.appendChild(s);
-						        s.parentNode.removeChild(s);
-						    };
-						    var displayUserInfobyMid = function(mid, hash) {
-						        if (hash && (CRC32.bstr("" + mid) >>> 0) === parseInt(hash, 16)) sessionStorage.setItem('hash/' + hash, mid);
-						        if (!mid) return control.find('.result').text('查询失败 :(');
-						        else if (mid === -1) return control.find('.result').text('游客弹幕');
-						        control.find('.result').html('发送者 UID: <a href="http://space.bilibili.com/' + mid + '" target="_blank" mid="' + mid + '">' + mid + '</a>');
-						        var data = sessionStorage.getItem('user/' + mid);
-						        if (data) {
-						            displayUserInfo(mid, JSON.parse(data));
-						            return false;
-						        }
-						        $.getJSON('http://api.bilibili.com/cardrich?mid=' + mid + '&type=jsonp', function(data) {
-						            if (data.code == 0) {
-						                sessionStorage.setItem('user/' + mid, JSON.stringify({
-						                    name: data.data.card.name,
-						                    level_info: {
-						                        current_level: data.data.card.level_info.current_level
-						                    }
-						                }));
-						                displayUserInfo(mid, data.data.card);
-						            }
-						        });
-						    };
 						    SelectModule.bind(control.find('div.b-slt'), {
-						                onChange: function(item) {
-						                        var sender = $(item[0]).data('sender');
-						                        control.find('.result').text('查询中…');
-						                        if (sender.indexOf('D') == 0) {
-						                            control.find('.result').text('游客弹幕');
-						                            return;
+						        onChange: function(item) {
+						            var sender = $(item[0]).data('sender');
+						            control.find('.result').text('查询中…');
+						            if (sender.indexOf('D') == 0) {
+						                control.find('.result').text('游客弹幕');
+						                return;
+						            }
+						            var displayUserInfo = function(uid, data) {
+						                control.find('.result').html('发送者: <a href="http://space.bilibili.com/' + uid + '" target="_blank" card="' + parseSafe(data.name) + '">' + parseSafe(data.name) + '</a><div target="_blank" class="user-info-level l' + parseSafe(data.level_info.current_level) + '"></div>');
+						                var s = document.createElement('script');
+						                s.appendChild(document.createTextNode('UserCard.bind($("#bilibili_helper .query .result"));'));
+						                document.body.appendChild(s);
+						                s.parentNode.removeChild(s);
+						            }
+						            $.get('http://biliquery.typcn.com/api/user/hash/' + sender, function(data) {
+						                if (!data || data.error != 0 || typeof data.data != 'object' || !data.data[0].id) {
+						                    control.find('.result').text('查询失败, 发送用户可能已被管理员删除.');
+						                } else {
+						                    var uid = parseSafe(data.data[0].id);
+						                    control.find('.result').html('发送者 UID: <a href="http://space.bilibili.com/' + uid + '" target="_blank">' + uid + '</a>');
+						                    var data = sessionStorage.getItem('user/' + uid);
+						                    if (data) {
+						                        displayUserInfo(uid, JSON.parse(data));
+						                        return false;
+						                    }
+						                    $.getJSON('http://api.bilibili.com/cardrich?mid=' + uid + '&type=jsonp', function(data) {
+						                        if (data.code == 0) {
+						                            sessionStorage.setItem('user/' + uid, JSON.stringify({
+						                                name: data.data.card.name,
+						                                level_info: {
+						                                    current_level: data.data.card.level_info.current_level
+						                                }
+						                            }));
+						                            displayUserInfo(uid, data.data.card);
 						                        }
-						                        var mid =  sessionStorage.getItem('hash/' + sender);
-						                        if (mid && (CRC32.bstr("" + mid) >>> 0) === parseInt(sender, 16)) return displayUserInfobyMid(mid);
-						                        $.ajaxSetup({timeout: 1000});
-						                        $.get('http://biliquery.typcn.com/api/user/hash/' + sender, function(data) {
-						                            $.ajaxSetup({timeout: 0});
-						                            if (!data || data.error != 0 || typeof data.data != 'object' || !data.data[0].id) {
-						                                var uid = checkCommentHash(sender, 65E6, 4E7 - 2);
-						                                displayUserInfobyMid(uid, sender);
-						                            } else {
-						                                var uid = parseSafe(data.data[0].id);
-						                                displayUserInfobyMid(uid, sender);
-						                            }
-						                        }, 'json').fail(function() {
-						                            var uid = checkCommentHash(sender, 65E6);
-						                            displayUserInfobyMid(uid, sender);
-						                        });
+						                    });
+						                }
+						            }, 'json').fail(function() {
+						                control.find('.result').text('查询失败, 无法连接到服务器 :(');
+						            });
 						        }
 						    });
 						    biliHelper.mainBlock.querySection.find('p').empty().append(control);
@@ -1094,17 +925,16 @@
 				if (biliHelper.genPage) {
 					tagList = "";
 					var alist = "";
-					if (videoInfo && videoInfo.list && videoInfo.list.length > 1) {
+					if (videoInfo.list.length > 1) {
 						alist += "<select id='dedepagetitles' onchange='location.href=this.options[this.selectedIndex].value;'>";
 						videoInfo.list.forEach(function(vPart) {
 							alist += "<option value='/video/av" + biliHelper.avid + "/index_" + parseSafe(vPart.page) + ".html'>" + parseSafe(vPart.page) + "、" + (vPart.part ? vPart.part : ("P" + parseSafe(vPart.page))) + "</option>";
 						});
 						alist += "</select>";
 					}
-					if (videoInfo && videoInfo.tag) videoInfo.tag.split(",").forEach(function(tag) {
+					videoInfo.tag.split(",").forEach(function(tag) {
 						tagList += '<li><a class="tag-val" href="/tag/' + encodeURIComponent(tag) + '/" title="' + tag + '" target="_blank">' + tag + '</a></li>';
 					});
-					if (!videoInfo.tag) videoInfo.tag = "";
 					$.get(chrome.extension.getURL("template.html"), function(template) {
 						var page = template.replace(/__bl_avid/g, biliHelper.avid).replace(/__bl_page/g, biliHelper.page).replace(/__bl_cid/g, biliHelper.cid).replace(/__bl_tid/g, videoInfo.tid).replace(/__bl_mid/g, videoInfo.mid)
 							.replace(/__bl_pic/g, videoInfo.pic).replace(/__bl_title/g, parseSafe(videoInfo.title)).replace(/__bl_sp_title_uri/g, videoInfo.sp_title ? encodeURIComponent(videoInfo.sp_title) : '')
