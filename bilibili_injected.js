@@ -851,16 +851,17 @@
 		    comments = comments ? comments : biliHelper.commentsUrl ? biliHelper.commentsUrl : 'http://comment.bilibili.com/' + biliHelper.cid + '.xml';
 		    fetch(comments).then(res => res.text()).then(res => {
 		        var response = parseXmlSafe(res);
+		        var assData;
 		        var assBtn = $('<a class="b-btn w">下载 ASS 格式弹幕</a>').attr('download', biliHelper.downloadFileName.replace('.xml', '.ass')).attr('href', null).click(function(e) {
-		            var assData = '\ufeff' + generateASS(setPosition(parseXML('', response)), {
-		                    'title': getNiceSectionFilename(biliHelper.avid, biliHelper.page, biliHelper.totalPage, 1, 1),
-		                    'ori': location.href
-		                }),
-		                assBlob = new Blob([assData], {
+		            e.preventDefault();
+		            if (!assData) assData = '\ufeff' + generateASS(setPosition(parseXML('', response)), {
+		                'title': getNiceSectionFilename(biliHelper.avid, biliHelper.page, biliHelper.totalPage, 1, 1),
+		                'ori': location.href
+		            });
+		            var assBlob = new Blob([assData], {
 		                    type: 'application/octet-stream'
 		                }),
 		                assUrl = window.URL.createObjectURL(assBlob);
-		            e.preventDefault();
 		            e.target.href = assUrl;
 		            chrome.runtime.sendMessage({
 		                command: 'requestForDownload',
