@@ -40,8 +40,6 @@
 
 	var checkCRCHash = new(function() {
 	    'use strict';
-	    var startTime = performance.now();
-
 	    function signed_crc_table() {
 	        var c = 0,
 	            table = typeof Int32Array !== 'undefined' ? new Int32Array(256) : new Array(256);
@@ -102,7 +100,6 @@
 	            return [1, str];
 	        };
 	    var index = new Array(4);
-	    console.log('初始化耗时：' + (performance.now() - startTime));
 	    return function(input) {
 	        var ht = parseInt(input, 16) ^ 0xffffffff,
 	            snum,
@@ -1144,7 +1141,7 @@
 						                        }
 						                        var mid =  sessionStorage.getItem('hash/' + sender);
 						                        if (mid && (CRC32.bstr("" + mid) >>> 0) === parseInt(sender, 16)) return displayUserInfobyMid(mid);
-						                        mid = checkCRCHash(sender, 65E6);
+						                        mid = checkCRCHash(sender);
 						                        displayUserInfobyMid(mid, sender);
 						        }
 						    });
