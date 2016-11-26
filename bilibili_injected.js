@@ -143,6 +143,16 @@
 	    } else throw new Error("parseXmlSafe: XML Parser Not Found.");
 	};
 
+	function parseJsonforFlvjs(json) {
+		if (!json) return console.warn('parseJsonforFlvjs Failed: No JSON provided.');
+		if (!(flvjs && flvjs.isSupported())) return console.warn('parseJsonforFlvjs Failed: flv.js Not Found or Not Supported.');
+		var mediaDataSource = {"type": "flv"};
+		if (parseInt(json.timelength)) mediaDataSource.duration = parseInt(json.timelength);
+		if (json.durl) mediaDataSource.segments = json.durl.map(obj=>{return {"duration": obj.length,"filesize": obj.size,"url": obj.url}});
+		if (!json.durl) return console.warn('parseJsonforFlvjs Failed: Nothing to play.');
+		return flvjs.createPlayer(mediaDataSource);
+	}
+	
 	function parseSafe(text) {
 		return ('' + text).replace(/&/g, "&amp;").replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 	}
@@ -311,6 +321,7 @@
 				videoPlaybackLink = response["playback"],
 			videoLowResLink = response["lowres"];
 			biliHelper.downloadUrls = [];
+			biliHelper.originalDownloadData = videoDownloadLink;
 			biliHelper.playbackUrls = [];
 			biliHelper.lowResUrl=videoLowResLink;
 			notifyCidHack();
@@ -520,6 +531,7 @@
 					biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + newMode + '"]').removeClass('w');
 					try{clearInterval(checkFinished);} catch(e){}
 					try{clearInterval(interval);} catch(e){}
+					if (this.current == 'html5' && this.flvPlayer) this.flvPlayer.unload();
 					if (newMode.match('html5')) {
 						biliHelper.mainBlock.speedSection.removeClass('hidden');
 					} else {
@@ -696,12 +708,17 @@
 						}
 					});
 					if (type && type.match(/hd|ld/)) return abp;
+					this.flvPlayer = parseJsonforFlvjs(biliHelper.originalDownloadData);
 				var interval = setInterval(function() {
 				    if (abp.commentObjArray) {
 				        clearInterval(interval);
-				        flv.playUrl(location.href);
+				        //flv.playUrl(location.href);
+				        biliHelper.switcher.flvPlayer.attachMediaElement(abp.video);
+				        biliHelper.switcher.flvPlayer.load();
+				        biliHelper.switcher.flvPlayer.play();
+				        console.log(this);
 				    }
-				}, 600);
+				}, 600);/*
 				var lastTime;
 				var checkFinished = setInterval(function() {
 					if (abp.video.currentTime !== lastTime){
@@ -716,7 +733,7 @@
 							}
 						};
 					};
-				}, 600);
+				}, 600);*/
 				},
 				html5hd: function(comments) {
 					comments = comments ? comments : biliHelper.commentsUrl ? biliHelper.commentsUrl : 'http://comment.bilibili.com/' + biliHelper.cid + '.xml';
