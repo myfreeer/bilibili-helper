@@ -37,6 +37,100 @@ var CRC32 = {};
     CRC32.bstr = crc32_bstr;
 })(CRC32);
 
+/* Usage: checkCRCHash(String hash)
+ * the return value would be mid, or -1 if process fails
+ * Speed test:
+   var t0 = performance.now();
+   checkCRCHash('444283f9');//should be 40000000
+   console.log("Call to checkCRCHash took " + (performance.now() - t0) + " milliseconds.");
+ */
+var checkCRCHash = new (function () {
+    'use strict';
+    var startTime = performance.now();
+    function signed_crc_table() {
+        var c = 0,
+            table = typeof Int32Array !== 'undefined' ? new Int32Array(256) : new Array(256);
+        for (var n = 0; n != 256; ++n) {
+            c = n;
+            for (var x = 0; x < 8; x++) {
+                c = c & 1 ? -306674912 ^ c >>> 1 : c >>> 1;
+            }
+            table[n] = c;
+        }
+        return table;
+    }
+    var crctable = signed_crc_table();
+    var crc32 = function crc32(input) {
+            if (typeof input != 'string') input = "" + input;
+            var crcstart = 0xFFFFFFFF,
+                len = input.length,
+                index;
+            for (var i = 0; i < len; ++i) {
+                index = (crcstart ^ input.charCodeAt(i)) & 0xff;
+                crcstart = crcstart >>> 8 ^ crctable[index];
+            }
+            return crcstart;
+        },
+        crc32lastindex = function crc32lastindex(input) {
+            if (typeof input != 'string') input = "" + input;
+            var crcstart = 0xFFFFFFFF,
+                len = input.length,
+                index;
+            for (var i = 0; i < len; ++i) {
+                index = (crcstart ^ input.charCodeAt(i)) & 0xff;
+                crcstart = crcstart >>> 8 ^ crctable[index];
+            }
+            return index;
+        },
+        getcrcindex = function getcrcindex(t) {
+            for (var i = 0; i < 256; i++) {
+                if (crctable[i] >>> 24 == t) return i;
+            }
+            return -1;
+        },
+        deepCheck = function deepCheck(i, index) {
+            var tc = 0x00,
+                str = '',
+                hash = crc32(i);
+            tc = hash & 0xff ^ index[2];
+            if (!(tc <= 57 && tc >= 48)) return [0];
+            str += tc - 48;
+            hash = crctable[index[2]] ^ hash >>> 8;
+            tc = hash & 0xff ^ index[1];
+            if (!(tc <= 57 && tc >= 48)) return [0];
+            str += tc - 48;
+            hash = crctable[index[1]] ^ hash >>> 8;
+            tc = hash & 0xff ^ index[0];
+            if (!(tc <= 57 && tc >= 48)) return [0];
+            str += tc - 48;
+            hash = crctable[index[0]] ^ hash >>> 8;
+            return [1, str];
+        };
+    var index = new Array(4);
+    console.log('初始化耗时：' + (performance.now() - startTime));
+    return function(input) {
+        var ht = parseInt(input, 16) ^ 0xffffffff,
+            snum,
+            i,
+            lastindex,
+            deepCheckData;
+        for (i = 3; i >= 0; i--) {
+            index[3 - i] = getcrcindex(ht >>> i * 8);
+            snum = crctable[index[3 - i]];
+            ht ^= snum >>> (3 - i) * 8;
+        }
+        for (i = 0; i < 100000; i++) {
+            lastindex = crc32lastindex(i);
+            if (lastindex == index[3]) {
+                deepCheckData = deepCheck(i, index);
+                if (deepCheckData[0]) break;
+            }
+        }
+        if (i == 100000) return -1;
+        return i + '' + deepCheckData[1];
+    };
+})();
+
 /* Usage: checkCommentHash(String hash, int maximumMid, int minimumMid)
  * argument hash is required, maximumMid and minimumMid is optional
  * maximumMid would be 65000000 if not set, minimumMid would be 0 if not set
