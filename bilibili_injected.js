@@ -512,10 +512,10 @@
 			biliHelper.switcher = {
 				current: "original",
 				set: function(newMode) {
-					if(this.current.match('bilih5')){
+				/*	if(this.current.match('bilih5')){
 						var biliMenu = document.querySelector('.bilibili-player-setting-menu-wrap');
 						if (biliMenu && biliMenu.lastChild && biliMenu.lastChild.getAttribute('value') === "change_flash") biliMenu.lastChild.click();
-					}
+					}*/
 					biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + this.current + '"]').addClass('w');
 					biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + newMode + '"]').removeClass('w');
 					try{clearInterval(checkFinished);} catch(e){}
