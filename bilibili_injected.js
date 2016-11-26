@@ -38,20 +38,93 @@
 	    CRC32.bstr = crc32_bstr;
 	})(CRC32);
 
-	function checkCommentHash(hash, maximumMid, minimumMid) {
-	    maximumMid = parseInt(maximumMid) ? parseInt(maximumMid) : 65000000;
-	    minimumMid = parseInt(minimumMid) ? parseInt(minimumMid) : 0;
-	    if (!hash) return false;
-	    if (hash.indexOf('D') == 0) return -1;
-	    var hashint = parseInt(hash, 16);
-	    if (!hashint) return false;
-	    for (var i = minimumMid; i < maximumMid + 1; i++) {
-	        if ((CRC32.bstr("" + i) >>> 0) === hashint) {
-	            return i;
+	var checkCRCHash = new(function() {
+	    'use strict';
+	    var startTime = performance.now();
+
+	    function signed_crc_table() {
+	        var c = 0,
+	            table = typeof Int32Array !== 'undefined' ? new Int32Array(256) : new Array(256);
+	        for (var n = 0; n != 256; ++n) {
+	            c = n;
+	            for (var x = 0; x < 8; x++) {
+	                c = c & 1 ? -306674912 ^ c >>> 1 : c >>> 1;
+	            }
+	            table[n] = c;
 	        }
+	        return table;
 	    }
-	    return false;
-	}
+	    var crctable = signed_crc_table();
+	    var crc32 = function crc32(input) {
+	            if (typeof input != 'string') input = "" + input;
+	            var crcstart = 0xFFFFFFFF,
+	                len = input.length,
+	                index;
+	            for (var i = 0; i < len; ++i) {
+	                index = (crcstart ^ input.charCodeAt(i)) & 0xff;
+	                crcstart = crcstart >>> 8 ^ crctable[index];
+	            }
+	            return crcstart;
+	        },
+	        crc32lastindex = function crc32lastindex(input) {
+	            if (typeof input != 'string') input = "" + input;
+	            var crcstart = 0xFFFFFFFF,
+	                len = input.length,
+	                index;
+	            for (var i = 0; i < len; ++i) {
+	                index = (crcstart ^ input.charCodeAt(i)) & 0xff;
+	                crcstart = crcstart >>> 8 ^ crctable[index];
+	            }
+	            return index;
+	        },
+	        getcrcindex = function getcrcindex(t) {
+	            for (var i = 0; i < 256; i++) {
+	                if (crctable[i] >>> 24 == t) return i;
+	            }
+	            return -1;
+	        },
+	        deepCheck = function deepCheck(i, index) {
+	            var tc = 0x00,
+	                str = '',
+	                hash = crc32(i);
+	            tc = hash & 0xff ^ index[2];
+	            if (!(tc <= 57 && tc >= 48)) return [0];
+	            str += tc - 48;
+	            hash = crctable[index[2]] ^ hash >>> 8;
+	            tc = hash & 0xff ^ index[1];
+	            if (!(tc <= 57 && tc >= 48)) return [0];
+	            str += tc - 48;
+	            hash = crctable[index[1]] ^ hash >>> 8;
+	            tc = hash & 0xff ^ index[0];
+	            if (!(tc <= 57 && tc >= 48)) return [0];
+	            str += tc - 48;
+	            hash = crctable[index[0]] ^ hash >>> 8;
+	            return [1, str];
+	        };
+	    var index = new Array(4);
+	    console.log('初始化耗时：' + (performance.now() - startTime));
+	    return function(input) {
+	        var ht = parseInt(input, 16) ^ 0xffffffff,
+	            snum,
+	            i,
+	            lastindex,
+	            deepCheckData;
+	        for (i = 3; i >= 0; i--) {
+	            index[3 - i] = getcrcindex(ht >>> i * 8);
+	            snum = crctable[index[3 - i]];
+	            ht ^= snum >>> (3 - i) * 8;
+	        }
+	        for (i = 0; i < 100000; i++) {
+	            lastindex = crc32lastindex(i);
+	            if (lastindex == index[3]) {
+	                deepCheckData = deepCheck(i, index);
+	                if (deepCheckData[0]) break;
+	            }
+	        }
+	        if (i == 100000) return -1;
+	        return i + '' + deepCheckData[1];
+	    };
+	})();
 
 	function formatInt(Source, Length) {
 		var strTemp = "";
@@ -1071,20 +1144,8 @@
 						                        }
 						                        var mid =  sessionStorage.getItem('hash/' + sender);
 						                        if (mid && (CRC32.bstr("" + mid) >>> 0) === parseInt(sender, 16)) return displayUserInfobyMid(mid);
-						                        $.ajaxSetup({timeout: 1000});
-						                        $.get('http://biliquery.typcn.com/api/user/hash/' + sender, function(data) {
-						                            $.ajaxSetup({timeout: 0});
-						                            if (!data || data.error != 0 || typeof data.data != 'object' || !data.data[0].id) {
-						                                var uid = checkCommentHash(sender, 65E6, 4E7 - 2);
-						                                displayUserInfobyMid(uid, sender);
-						                            } else {
-						                                var uid = parseSafe(data.data[0].id);
-						                                displayUserInfobyMid(uid, sender);
-						                            }
-						                        }, 'json').fail(function() {
-						                            var uid = checkCommentHash(sender, 65E6);
-						                            displayUserInfobyMid(uid, sender);
-						                        });
+						                        mid = checkCRCHash(sender, 65E6);
+						                        displayUserInfobyMid(mid, sender);
 						        }
 						    });
 						    biliHelper.mainBlock.querySection.find('p').empty().append(control);
