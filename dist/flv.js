@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.flvjs = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function (process,global){
 /*!
  * @overview es6-promise - a tiny implementation of Promises/A+.
@@ -135,7 +135,7 @@ function flush() {
 
 function attemptVertx() {
   try {
-    var r = require;
+    var r = _dereq_;
     var vertx = r('vertx');
     vertxNext = vertx.runOnLoop || vertx.runOnContext;
     return useVertxTimer();
@@ -152,7 +152,7 @@ if (isNode) {
   scheduleFlush = useMutationObserver();
 } else if (isWorker) {
   scheduleFlush = useMessageChannel();
-} else if (browserWindow === undefined && typeof require === 'function') {
+} else if (browserWindow === undefined && typeof _dereq_ === 'function') {
   scheduleFlush = attemptVertx();
 } else {
   scheduleFlush = useSetTimeout();
@@ -1157,9 +1157,9 @@ return Promise;
 
 })));
 
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+}).call(this,_dereq_('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"_process":3}],2:[function(require,module,exports){
+},{"_process":3}],2:[function(_dereq_,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1463,7 +1463,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],3:[function(require,module,exports){
+},{}],3:[function(_dereq_,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -1645,7 +1645,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],4:[function(require,module,exports){
+},{}],4:[function(_dereq_,module,exports){
 var bundleFn = arguments[3];
 var sources = arguments[4];
 var cache = arguments[5];
@@ -1728,7 +1728,7 @@ module.exports = function (fn, options) {
     return worker;
 };
 
-},{}],5:[function(require,module,exports){
+},{}],5:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1778,7 +1778,7 @@ function createDefaultConfig() {
     return Object.assign({}, defaultConfig);
 }
 
-},{}],6:[function(require,module,exports){
+},{}],6:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1803,11 +1803,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * limitations under the License.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
-var _ioController = require('../io/io-controller.js');
+var _ioController = _dereq_('../io/io-controller.js');
 
 var _ioController2 = _interopRequireDefault(_ioController);
 
-var _config = require('../config.js');
+var _config = _dereq_('../config.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1878,7 +1878,7 @@ var Features = function () {
 
 exports.default = Features;
 
-},{"../config.js":5,"../io/io-controller.js":22}],7:[function(require,module,exports){
+},{"../config.js":5,"../io/io-controller.js":23}],7:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2007,7 +2007,7 @@ var MediaInfo = function () {
 
 exports.default = MediaInfo;
 
-},{}],8:[function(require,module,exports){
+},{}],8:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2276,7 +2276,7 @@ var MediaSegmentInfoList = exports.MediaSegmentInfoList = function () {
     return MediaSegmentInfoList;
 }();
 
-},{}],9:[function(require,module,exports){
+},{}],9:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2301,25 +2301,25 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * limitations under the License.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
-var _events = require('events');
+var _events = _dereq_('events');
 
 var _events2 = _interopRequireDefault(_events);
 
-var _logger = require('../utils/logger.js');
+var _logger = _dereq_('../utils/logger.js');
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _browser = require('../utils/browser.js');
+var _browser = _dereq_('../utils/browser.js');
 
 var _browser2 = _interopRequireDefault(_browser);
 
-var _mseEvents = require('./mse-events.js');
+var _mseEvents = _dereq_('./mse-events.js');
 
 var _mseEvents2 = _interopRequireDefault(_mseEvents);
 
-var _mediaSegmentInfo = require('./media-segment-info.js');
+var _mediaSegmentInfo = _dereq_('./media-segment-info.js');
 
-var _exception = require('../utils/exception.js');
+var _exception = _dereq_('../utils/exception.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2330,7 +2330,7 @@ var MSEController = function () {
     function MSEController() {
         _classCallCheck(this, MSEController);
 
-        this.TAG = this.constructor.name;
+        this.TAG = 'MSEController';
 
         this._emitter = new _events2.default();
 
@@ -2739,7 +2739,7 @@ var MSEController = function () {
 
 exports.default = MSEController;
 
-},{"../utils/browser.js":38,"../utils/exception.js":39,"../utils/logger.js":40,"./media-segment-info.js":8,"./mse-events.js":10,"events":2}],10:[function(require,module,exports){
+},{"../utils/browser.js":39,"../utils/exception.js":40,"../utils/logger.js":41,"./media-segment-info.js":8,"./mse-events.js":10,"events":2}],10:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2772,7 +2772,7 @@ var MSEEvents = {
 
 exports.default = MSEEvents;
 
-},{}],11:[function(require,module,exports){
+},{}],11:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2797,31 +2797,31 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * limitations under the License.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
-var _events = require('events');
+var _events = _dereq_('events');
 
 var _events2 = _interopRequireDefault(_events);
 
-var _logger = require('../utils/logger.js');
+var _logger = _dereq_('../utils/logger.js');
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _loggingControl = require('../utils/logging-control.js');
+var _loggingControl = _dereq_('../utils/logging-control.js');
 
 var _loggingControl2 = _interopRequireDefault(_loggingControl);
 
-var _transmuxingController = require('./transmuxing-controller.js');
+var _transmuxingController = _dereq_('./transmuxing-controller.js');
 
 var _transmuxingController2 = _interopRequireDefault(_transmuxingController);
 
-var _transmuxingEvents = require('./transmuxing-events.js');
+var _transmuxingEvents = _dereq_('./transmuxing-events.js');
 
 var _transmuxingEvents2 = _interopRequireDefault(_transmuxingEvents);
 
-var _transmuxingWorker = require('./transmuxing-worker.js');
+var _transmuxingWorker = _dereq_('./transmuxing-worker.js');
 
 var _transmuxingWorker2 = _interopRequireDefault(_transmuxingWorker);
 
-var _mediaInfo = require('./media-info.js');
+var _mediaInfo = _dereq_('./media-info.js');
 
 var _mediaInfo2 = _interopRequireDefault(_mediaInfo);
 
@@ -2833,12 +2833,12 @@ var Transmuxer = function () {
     function Transmuxer(mediaDataSource, config) {
         _classCallCheck(this, Transmuxer);
 
-        this.TAG = this.constructor.name;
+        this.TAG = 'Transmuxer';
         this._emitter = new _events2.default();
 
         if (config.enableWorker && typeof Worker !== 'undefined') {
             try {
-                var work = require('webworkify');
+                var work = _dereq_('webworkify');
                 this._worker = work(_transmuxingWorker2.default);
                 this._workerDestroying = false;
                 this._worker.addEventListener('message', this._onWorkerMessage.bind(this));
@@ -3084,7 +3084,7 @@ var Transmuxer = function () {
 
 exports.default = Transmuxer;
 
-},{"../utils/logger.js":40,"../utils/logging-control.js":41,"./media-info.js":7,"./transmuxing-controller.js":12,"./transmuxing-events.js":13,"./transmuxing-worker.js":14,"events":2,"webworkify":4}],12:[function(require,module,exports){
+},{"../utils/logger.js":41,"../utils/logging-control.js":42,"./media-info.js":7,"./transmuxing-controller.js":12,"./transmuxing-events.js":13,"./transmuxing-worker.js":14,"events":2,"webworkify":4}],12:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3109,43 +3109,43 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * limitations under the License.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
-var _events = require('events');
+var _events = _dereq_('events');
 
 var _events2 = _interopRequireDefault(_events);
 
-var _logger = require('../utils/logger.js');
+var _logger = _dereq_('../utils/logger.js');
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _browser = require('../utils/browser.js');
+var _browser = _dereq_('../utils/browser.js');
 
 var _browser2 = _interopRequireDefault(_browser);
 
-var _mediaInfo = require('./media-info.js');
+var _mediaInfo = _dereq_('./media-info.js');
 
 var _mediaInfo2 = _interopRequireDefault(_mediaInfo);
 
-var _flvDemuxer = require('../demux/flv-demuxer.js');
+var _flvDemuxer = _dereq_('../demux/flv-demuxer.js');
 
 var _flvDemuxer2 = _interopRequireDefault(_flvDemuxer);
 
-var _mp4Remuxer = require('../remux/mp4-remuxer.js');
+var _mp4Remuxer = _dereq_('../remux/mp4-remuxer.js');
 
 var _mp4Remuxer2 = _interopRequireDefault(_mp4Remuxer);
 
-var _demuxErrors = require('../demux/demux-errors.js');
+var _demuxErrors = _dereq_('../demux/demux-errors.js');
 
 var _demuxErrors2 = _interopRequireDefault(_demuxErrors);
 
-var _ioController = require('../io/io-controller.js');
+var _ioController = _dereq_('../io/io-controller.js');
 
 var _ioController2 = _interopRequireDefault(_ioController);
 
-var _transmuxingEvents = require('./transmuxing-events.js');
+var _transmuxingEvents = _dereq_('./transmuxing-events.js');
 
 var _transmuxingEvents2 = _interopRequireDefault(_transmuxingEvents);
 
-var _loader = require('../io/loader.js');
+var _loader = _dereq_('../io/loader.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3156,7 +3156,7 @@ var TransmuxingController = function () {
     function TransmuxingController(mediaDataSource, config) {
         _classCallCheck(this, TransmuxingController);
 
-        this.TAG = this.constructor.name;
+        this.TAG = 'TransmuxingController';
         this._emitter = new _events2.default();
 
         this._config = config;
@@ -3202,6 +3202,8 @@ var TransmuxingController = function () {
 
         this._pendingSeekTime = null;
         this._pendingResolveSeekPoint = null;
+
+        this._statisticsReporter = null;
     }
 
     _createClass(TransmuxingController, [{
@@ -3210,6 +3212,9 @@ var TransmuxingController = function () {
             this._mediaInfo = null;
             this._mediaDataSource = null;
 
+            if (this._statisticsReporter) {
+                this._disableStatisticsReporter();
+            }
             if (this._ioctl) {
                 this._ioctl.destroy();
                 this._ioctl = null;
@@ -3240,6 +3245,7 @@ var TransmuxingController = function () {
         key: 'start',
         value: function start() {
             this._loadSegment(0);
+            this._enableStatisticsReporter();
         }
     }, {
         key: '_loadSegment',
@@ -3265,6 +3271,7 @@ var TransmuxingController = function () {
         key: 'stop',
         value: function stop() {
             this._internalAbort();
+            this._disableStatisticsReporter();
         }
     }, {
         key: '_internalAbort',
@@ -3280,6 +3287,7 @@ var TransmuxingController = function () {
             // take a rest
             if (this._ioctl && this._ioctl.isWorking()) {
                 this._ioctl.pause();
+                this._disableStatisticsReporter();
             }
         }
     }, {
@@ -3287,15 +3295,13 @@ var TransmuxingController = function () {
         value: function resume() {
             if (this._ioctl && this._ioctl.isPaused()) {
                 this._ioctl.resume();
+                this._enableStatisticsReporter();
             }
         }
     }, {
         key: 'seek',
         value: function seek(milliseconds) {
-            if (this._mediaInfo == null) {
-                return;
-            }
-            if (!this._mediaInfo.isSeekable()) {
+            if (this._mediaInfo == null || !this._mediaInfo.isSeekable()) {
                 return;
             }
 
@@ -3334,11 +3340,15 @@ var TransmuxingController = function () {
                     this._internalAbort();
                     this._remuxer.seek(milliseconds);
                     this._remuxer.insertDiscontinuity();
+                    this._demuxer.resetMediaInfo();
                     this._demuxer.timestampBase = this._mediaDataSource.segments[targetSegmentIndex].timestampBase;
                     this._loadSegment(targetSegmentIndex, _keyframe.fileposition);
                     this._pendingResolveSeekPoint = _keyframe.milliseconds;
+                    this._reportSegmentMediaInfo(targetSegmentIndex);
                 }
             }
+
+            this._enableStatisticsReporter();
         }
     }, {
         key: '_searchSegmentIndexContains',
@@ -3416,19 +3426,14 @@ var TransmuxingController = function () {
                 this._mediaInfo.segments = [];
                 this._mediaInfo.segmentCount = this._mediaDataSource.segments.length;
                 Object.setPrototypeOf(this._mediaInfo, _mediaInfo2.default.prototype);
-
-                var exportInfo = Object.assign({}, this._mediaInfo);
-                delete exportInfo.segments;
-                delete exportInfo.keyframesIndex;
-                this._emitter.emit(_transmuxingEvents2.default.MEDIA_INFO, exportInfo);
             }
 
-            if (this._mediaInfo.segments[this._currentSegmentIndex] == undefined) {
-                var segmentInfo = Object.assign({}, mediaInfo);
-                Object.setPrototypeOf(segmentInfo, _mediaInfo2.default.prototype);
+            var segmentInfo = Object.assign({}, mediaInfo);
+            Object.setPrototypeOf(segmentInfo, _mediaInfo2.default.prototype);
+            this._mediaInfo.segments[this._currentSegmentIndex] = segmentInfo;
 
-                this._mediaInfo.segments[this._currentSegmentIndex] = segmentInfo;
-            }
+            // notify mediaInfo update
+            this._reportSegmentMediaInfo(this._currentSegmentIndex);
 
             if (this._pendingSeekTime != null) {
                 Promise.resolve().then(function () {
@@ -3454,6 +3459,7 @@ var TransmuxingController = function () {
                 this._loadSegment(nextSegmentIndex);
             } else {
                 this._emitter.emit(_transmuxingEvents2.default.LOADING_COMPLETE);
+                this._disableStatisticsReporter();
             }
         }
     }, {
@@ -3466,6 +3472,7 @@ var TransmuxingController = function () {
         value: function _onIOException(type, info) {
             _logger2.default.e(this.TAG, 'IOException: type = ' + type + ', code = ' + info.code + ', msg = ' + info.msg);
             this._emitter.emit(_transmuxingEvents2.default.IO_ERROR, type, info);
+            this._disableStatisticsReporter();
         }
     }, {
         key: '_onDemuxException',
@@ -3487,6 +3494,7 @@ var TransmuxingController = function () {
             }
             this._emitter.emit(_transmuxingEvents2.default.MEDIA_SEGMENT, type, mediaSegment);
 
+            // Resolve pending seekPoint
             if (this._pendingResolveSeekPoint != null && type === 'video') {
                 var syncPoints = mediaSegment.info.syncPoints;
                 var seekpoint = this._pendingResolveSeekPoint;
@@ -3500,15 +3508,40 @@ var TransmuxingController = function () {
 
                 this._emitter.emit(_transmuxingEvents2.default.RECOMMEND_SEEKPOINT, seekpoint);
             }
-
-            if (type === 'video') {
-                this._reportStatisticsInfo();
+        }
+    }, {
+        key: '_enableStatisticsReporter',
+        value: function _enableStatisticsReporter() {
+            if (this._statisticsReporter == null) {
+                this._statisticsReporter = self.setInterval(this._reportStatisticsInfo.bind(this), this._config.statisticsInfoReportInterval);
             }
+        }
+    }, {
+        key: '_disableStatisticsReporter',
+        value: function _disableStatisticsReporter() {
+            if (this._statisticsReporter) {
+                self.clearInterval(this._statisticsReporter);
+                this._statisticsReporter = null;
+            }
+        }
+    }, {
+        key: '_reportSegmentMediaInfo',
+        value: function _reportSegmentMediaInfo(segmentIndex) {
+            var segmentInfo = this._mediaInfo.segments[segmentIndex];
+            var exportInfo = Object.assign({}, segmentInfo);
+
+            exportInfo.duration = this._mediaInfo.duration;
+            exportInfo.segmentCount = this._mediaInfo.segmentCount;
+            delete exportInfo.segments;
+            delete exportInfo.keyframesIndex;
+
+            this._emitter.emit(_transmuxingEvents2.default.MEDIA_INFO, exportInfo);
         }
     }, {
         key: '_reportStatisticsInfo',
         value: function _reportStatisticsInfo() {
             var info = {};
+
             info.url = this._ioctl.currentUrl;
             info.speed = this._ioctl.currentSpeed;
             info.loaderType = this._ioctl.loaderType;
@@ -3524,7 +3557,7 @@ var TransmuxingController = function () {
 
 exports.default = TransmuxingController;
 
-},{"../demux/demux-errors.js":16,"../demux/flv-demuxer.js":18,"../io/io-controller.js":22,"../io/loader.js":23,"../remux/mp4-remuxer.js":37,"../utils/browser.js":38,"../utils/logger.js":40,"./media-info.js":7,"./transmuxing-events.js":13,"events":2}],13:[function(require,module,exports){
+},{"../demux/demux-errors.js":16,"../demux/flv-demuxer.js":18,"../io/io-controller.js":23,"../io/loader.js":24,"../remux/mp4-remuxer.js":38,"../utils/browser.js":39,"../utils/logger.js":41,"./media-info.js":7,"./transmuxing-events.js":13,"events":2}],13:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3562,30 +3595,30 @@ var TransmuxingEvents = {
 
 exports.default = TransmuxingEvents;
 
-},{}],14:[function(require,module,exports){
+},{}],14:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _logger = require('../utils/logger.js');
+var _logger = _dereq_('../utils/logger.js');
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _loggingControl = require('../utils/logging-control.js');
+var _loggingControl = _dereq_('../utils/logging-control.js');
 
 var _loggingControl2 = _interopRequireDefault(_loggingControl);
 
-var _polyfill = require('../utils/polyfill.js');
+var _polyfill = _dereq_('../utils/polyfill.js');
 
 var _polyfill2 = _interopRequireDefault(_polyfill);
 
-var _transmuxingController = require('./transmuxing-controller.js');
+var _transmuxingController = _dereq_('./transmuxing-controller.js');
 
 var _transmuxingController2 = _interopRequireDefault(_transmuxingController);
 
-var _transmuxingEvents = require('./transmuxing-events.js');
+var _transmuxingEvents = _dereq_('./transmuxing-events.js');
 
 var _transmuxingEvents2 = _interopRequireDefault(_transmuxingEvents);
 
@@ -3751,7 +3784,7 @@ var TransmuxingWorker = function TransmuxingWorker(self) {
 
 exports.default = TransmuxingWorker;
 
-},{"../utils/logger.js":40,"../utils/logging-control.js":41,"../utils/polyfill.js":42,"./transmuxing-controller.js":12,"./transmuxing-events.js":13}],15:[function(require,module,exports){
+},{"../utils/logger.js":41,"../utils/logging-control.js":42,"../utils/polyfill.js":43,"./transmuxing-controller.js":12,"./transmuxing-events.js":13}],15:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3776,15 +3809,15 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * limitations under the License.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
-var _logger = require('../utils/logger.js');
+var _logger = _dereq_('../utils/logger.js');
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _utf8Conv = require('../utils/utf8-conv.js');
+var _utf8Conv = _dereq_('../utils/utf8-conv.js');
 
 var _utf8Conv2 = _interopRequireDefault(_utf8Conv);
 
-var _exception = require('../utils/exception.js');
+var _exception = _dereq_('../utils/exception.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4041,7 +4074,7 @@ var AMF = function () {
 
 exports.default = AMF;
 
-},{"../utils/exception.js":39,"../utils/logger.js":40,"../utils/utf8-conv.js":43}],16:[function(require,module,exports){
+},{"../utils/exception.js":40,"../utils/logger.js":41,"../utils/utf8-conv.js":44}],16:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4074,7 +4107,7 @@ var DemuxErrors = {
 
 exports.default = DemuxErrors;
 
-},{}],17:[function(require,module,exports){
+},{}],17:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4099,7 +4132,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * limitations under the License.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
-var _exception = require('../utils/exception.js');
+var _exception = _dereq_('../utils/exception.js');
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -4108,7 +4141,7 @@ var ExpGolomb = function () {
     function ExpGolomb(uint8array) {
         _classCallCheck(this, ExpGolomb);
 
-        this.TAG = this.constructor.name;
+        this.TAG = 'ExpGolomb';
 
         this._buffer = uint8array;
         this._buffer_index = 0;
@@ -4212,7 +4245,7 @@ var ExpGolomb = function () {
 
 exports.default = ExpGolomb;
 
-},{"../utils/exception.js":39}],18:[function(require,module,exports){
+},{"../utils/exception.js":40}],18:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4239,27 +4272,27 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * limitations under the License.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
-var _logger = require('../utils/logger.js');
+var _logger = _dereq_('../utils/logger.js');
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _amfParser = require('./amf-parser.js');
+var _amfParser = _dereq_('./amf-parser.js');
 
 var _amfParser2 = _interopRequireDefault(_amfParser);
 
-var _spsParser = require('./sps-parser.js');
+var _spsParser = _dereq_('./sps-parser.js');
 
 var _spsParser2 = _interopRequireDefault(_spsParser);
 
-var _demuxErrors = require('./demux-errors.js');
+var _demuxErrors = _dereq_('./demux-errors.js');
 
 var _demuxErrors2 = _interopRequireDefault(_demuxErrors);
 
-var _mediaInfo = require('../core/media-info.js');
+var _mediaInfo = _dereq_('../core/media-info.js');
 
 var _mediaInfo2 = _interopRequireDefault(_mediaInfo);
 
-var _exception = require('../utils/exception.js');
+var _exception = _dereq_('../utils/exception.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4281,7 +4314,7 @@ var FLVDemuxer = function () {
     function FLVDemuxer(probeData, config) {
         _classCallCheck(this, FLVDemuxer);
 
-        this.TAG = this.constructor.name;
+        this.TAG = 'FLVDemuxer';
 
         this._config = config;
 
@@ -4353,6 +4386,11 @@ var FLVDemuxer = function () {
 
         // prototype: function(type: string, metadata: any): void
 
+    }, {
+        key: 'resetMediaInfo',
+        value: function resetMediaInfo() {
+            this._mediaInfo = new _mediaInfo2.default();
+        }
     }, {
         key: '_isInitialMetadataDispatched',
         value: function _isInitialMetadataDispatched() {
@@ -5175,7 +5213,7 @@ var FLVDemuxer = function () {
 
 exports.default = FLVDemuxer;
 
-},{"../core/media-info.js":7,"../utils/exception.js":39,"../utils/logger.js":40,"./amf-parser.js":15,"./demux-errors.js":16,"./sps-parser.js":19}],19:[function(require,module,exports){
+},{"../core/media-info.js":7,"../utils/exception.js":40,"../utils/logger.js":41,"./amf-parser.js":15,"./demux-errors.js":16,"./sps-parser.js":19}],19:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -5200,7 +5238,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * limitations under the License.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
-var _expGolomb = require('./exp-golomb.js');
+var _expGolomb = _dereq_('./exp-golomb.js');
 
 var _expGolomb2 = _interopRequireDefault(_expGolomb);
 
@@ -5492,7 +5530,7 @@ var SPSParser = function () {
 
 exports.default = SPSParser;
 
-},{"./exp-golomb.js":17}],20:[function(require,module,exports){
+},{"./exp-golomb.js":17}],20:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -5517,37 +5555,37 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                                                                                                                                                                                                                                                                                * limitations under the License.
                                                                                                                                                                                                                                                                                */
 
-var _polyfill = require('./utils/polyfill.js');
+var _polyfill = _dereq_('./utils/polyfill.js');
 
 var _polyfill2 = _interopRequireDefault(_polyfill);
 
-var _features = require('./core/features.js');
+var _features = _dereq_('./core/features.js');
 
 var _features2 = _interopRequireDefault(_features);
 
-var _flvPlayer = require('./player/flv-player.js');
+var _flvPlayer = _dereq_('./player/flv-player.js');
 
 var _flvPlayer2 = _interopRequireDefault(_flvPlayer);
 
-var _nativePlayer = require('./player/native-player.js');
+var _nativePlayer = _dereq_('./player/native-player.js');
 
 var _nativePlayer2 = _interopRequireDefault(_nativePlayer);
 
-var _playerEvents = require('./player/player-events.js');
+var _playerEvents = _dereq_('./player/player-events.js');
 
 var _playerEvents2 = _interopRequireDefault(_playerEvents);
 
-var _playerErrors = require('./player/player-errors.js');
+var _playerErrors = _dereq_('./player/player-errors.js');
 
-var _loggingControl = require('./utils/logging-control.js');
+var _loggingControl = _dereq_('./utils/logging-control.js');
 
 var _loggingControl2 = _interopRequireDefault(_loggingControl);
 
-var _exception = require('./utils/exception.js');
+var _exception = _dereq_('./utils/exception.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// entry/index file
+// here are all the interfaces
 
 // install polyfills
 _polyfill2.default.install();
@@ -5595,11 +5633,25 @@ flvjs.FlvPlayer = _flvPlayer2.default;
 flvjs.NativePlayer = _nativePlayer2.default;
 flvjs.LoggingControl = _loggingControl2.default;
 
-// export interfaces to global context
-window.flvjs = flvjs;
+Object.defineProperty(flvjs, 'version', {
+    enumerable: true,
+    get: function get() {
+        // replaced by browserify-versionify transform
+        return '1.1.0';
+    }
+});
+
 exports.default = flvjs;
 
-},{"./core/features.js":6,"./player/flv-player.js":31,"./player/native-player.js":32,"./player/player-errors.js":33,"./player/player-events.js":34,"./utils/exception.js":39,"./utils/logging-control.js":41,"./utils/polyfill.js":42}],21:[function(require,module,exports){
+},{"./core/features.js":6,"./player/flv-player.js":32,"./player/native-player.js":33,"./player/player-errors.js":34,"./player/player-events.js":35,"./utils/exception.js":40,"./utils/logging-control.js":42,"./utils/polyfill.js":43}],21:[function(_dereq_,module,exports){
+'use strict';
+
+// entry/index file
+
+// make it compatible with browserify's umd wrapper
+module.exports = _dereq_('./flv.js').default;
+
+},{"./flv.js":20}],22:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -5612,17 +5664,17 @@ var _get = function get(object, property, receiver) { if (object === null) objec
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _logger = require('../utils/logger.js');
+var _logger = _dereq_('../utils/logger.js');
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _browser = require('../utils/browser.js');
+var _browser = _dereq_('../utils/browser.js');
 
 var _browser2 = _interopRequireDefault(_browser);
 
-var _loader = require('./loader.js');
+var _loader = _dereq_('./loader.js');
 
-var _exception = require('../utils/exception.js');
+var _exception = _dereq_('../utils/exception.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5675,7 +5727,7 @@ var FetchStreamLoader = function (_BaseLoader) {
 
         var _this = _possibleConstructorReturn(this, (FetchStreamLoader.__proto__ || Object.getPrototypeOf(FetchStreamLoader)).call(this, 'fetch-stream-loader'));
 
-        _this.TAG = _this.constructor.name;
+        _this.TAG = 'FetchStreamLoader';
 
         _this._seekHandler = seekHandler;
         _this._needStash = true;
@@ -5833,7 +5885,7 @@ var FetchStreamLoader = function (_BaseLoader) {
 
 exports.default = FetchStreamLoader;
 
-},{"../utils/browser.js":38,"../utils/exception.js":39,"../utils/logger.js":40,"./loader.js":23}],22:[function(require,module,exports){
+},{"../utils/browser.js":39,"../utils/exception.js":40,"../utils/logger.js":41,"./loader.js":24}],23:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -5858,45 +5910,45 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * limitations under the License.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
-var _logger = require('../utils/logger.js');
+var _logger = _dereq_('../utils/logger.js');
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _speedSampler = require('./speed-sampler.js');
+var _speedSampler = _dereq_('./speed-sampler.js');
 
 var _speedSampler2 = _interopRequireDefault(_speedSampler);
 
-var _loader = require('./loader.js');
+var _loader = _dereq_('./loader.js');
 
-var _fetchStreamLoader = require('./fetch-stream-loader.js');
+var _fetchStreamLoader = _dereq_('./fetch-stream-loader.js');
 
 var _fetchStreamLoader2 = _interopRequireDefault(_fetchStreamLoader);
 
-var _xhrMozChunkedLoader = require('./xhr-moz-chunked-loader.js');
+var _xhrMozChunkedLoader = _dereq_('./xhr-moz-chunked-loader.js');
 
 var _xhrMozChunkedLoader2 = _interopRequireDefault(_xhrMozChunkedLoader);
 
-var _xhrMsstreamLoader = require('./xhr-msstream-loader.js');
+var _xhrMsstreamLoader = _dereq_('./xhr-msstream-loader.js');
 
 var _xhrMsstreamLoader2 = _interopRequireDefault(_xhrMsstreamLoader);
 
-var _xhrRangeLoader = require('./xhr-range-loader.js');
+var _xhrRangeLoader = _dereq_('./xhr-range-loader.js');
 
 var _xhrRangeLoader2 = _interopRequireDefault(_xhrRangeLoader);
 
-var _websocketLoader = require('./websocket-loader.js');
+var _websocketLoader = _dereq_('./websocket-loader.js');
 
 var _websocketLoader2 = _interopRequireDefault(_websocketLoader);
 
-var _rangeSeekHandler = require('./range-seek-handler.js');
+var _rangeSeekHandler = _dereq_('./range-seek-handler.js');
 
 var _rangeSeekHandler2 = _interopRequireDefault(_rangeSeekHandler);
 
-var _paramSeekHandler = require('./param-seek-handler.js');
+var _paramSeekHandler = _dereq_('./param-seek-handler.js');
 
 var _paramSeekHandler2 = _interopRequireDefault(_paramSeekHandler);
 
-var _exception = require('../utils/exception.js');
+var _exception = _dereq_('../utils/exception.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5917,7 +5969,7 @@ var IOController = function () {
     function IOController(dataSource, config, extraData) {
         _classCallCheck(this, IOController);
 
-        this.TAG = this.constructor.name;
+        this.TAG = 'IOController';
 
         this._config = config;
         this._extraData = extraData;
@@ -5952,7 +6004,6 @@ var IOController = function () {
         this._fullRequestFlag = false;
         this._currentRange = null;
 
-        this._speed = 0;
         this._speedNormalized = 0;
         this._speedSampler = new _speedSampler2.default();
         this._speedNormalizeList = [64, 128, 256, 384, 512, 768, 1024, 1536, 2048, 3072, 4096];
@@ -6140,7 +6191,6 @@ var IOController = function () {
             var requestRange = { from: bytes, to: -1 };
             this._currentRange = { from: requestRange.from, to: -1 };
 
-            this._speed = 0;
             this._speedSampler.reset();
             this._stashSize = this._stashInitialSize;
             this._createLoader();
@@ -6275,7 +6325,6 @@ var IOController = function () {
             // adjust stash buffer size according to network speed dynamically
             var KBps = this._speedSampler.lastSecondKBps;
             if (KBps !== 0) {
-                this._speed = KBps;
                 var normalized = this._normalizeSpeed(KBps);
                 if (this._speedNormalized !== normalized) {
                     this._speedNormalized = normalized;
@@ -6528,10 +6577,10 @@ var IOController = function () {
         key: 'currentSpeed',
         get: function get() {
             if (this._loaderClass === _xhrRangeLoader2.default) {
-                // this._speed is inaccuracy if loader is RangeLoader
+                // SpeedSampler is inaccuracy if loader is RangeLoader
                 return this._loader.currentSpeed;
             }
-            return this._speed;
+            return this._speedSampler.lastSecondKBps;
         }
     }, {
         key: 'loaderType',
@@ -6545,7 +6594,7 @@ var IOController = function () {
 
 exports.default = IOController;
 
-},{"../utils/exception.js":39,"../utils/logger.js":40,"./fetch-stream-loader.js":21,"./loader.js":23,"./param-seek-handler.js":24,"./range-seek-handler.js":25,"./speed-sampler.js":26,"./websocket-loader.js":27,"./xhr-moz-chunked-loader.js":28,"./xhr-msstream-loader.js":29,"./xhr-range-loader.js":30}],23:[function(require,module,exports){
+},{"../utils/exception.js":40,"../utils/logger.js":41,"./fetch-stream-loader.js":22,"./loader.js":24,"./param-seek-handler.js":25,"./range-seek-handler.js":26,"./speed-sampler.js":27,"./websocket-loader.js":28,"./xhr-moz-chunked-loader.js":29,"./xhr-msstream-loader.js":30,"./xhr-range-loader.js":31}],24:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -6571,7 +6620,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * limitations under the License.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
-var _exception = require('../utils/exception.js');
+var _exception = _dereq_('../utils/exception.js');
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -6692,7 +6741,7 @@ var BaseLoader = exports.BaseLoader = function () {
     return BaseLoader;
 }();
 
-},{"../utils/exception.js":39}],24:[function(require,module,exports){
+},{"../utils/exception.js":40}],25:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -6764,7 +6813,7 @@ var ParamSeekHandler = function () {
 
 exports.default = ParamSeekHandler;
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -6829,7 +6878,7 @@ var RangeSeekHandler = function () {
 
 exports.default = RangeSeekHandler;
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6907,12 +6956,17 @@ var SpeedSampler = function () {
     }, {
         key: "currentKBps",
         get: function get() {
+            this.addBytes(0);
+
             var durationSeconds = (this._now() - this._lastCheckpoint) / 1000;
+            if (durationSeconds == 0) durationSeconds = 1;
             return this._intervalBytes / durationSeconds / 1024;
         }
     }, {
         key: "lastSecondKBps",
         get: function get() {
+            this.addBytes(0);
+
             if (this._lastSecondBytes !== 0) {
                 return this._lastSecondBytes / 1024;
             } else {
@@ -6940,7 +6994,7 @@ var SpeedSampler = function () {
 
 exports.default = SpeedSampler;
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -6951,13 +7005,13 @@ var _get = function get(object, property, receiver) { if (object === null) objec
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _logger = require('../utils/logger.js');
+var _logger = _dereq_('../utils/logger.js');
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _loader = require('./loader.js');
+var _loader = _dereq_('./loader.js');
 
-var _exception = require('../utils/exception.js');
+var _exception = _dereq_('../utils/exception.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7003,7 +7057,7 @@ var WebSocketLoader = function (_BaseLoader) {
 
         var _this = _possibleConstructorReturn(this, (WebSocketLoader.__proto__ || Object.getPrototypeOf(WebSocketLoader)).call(this, 'websocket-loader'));
 
-        _this.TAG = _this.constructor.name;
+        _this.TAG = 'WebSocketLoader';
 
         _this._needStash = true;
 
@@ -7080,7 +7134,33 @@ var WebSocketLoader = function (_BaseLoader) {
     }, {
         key: '_onWebSocketMessage',
         value: function _onWebSocketMessage(e) {
-            var chunk = e.data;
+            var _this2 = this;
+
+            if (e.data instanceof ArrayBuffer) {
+                this._dispatchArrayBuffer(e.data);
+            } else if (e.data instanceof Blob) {
+                (function () {
+                    var reader = new FileReader();
+                    reader.onload = function () {
+                        _this2._dispatchArrayBuffer(reader.result);
+                    };
+                    reader.readAsArrayBuffer(e.data);
+                })();
+            } else {
+                this._status = _loader.LoaderStatus.kError;
+                var info = { code: -1, msg: 'Unsupported WebSocket message type: ' + e.data.constructor.name };
+
+                if (this._onError) {
+                    this._onError(_loader.LoaderErrors.EXCEPTION, info);
+                } else {
+                    throw new _exception.RuntimeException(info.msg);
+                }
+            }
+        }
+    }, {
+        key: '_dispatchArrayBuffer',
+        value: function _dispatchArrayBuffer(arraybuffer) {
+            var chunk = arraybuffer;
             var byteStart = this._receivedLength;
             this._receivedLength += chunk.byteLength;
 
@@ -7111,7 +7191,7 @@ var WebSocketLoader = function (_BaseLoader) {
 
 exports.default = WebSocketLoader;
 
-},{"../utils/exception.js":39,"../utils/logger.js":40,"./loader.js":23}],28:[function(require,module,exports){
+},{"../utils/exception.js":40,"../utils/logger.js":41,"./loader.js":24}],29:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -7124,13 +7204,13 @@ var _get = function get(object, property, receiver) { if (object === null) objec
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _logger = require('../utils/logger.js');
+var _logger = _dereq_('../utils/logger.js');
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _loader = require('./loader.js');
+var _loader = _dereq_('./loader.js');
 
-var _exception = require('../utils/exception.js');
+var _exception = _dereq_('../utils/exception.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7181,7 +7261,7 @@ var MozChunkedLoader = function (_BaseLoader) {
 
         var _this = _possibleConstructorReturn(this, (MozChunkedLoader.__proto__ || Object.getPrototypeOf(MozChunkedLoader)).call(this, 'xhr-moz-chunked-loader'));
 
-        _this.TAG = _this.constructor.name;
+        _this.TAG = 'MozChunkedLoader';
 
         _this._seekHandler = seekHandler;
         _this._needStash = true;
@@ -7335,7 +7415,7 @@ var MozChunkedLoader = function (_BaseLoader) {
 
 exports.default = MozChunkedLoader;
 
-},{"../utils/exception.js":39,"../utils/logger.js":40,"./loader.js":23}],29:[function(require,module,exports){
+},{"../utils/exception.js":40,"../utils/logger.js":41,"./loader.js":24}],30:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -7348,13 +7428,13 @@ var _get = function get(object, property, receiver) { if (object === null) objec
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _logger = require('../utils/logger.js');
+var _logger = _dereq_('../utils/logger.js');
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _loader = require('./loader.js');
+var _loader = _dereq_('./loader.js');
 
-var _exception = require('../utils/exception.js');
+var _exception = _dereq_('../utils/exception.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7418,7 +7498,7 @@ var MSStreamLoader = function (_BaseLoader) {
 
         var _this = _possibleConstructorReturn(this, (MSStreamLoader.__proto__ || Object.getPrototypeOf(MSStreamLoader)).call(this, 'xhr-msstream-loader'));
 
-        _this.TAG = _this.constructor.name;
+        _this.TAG = 'MSStreamLoader';
 
         _this._seekHandler = seekHandler;
         _this._needStash = true;
@@ -7653,7 +7733,7 @@ var MSStreamLoader = function (_BaseLoader) {
 
 exports.default = MSStreamLoader;
 
-},{"../utils/exception.js":39,"../utils/logger.js":40,"./loader.js":23}],30:[function(require,module,exports){
+},{"../utils/exception.js":40,"../utils/logger.js":41,"./loader.js":24}],31:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -7666,17 +7746,17 @@ var _get = function get(object, property, receiver) { if (object === null) objec
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _logger = require('../utils/logger.js');
+var _logger = _dereq_('../utils/logger.js');
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _speedSampler = require('./speed-sampler.js');
+var _speedSampler = _dereq_('./speed-sampler.js');
 
 var _speedSampler2 = _interopRequireDefault(_speedSampler);
 
-var _loader = require('./loader.js');
+var _loader = _dereq_('./loader.js');
 
-var _exception = require('../utils/exception.js');
+var _exception = _dereq_('../utils/exception.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7726,14 +7806,13 @@ var RangeLoader = function (_BaseLoader) {
 
         var _this = _possibleConstructorReturn(this, (RangeLoader.__proto__ || Object.getPrototypeOf(RangeLoader)).call(this, 'xhr-range-loader'));
 
-        _this.TAG = _this.constructor.name;
+        _this.TAG = 'RangeLoader';
 
         _this._seekHandler = seekHandler;
         _this._needStash = false;
 
         _this._chunkSizeKBList = [128, 256, 384, 512, 768, 1024, 1536, 2048, 3072, 4096, 5120, 6144, 7168, 8192];
         _this._currentChunkSizeKB = 384;
-        _this._currentSpeed = 0;
         _this._currentSpeedNormalized = 0;
         _this._zeroSpeedChunkCount = 0;
 
@@ -7954,7 +8033,6 @@ var RangeLoader = function (_BaseLoader) {
             }
 
             if (KBps !== 0) {
-                this._currentSpeed = KBps;
                 var normalized = this._normalizeSpeed(KBps);
                 if (this._currentSpeedNormalized !== normalized) {
                     this._currentSpeedNormalized = normalized;
@@ -8011,7 +8089,7 @@ var RangeLoader = function (_BaseLoader) {
     }, {
         key: 'currentSpeed',
         get: function get() {
-            return this._currentSpeed;
+            return this._speedSampler.lastSecondKBps;
         }
     }]);
 
@@ -8020,7 +8098,7 @@ var RangeLoader = function (_BaseLoader) {
 
 exports.default = RangeLoader;
 
-},{"../utils/exception.js":39,"../utils/logger.js":40,"./loader.js":23,"./speed-sampler.js":26}],31:[function(require,module,exports){
+},{"../utils/exception.js":40,"../utils/logger.js":41,"./loader.js":24,"./speed-sampler.js":27}],32:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -8047,43 +8125,43 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * limitations under the License.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
-var _events = require('events');
+var _events = _dereq_('events');
 
 var _events2 = _interopRequireDefault(_events);
 
-var _logger = require('../utils/logger.js');
+var _logger = _dereq_('../utils/logger.js');
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _browser = require('../utils/browser.js');
+var _browser = _dereq_('../utils/browser.js');
 
 var _browser2 = _interopRequireDefault(_browser);
 
-var _playerEvents = require('./player-events.js');
+var _playerEvents = _dereq_('./player-events.js');
 
 var _playerEvents2 = _interopRequireDefault(_playerEvents);
 
-var _transmuxer = require('../core/transmuxer.js');
+var _transmuxer = _dereq_('../core/transmuxer.js');
 
 var _transmuxer2 = _interopRequireDefault(_transmuxer);
 
-var _transmuxingEvents = require('../core/transmuxing-events.js');
+var _transmuxingEvents = _dereq_('../core/transmuxing-events.js');
 
 var _transmuxingEvents2 = _interopRequireDefault(_transmuxingEvents);
 
-var _mseController = require('../core/mse-controller.js');
+var _mseController = _dereq_('../core/mse-controller.js');
 
 var _mseController2 = _interopRequireDefault(_mseController);
 
-var _mseEvents = require('../core/mse-events.js');
+var _mseEvents = _dereq_('../core/mse-events.js');
 
 var _mseEvents2 = _interopRequireDefault(_mseEvents);
 
-var _playerErrors = require('./player-errors.js');
+var _playerErrors = _dereq_('./player-errors.js');
 
-var _config = require('../config.js');
+var _config = _dereq_('../config.js');
 
-var _exception = require('../utils/exception.js');
+var _exception = _dereq_('../utils/exception.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -8093,7 +8171,7 @@ var FlvPlayer = function () {
     function FlvPlayer(mediaDataSource, config) {
         _classCallCheck(this, FlvPlayer);
 
-        this.TAG = this.constructor.name;
+        this.TAG = 'FlvPlayer';
         this._type = 'FlvPlayer';
         this._emitter = new _events2.default();
 
@@ -8127,10 +8205,7 @@ var FlvPlayer = function () {
         this._pendingSeekTime = null; // in seconds
         this._requestSetTime = false;
         this._seekpointRecord = null;
-        this._statisticsReporter = null;
         this._progressChecker = null;
-
-        this._hasStatisticsListener = false;
 
         this._mediaDataSource = mediaDataSource;
         this._mediaElement = null;
@@ -8183,14 +8258,10 @@ var FlvPlayer = function () {
                     });
                 }
             } else if (event === _playerEvents2.default.STATISTICS_INFO) {
-                this._hasStatisticsListener = true;
                 if (this._statisticsInfo != null) {
                     Promise.resolve().then(function () {
                         _this._emitter.emit(_playerEvents2.default.STATISTICS_INFO, _this.statisticsInfo);
                     });
-                }
-                if (this._statisticsReporter == null) {
-                    this._statisticsReporter = window.setInterval(this._reportStatisticsInfo.bind(this), this._config.statisticsInfoReportInterval);
                 }
             }
             this._emitter.addListener(event, listener);
@@ -8198,13 +8269,6 @@ var FlvPlayer = function () {
     }, {
         key: 'off',
         value: function off(event, listener) {
-            if (event === _playerEvents2.default.STATISTICS_INFO) {
-                this._hasStatisticsListener = false;
-                if (this._statisticsReporter != null) {
-                    window.clearInterval(this._statisticsReporter);
-                    this._statisticsReporter = null;
-                }
-            }
             this._emitter.removeListener(event, listener);
         }
     }, {
@@ -8297,12 +8361,6 @@ var FlvPlayer = function () {
             this._transmuxer.on(_transmuxingEvents2.default.MEDIA_SEGMENT, function (type, ms) {
                 _this3._msectl.appendMediaSegment(ms);
 
-                if (_this3._hasStatisticsListener && _this3._statisticsReporter == null) {
-                    if (_this3._progressChecker == null) {
-                        _this3._statisticsReporter = window.setInterval(_this3._reportStatisticsInfo.bind(_this3), _this3._config.statisticsInfoReportInterval);
-                    }
-                }
-
                 // lazyLoad check
                 if (_this3._config.lazyLoad && !_this3._config.isLive) {
                     var currentTime = _this3._mediaElement.currentTime;
@@ -8316,10 +8374,6 @@ var FlvPlayer = function () {
             });
             this._transmuxer.on(_transmuxingEvents2.default.LOADING_COMPLETE, function () {
                 _this3._msectl.endOfStream();
-                if (_this3._statisticsReporter != null) {
-                    window.clearInterval(_this3._statisticsReporter);
-                    _this3._statisticsReporter = null;
-                }
                 _this3._emitter.emit(_playerEvents2.default.LOADING_COMPLETE);
             });
             this._transmuxer.on(_transmuxingEvents2.default.RECOVERED_EARLY_EOF, function () {
@@ -8333,10 +8387,11 @@ var FlvPlayer = function () {
             });
             this._transmuxer.on(_transmuxingEvents2.default.MEDIA_INFO, function (mediaInfo) {
                 _this3._mediaInfo = mediaInfo;
-                _this3._emitter.emit(_playerEvents2.default.MEDIA_INFO, mediaInfo);
+                _this3._emitter.emit(_playerEvents2.default.MEDIA_INFO, Object.assign({}, mediaInfo));
             });
             this._transmuxer.on(_transmuxingEvents2.default.STATISTICS_INFO, function (statInfo) {
                 _this3._statisticsInfo = _this3._fillStatisticsInfo(statInfo);
+                _this3._emitter.emit(_playerEvents2.default.STATISTICS_INFO, Object.assign({}, _this3._statisticsInfo));
             });
             this._transmuxer.on(_transmuxingEvents2.default.RECOMMEND_SEEKPOINT, function (milliseconds) {
                 if (_this3._mediaElement && !_this3._config.accurateSeek) {
@@ -8350,10 +8405,6 @@ var FlvPlayer = function () {
     }, {
         key: 'unload',
         value: function unload() {
-            if (this._statisticsReporter != null) {
-                window.clearInterval(this._statisticsReporter);
-                this._statisticsReporter = null;
-            }
             if (this._mediaElement) {
                 this._mediaElement.pause();
             }
@@ -8381,6 +8432,10 @@ var FlvPlayer = function () {
         value: function _fillStatisticsInfo(statInfo) {
             statInfo.playerType = this._type;
 
+            if (!(this._mediaElement instanceof HTMLVideoElement)) {
+                return statInfo;
+            }
+
             var hasQualityInfo = true;
             var decoded = 0;
             var dropped = 0;
@@ -8402,13 +8457,6 @@ var FlvPlayer = function () {
             }
 
             return statInfo;
-        }
-    }, {
-        key: '_reportStatisticsInfo',
-        value: function _reportStatisticsInfo() {
-            if (this._statisticsInfo != null) {
-                this._emitter.emit(_playerEvents2.default.STATISTICS_INFO, this.statisticsInfo);
-            }
         }
     }, {
         key: '_onmseUpdateEnd',
@@ -8450,11 +8498,6 @@ var FlvPlayer = function () {
         value: function _suspendTransmuxer() {
             if (this._transmuxer) {
                 this._transmuxer.pause();
-
-                if (this._statisticsReporter != null) {
-                    window.clearInterval(this._statisticsReporter);
-                    this._statisticsReporter = null;
-                }
 
                 if (this._progressChecker == null) {
                     this._progressChecker = window.setInterval(this._checkProgressAndResume.bind(this), 1000);
@@ -8735,7 +8778,7 @@ var FlvPlayer = function () {
 
 exports.default = FlvPlayer;
 
-},{"../config.js":5,"../core/mse-controller.js":9,"../core/mse-events.js":10,"../core/transmuxer.js":11,"../core/transmuxing-events.js":13,"../utils/browser.js":38,"../utils/exception.js":39,"../utils/logger.js":40,"./player-errors.js":33,"./player-events.js":34,"events":2}],32:[function(require,module,exports){
+},{"../config.js":5,"../core/mse-controller.js":9,"../core/mse-events.js":10,"../core/transmuxer.js":11,"../core/transmuxing-events.js":13,"../utils/browser.js":39,"../utils/exception.js":40,"../utils/logger.js":41,"./player-errors.js":34,"./player-events.js":35,"events":2}],33:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -8762,17 +8805,17 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * limitations under the License.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
-var _events = require('events');
+var _events = _dereq_('events');
 
 var _events2 = _interopRequireDefault(_events);
 
-var _playerEvents = require('./player-events.js');
+var _playerEvents = _dereq_('./player-events.js');
 
 var _playerEvents2 = _interopRequireDefault(_playerEvents);
 
-var _config = require('../config.js');
+var _config = _dereq_('../config.js');
 
-var _exception = require('../utils/exception.js');
+var _exception = _dereq_('../utils/exception.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -8783,7 +8826,7 @@ var NativePlayer = function () {
     function NativePlayer(mediaDataSource, config) {
         _classCallCheck(this, NativePlayer);
 
-        this.TAG = this.constructor.name;
+        this.TAG = 'NativePlayer';
         this._type = 'NativePlayer';
         this._emitter = new _events2.default();
 
@@ -8979,13 +9022,16 @@ var NativePlayer = function () {
     }, {
         key: 'mediaInfo',
         get: function get() {
+            var mediaPrefix = this._mediaElement instanceof HTMLAudioElement ? 'audio/' : 'video/';
             var info = {
-                mimeType: 'video/' + this._mediaDataSource.type
+                mimeType: mediaPrefix + this._mediaDataSource.type
             };
             if (this._mediaElement) {
                 info.duration = Math.floor(this._mediaElement.duration * 1000);
-                info.width = this._mediaElement.videoWidth;
-                info.height = this._mediaElement.videoHeight;
+                if (this._mediaElement instanceof HTMLVideoElement) {
+                    info.width = this._mediaElement.videoWidth;
+                    info.height = this._mediaElement.videoHeight;
+                }
             }
             return info;
         }
@@ -8996,6 +9042,10 @@ var NativePlayer = function () {
                 playerType: this._type,
                 url: this._mediaDataSource.url
             };
+
+            if (!(this._mediaElement instanceof HTMLVideoElement)) {
+                return info;
+            }
 
             var hasQualityInfo = true;
             var decoded = 0;
@@ -9026,7 +9076,7 @@ var NativePlayer = function () {
 
 exports.default = NativePlayer;
 
-},{"../config.js":5,"../utils/exception.js":39,"./player-events.js":34,"events":2}],33:[function(require,module,exports){
+},{"../config.js":5,"../utils/exception.js":40,"./player-events.js":35,"events":2}],34:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -9034,9 +9084,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.ErrorDetails = exports.ErrorTypes = undefined;
 
-var _loader = require('../io/loader.js');
+var _loader = _dereq_('../io/loader.js');
 
-var _demuxErrors = require('../demux/demux-errors.js');
+var _demuxErrors = _dereq_('../demux/demux-errors.js');
 
 var _demuxErrors2 = _interopRequireDefault(_demuxErrors);
 
@@ -9079,7 +9129,7 @@ var ErrorDetails = exports.ErrorDetails = {
     MEDIA_CODEC_UNSUPPORTED: _demuxErrors2.default.CODEC_UNSUPPORTED
 };
 
-},{"../demux/demux-errors.js":16,"../io/loader.js":23}],34:[function(require,module,exports){
+},{"../demux/demux-errors.js":16,"../io/loader.js":24}],35:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -9113,7 +9163,7 @@ var PlayerEvents = {
 
 exports.default = PlayerEvents;
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -9173,7 +9223,7 @@ var AAC = function () {
 
 exports.default = AAC;
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -9675,7 +9725,7 @@ MP4.init();
 
 exports.default = MP4;
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -9700,25 +9750,25 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * limitations under the License.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
-var _logger = require('../utils/logger.js');
+var _logger = _dereq_('../utils/logger.js');
 
 var _logger2 = _interopRequireDefault(_logger);
 
-var _mp4Generator = require('./mp4-generator.js');
+var _mp4Generator = _dereq_('./mp4-generator.js');
 
 var _mp4Generator2 = _interopRequireDefault(_mp4Generator);
 
-var _aacSilent = require('./aac-silent.js');
+var _aacSilent = _dereq_('./aac-silent.js');
 
 var _aacSilent2 = _interopRequireDefault(_aacSilent);
 
-var _browser = require('../utils/browser.js');
+var _browser = _dereq_('../utils/browser.js');
 
 var _browser2 = _interopRequireDefault(_browser);
 
-var _mediaSegmentInfo = require('../core/media-segment-info.js');
+var _mediaSegmentInfo = _dereq_('../core/media-segment-info.js');
 
-var _exception = require('../utils/exception.js');
+var _exception = _dereq_('../utils/exception.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -9729,7 +9779,7 @@ var MP4Remuxer = function () {
     function MP4Remuxer(config) {
         _classCallCheck(this, MP4Remuxer);
 
-        this.TAG = this.constructor.name;
+        this.TAG = 'MP4Remuxer';
 
         this._config = config;
         this._isLive = config.isLive === true ? true : false;
@@ -10250,7 +10300,7 @@ var MP4Remuxer = function () {
 
 exports.default = MP4Remuxer;
 
-},{"../core/media-segment-info.js":8,"../utils/browser.js":38,"../utils/exception.js":39,"../utils/logger.js":40,"./aac-silent.js":35,"./mp4-generator.js":36}],38:[function(require,module,exports){
+},{"../core/media-segment-info.js":8,"../utils/browser.js":39,"../utils/exception.js":40,"../utils/logger.js":41,"./aac-silent.js":36,"./mp4-generator.js":37}],39:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -10364,7 +10414,7 @@ detect();
 
 exports.default = Browser;
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -10481,7 +10531,7 @@ var NotImplementedException = exports.NotImplementedException = function (_Runti
     return NotImplementedException;
 }(RuntimeException);
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -10611,7 +10661,7 @@ Log.ENABLE_VERBOSE = true;
 
 exports.default = Log;
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -10636,11 +10686,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       * limitations under the License.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       */
 
-var _events = require('events');
+var _events = _dereq_('events');
 
 var _events2 = _interopRequireDefault(_events);
 
-var _logger = require('./logger.js');
+var _logger = _dereq_('./logger.js');
 
 var _logger2 = _interopRequireDefault(_logger);
 
@@ -10782,7 +10832,7 @@ LoggingControl.emitter = new _events2.default();
 
 exports.default = LoggingControl;
 
-},{"./logger.js":40,"events":2}],42:[function(require,module,exports){
+},{"./logger.js":41,"events":2}],43:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -10847,8 +10897,7 @@ var Polyfill = function () {
 
             // ES6 Promise (missing support in IE11)
             if (typeof self.Promise !== 'function') {
-                // polyfill() will be called internally during module load
-                require('es6-promise');
+                _dereq_('es6-promise').polyfill();
             }
         }
     }]);
@@ -10860,7 +10909,7 @@ Polyfill.install();
 
 exports.default = Polyfill;
 
-},{"es6-promise":1}],43:[function(require,module,exports){
+},{"es6-promise":1}],44:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -10949,7 +10998,8 @@ function decodeUTF8(uint8array) {
 
 exports.default = decodeUTF8;
 
-},{}]},{},[20])
+},{}]},{},[21])(21)
+});
 
 
 //# sourceMappingURL=flv.js.map
