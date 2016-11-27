@@ -336,6 +336,7 @@
 		});
 	}
 	exports.playUrl = playUrl;
+	exports.end = mediaSource.end;
 	let cmd = {};
 	
 	cmd.youku = youku;
@@ -982,11 +983,11 @@
 						if (!xhr.response) return xhr.onerror();
 						if (xhr.response.byteLength < end - start && i+1 <= ranges.length) xhr.onerror();
 						let segbuf;
+						let cputimeStart = performance.now();
 						try{segbuf = new Uint8Array(xhr.response);} catch(e){console.warn(e);return xhr.onerror();}
 						if (!segbuf) return xhr.onerror();
-						let cputimeStart = new Date().getTime();
 						let buf = this.transcodeMediaSegments(segbuf, range);
-						let cputimeEnd = new Date().getTime();
+						let cputimeEnd = performance.now();
 						dbp('transcode:', `[${range.indexStart},${range.indexEnd}]`, 'cputime(ms):', (cputimeEnd-cputimeStart), 
 								'segbuf(MB)', segbuf.byteLength/1e6,
 								'videotime(s)', range.duration
@@ -1334,10 +1335,18 @@
 			streams.probeFirst().then(() => {
 				sourceBuffer.appendBuffer(streams.getInitSegment());
 			});
+			let end = () => {
+				if (sourceBuffer.updating) sourceBuffer.abort();
+				sourceBuffer.remove(0, video.duration);
+			};
 	
 			video.addEventListener('loadedmetadata', () => {
 				tryPrefetch(5.0);
 				interval = setInterval(() => {
+					if (!document.contains(video)){
+						clearInterval(interval);
+						return end();
+					};
 					tryPrefetch();
 				}, 1000);
 			});
