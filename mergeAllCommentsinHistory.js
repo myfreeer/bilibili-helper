@@ -22,7 +22,7 @@ let parseXmlSafe = text => {
  */
 /* Batch Download (in pages like http://api.bilibili.com/view?type=json&batch=true&id=371561&page=1&appkey=)
    var q=JSON.parse(document.body.innerText);
-   q.list.map((e,index)=>setTimeout(()=>mergeAllCommentsinHistory(e.cid,index + '、' + e.part),index*5000));
+   q.list.map((e,index)=>setTimeout(()=>mergeAllCommentsinHistory(e.cid,(index + 1) + '、' + e.part),index*5000));
  */
 function mergeAllCommentsinHistory(cid, filename, nodownload) {
     if (!cid) return false;
