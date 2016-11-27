@@ -11,20 +11,22 @@ let parseXmlSafe = text => {
         return activeXObject;
     } else throw new Error("parseXmlSafe: XML Parser Not Found.");
 };
-var commentsAll = [];
-var xmltext;
 
 //get error of cors
-function mergeAllCommentsinHistory(cid) {
+function mergeAllCommentsinHistory(cid, filename) {
     if (!cid) return false;
     var startTime = performance.now();
+    var xmltext;
+    var commentsAll = [];
     var rolldate = "http://comment.bilibili.com/rolldate," + cid;
     var dmroll = ['http://comment.bilibili.com/' + cid + '.xml'];
     var count = 0;
+    if (filename && !filename.match(/\.xml$/)) filename += '.xml';
+    if (!filename) filename = cid + "_full.xml";
     let checkCount = (count, array) => {
         if (count < array.length) return;
         commentsAll = [...new Set(commentsAll)];
-        xmltext = decodeURIComponent("%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E<i><chatserver>chat.bilibili.com</chatserver><chatid>") + cid + "</chatid><mission>0</mission><maxlimit>" + commentsAll.length + "</maxlimit>" + "\n" + commentsAll.join('\n') + "\n</i>";
+        xmltext = decodeURIComponent("%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E<i><chatserver>chat.bilibili.com</chatserver><chatid>") + cid + "</chatid><mission>0</mission><maxlimit>" + commentsAll.length + "</maxlimit>\n" + commentsAll.join('\n') + "\n</i>";
         let blob = new Blob([xmltext], {
             type: "application/octet-stream"
         });
@@ -33,14 +35,14 @@ function mergeAllCommentsinHistory(cid) {
         a.href = objectURL;
         a.style.display = "none";
         document.body.appendChild(a);
-        a.download = cid + "_full.xml";
+        a.download = filename;
         console.log("mergeAllCommentsinHistory: took " + (performance.now() - startTime) + " milliseconds.");
         try {
             a.click();
             setTimeout(() =>a.parentNode.removeChild(a), 1000);
         } catch (e) {
             a.parentNode.removeChild(a);
-            window.navigator.msSaveOrOpenBlob(blob, cid + "_full.xml");
+            window.navigator.msSaveOrOpenBlob(blob, filename);
         }
     };
     fetch(rolldate).then(res => res.json().then(json => {
