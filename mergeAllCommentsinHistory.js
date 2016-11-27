@@ -1,9 +1,11 @@
-var parseXmlSafe = function parseXmlSafe(text) {
+//function parseXmlSafe by myfreeer
+//https://gist.github.com/myfreeer/ad95050ab5fc22c466fcc65c6e95444e
+let parseXmlSafe = text => {
     "use strict";
     text = text.replace(/[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]/g, "");
-    if (window.DOMParser) return new window.DOMParser().parseFromString(text, "text/xml");
+    if (window.DOMParser) return (new window.DOMParser()).parseFromString(text, "text/xml");
     else if (ActiveXObject) {
-        var activeXObject = new ActiveXObject("Microsoft.XMLDOM");
+        let activeXObject = new ActiveXObject("Microsoft.XMLDOM");
         activeXObject.async = false;
         activeXObject.loadXML(text);
         return activeXObject;
@@ -11,7 +13,6 @@ var parseXmlSafe = function parseXmlSafe(text) {
 };
 var commentsAll = [];
 var xmltext;
-var count = 0;
 
 //get error of cors
 function mergeAllCommentsinHistory(cid) {
@@ -19,8 +20,10 @@ function mergeAllCommentsinHistory(cid) {
     var startTime = performance.now();
     var rolldate = "http://comment.bilibili.com/rolldate," + cid;
     var dmroll = ['http://comment.bilibili.com/' + cid + '.xml'];
+    var count = 0;
     let checkCount = (count, array) => {
         if (count < array.length) return;
+        commentsAll = [...new Set(commentsAll)];
         xmltext = decodeURIComponent("%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E<i><chatserver>chat.bilibili.com</chatserver><chatid>") + cid + "</chatid><mission>0</mission><maxlimit>" + commentsAll.length + "</maxlimit>" + "\n" + commentsAll.join('\n') + "\n</i>";
         let blob = new Blob([xmltext], {
             type: "application/octet-stream"
@@ -34,9 +37,7 @@ function mergeAllCommentsinHistory(cid) {
         console.log("mergeAllCommentsinHistory: took " + (performance.now() - startTime) + " milliseconds.");
         try {
             a.click();
-            setTimeout(function() {
-                a.parentNode.removeChild(a);
-            }, 1000);
+            setTimeout(() =>a.parentNode.removeChild(a), 1000);
         } catch (e) {
             a.parentNode.removeChild(a);
             window.navigator.msSaveOrOpenBlob(blob, cid + "_full.xml");
@@ -45,12 +46,11 @@ function mergeAllCommentsinHistory(cid) {
     fetch(rolldate).then(res => res.json().then(json => {
         for (let i in json)
             if (json[i].timestamp) dmroll.push('http://comment.bilibili.com/dmroll,' + json[i].timestamp + ',' + cid);
-            //count=dmroll.length;
         dmroll.map(url => fetch(url).then(res => res.text()).then(res => {
             let response = parseXmlSafe(res);
             let comments = response.getElementsByTagName('d');
             let array = x => Array.prototype.slice.call(x);
-            array(comments).map(e => (e.outerHTML && commentsAll.indexOf(e.outerHTML) < 0) ? commentsAll.push(e.outerHTML) : null);
+            commentsAll = commentsAll.concat(array(comments).map(e => e.outerHTML));
             checkCount(++count, dmroll);
         }).catch(e => checkCount(++count, dmroll)));
     }));
