@@ -40,15 +40,11 @@ function mergeAllCommentsinHistory(cid) {
             window.navigator.msSaveOrOpenBlob(blob, cid + "_full.xml");
         }
     };
-    fetch(rolldate, {
-        mode: 'no-cors'
-    }).then(res => res.json().then(json => {
+    fetch(rolldate).then(res => res.json().then(json => {
         for (let i in json)
             if (json[i].timestamp) dmroll.push('http://comment.bilibili.com/dmroll,' + json[i].timestamp + ',' + cid);
             //count=dmroll.length;
-        dmroll.map(url => fetch(url, {
-            mode: 'no-cors'
-        }).then(res => res.text()).then(res => {
+        dmroll.map(url => fetch(url).then(res => res.text()).then(res => {
             let response = parseXmlSafe(res);
             let comments = response.getElementsByTagName('d');
             let array = x => Array.prototype.slice.call(x);
