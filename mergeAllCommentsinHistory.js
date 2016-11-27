@@ -13,7 +13,14 @@ let parseXmlSafe = text => {
 };
 
 //get error of cors
-function mergeAllCommentsinHistory(cid, filename) {
+/* Usage:
+ * mergeAllCommentsinHistory(cid) to download all comments in history as cid + "_full.xml"
+ * mergeAllCommentsinHistory(cid, filename) to download all comments in history as filename
+ * mergeAllCommentsinHistory(cid, filename, true) to merge but not download
+ * Example :mergeAllCommentsinHistory(1725101,null,1).then(array=>array.map(data=>data.then(text=>text?callback(text):null)))
+ * Use your callback function as callback
+ */
+function mergeAllCommentsinHistory(cid, filename, nodownload) {
     if (!cid) return false;
     var startTime = performance.now();
     var xmltext;
@@ -27,6 +34,10 @@ function mergeAllCommentsinHistory(cid, filename) {
         if (count < array.length) return;
         commentsAll = [...new Set(commentsAll)];
         xmltext = decodeURIComponent("%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E<i><chatserver>chat.bilibili.com</chatserver><chatid>") + cid + "</chatid><mission>0</mission><maxlimit>" + commentsAll.length + "</maxlimit>\n" + commentsAll.join('\n') + "\n</i>";
+        if (nodownload) {
+            console.log("mergeAllCommentsinHistory: took " + (performance.now() - startTime) + " milliseconds.");
+            return xmltext;
+        }
         let blob = new Blob([xmltext], {
             type: "application/octet-stream"
         });
@@ -39,21 +50,22 @@ function mergeAllCommentsinHistory(cid, filename) {
         console.log("mergeAllCommentsinHistory: took " + (performance.now() - startTime) + " milliseconds.");
         try {
             a.click();
-            setTimeout(() =>a.parentNode.removeChild(a), 1000);
+            setTimeout(() => a.parentNode.removeChild(a), 1000);
         } catch (e) {
             a.parentNode.removeChild(a);
             window.navigator.msSaveOrOpenBlob(blob, filename);
         }
+        return xmltext;
     };
-    fetch(rolldate).then(res => res.json().then(json => {
+    return fetch(rolldate).then(res => res.json().then(json => {
         for (let i in json)
             if (json[i].timestamp) dmroll.push('http://comment.bilibili.com/dmroll,' + json[i].timestamp + ',' + cid);
-        dmroll.map(url => fetch(url).then(res => res.text()).then(res => {
+        return dmroll.map(url => fetch(url).then(res => res.text()).then(res => {
             let response = parseXmlSafe(res);
             let comments = response.getElementsByTagName('d');
             let array = x => Array.prototype.slice.call(x);
             commentsAll = commentsAll.concat(array(comments).map(e => e.outerHTML));
-            checkCount(++count, dmroll);
+            return checkCount(++count, dmroll);
         }).catch(e => checkCount(++count, dmroll)));
     }));
 }
