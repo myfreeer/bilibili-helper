@@ -20,6 +20,10 @@ let parseXmlSafe = text => {
  * Example :mergeAllCommentsinHistory(1725101,null,1).then(array=>array.map(data=>data.then(text=>text?callback(text):null)))
  * Use your callback function as callback
  */
+/* Batch Download (in pages like http://api.bilibili.com/view?type=json&batch=true&id=371561&page=1&appkey=)
+   var q=JSON.parse(document.body.innerText);
+   q.list.map((e,index)=>setTimeout(()=>mergeAllCommentsinHistory(e.cid,index + '、' + e.part),index*5000));
+ */
 function mergeAllCommentsinHistory(cid, filename, nodownload) {
     if (!cid) return false;
     var startTime = performance.now();
