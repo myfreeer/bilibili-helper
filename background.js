@@ -346,6 +346,29 @@ function checkSecurePlayer() {
     xmlhttp.send();
 }
 
+//rewrite from https://github.com/jonbern/fetch-retry
+let fetchretry = (url, options) => {
+    var retries = (options && options.retries) ? options.retries : 3;
+    var retryDelay = (options && options.retryDelay) ? options.retryDelay : 300;
+    return new Promise((resolve, reject) => {
+        let wrappedFetch = n => fetch(url, options).then(response => resolve(response)).catch(error => n > 0 ? setTimeout(() => wrappedFetch(--n), retryDelay) : reject(error));
+        wrappedFetch(retries);
+    });
+};
+
+function getDownloadLink(request) {
+    var urls = [
+        request.token ? 'https://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5&token=' + request.token : 'https://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5',
+        "https://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + appsec),
+        getOption("dlquality") == 'flv' && use_SECRETKEY_MINILOADER ? "https://interface.bilibili.com/playurl?&cid=" + request.cid + "&from=miniplay&otype=json&player=1&sign=" + md5("cid=" + request.cid + "&from=miniplay&otype=json&player=1" + SECRETKEY_MINILOADER) : "https://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + appsec)
+    ];
+    if (request.cidHack && request.cidHack != locale) {
+        cidHackType[request.cid] = request.cidHack;
+    }
+    if (getOption("dlquality") == 'mp4') urls.pop();
+    return Promise.all(urls.map(url => fetchretry(url).then(response => response.json())));
+}
+
 Live.treasure = {};
 Live.watcherRoom = {};
 Live.tvs = {};
@@ -519,47 +542,19 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             });
             return true;
         case "getDownloadLink":
-            var url = {
-                download: getOption("dlquality") == 'flv' && use_SECRETKEY_MINILOADER ? "https://interface.bilibili.com/playurl?&cid=" + request.cid + "&from=miniplay&otype=json&player=1&sign=" + md5("cid=" + request.cid + "&from=miniplay&otype=json&player=1" + SECRETKEY_MINILOADER) : "https://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + appsec),
-                playback: "https://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + appsec),
-                lowres: request.token ? 'https://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5&token=' + request.token : 'https://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5'
-            };
-            if (request.cidHack && request.cidHack != locale) {
-                cidHackType[request.cid] = request.cidHack;
-            }
-            getFileData(url["download"], function(avDownloadLink) {
-                avDownloadLink = JSON.parse(avDownloadLink);
-                if (getOption("dlquality") == 'mp4') {
-                    if (avDownloadLink)
-                        getFileData(url["lowres"], function(avLowResLink) {
-                            avLowResLink = JSON.parse(avLowResLink);
-                            resolvePlaybackLink(avDownloadLink, function(avRealPlaybackLink) {
-                                sendResponse({
-                                    download: avDownloadLink,
-                                    playback: avRealPlaybackLink,
-                                    lowres: avLowResLink,
-                                    dlquality: getOption("dlquality"),
-                                    rel_search: getOption("rel_search")
-                                });
-                            });
-                        });
-                } else {
-                    getFileData(url["playback"], function(avPlaybackLink) {
-                        avPlaybackLink = JSON.parse(avPlaybackLink);
-                        getFileData(url["lowres"], function(avLowResLink) {
-                            avLowResLink = JSON.parse(avLowResLink);
-                            resolvePlaybackLink(avPlaybackLink, function(avRealPlaybackLink) {
-                                sendResponse({
-                                    download: avDownloadLink,
-                                    playback: avRealPlaybackLink,
-                                    lowres: avLowResLink,
-                                    dlquality: getOption("dlquality"),
-                                    rel_search: getOption("rel_search")
-                                });
-                            });
-                        });
+            getDownloadLink(request).then(array => {
+                var avLowResLink = array[0],
+                    avPlaybackLink = array[1];
+                var avDownloadLink = (getOption("dlquality") == 'mp4') ? avPlaybackLink : array[2];
+                resolvePlaybackLink(avPlaybackLink, function(avRealPlaybackLink) {
+                    sendResponse({
+                        download: avDownloadLink,
+                        playback: avRealPlaybackLink,
+                        lowres: avLowResLink,
+                        dlquality: getOption("dlquality"),
+                        rel_search: getOption("rel_search")
                     });
-                }
+                });
             });
             return true;
         case "getMyInfo":
