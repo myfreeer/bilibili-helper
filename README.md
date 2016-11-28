@@ -1,12 +1,11 @@
 # bilibili-helper
 
-An auxiliary extension for Bilibili (bilibili.com) which allows users to bypass playback restrictions, replace video players and use shortcuts.
+An auxiliary extension for Bilibili (bilibili.com) which allows users to bypass playback restrictions, replace video players and use shortcuts. Specially optimised for foreign (outside mainland) users.
 
 哔哩哔哩 (bilibili.com) 辅助工具，可以替换播放器、去广告、推送通知并进行一些快捷操作。
 
 ## Release (发行)
-[![Latest Release](https://img.shields.io/github/release/myfreeer/bilibili-helper.svg)](https://github.com/myfreeer/bilibili-helper/releases/latest)
-[![Download](https://img.shields.io/github/downloads/myfreeer/bilibili-helper/total.svg)](https://github.com/myfreeer/bilibili-helper/releases)
+No release for the foreign branch. You should [download](https://github.com/myfreeer/bilibili-helper/archive/foreign.zip) the branch and [load unpacked extension](https://developer.chrome.com/extensions/getstarted#unpacked)
 
 ## License (许可)
 [![GitHub license](https://img.shields.io/github/license/myfreeer/bilibili-helper.svg)](LICENSE) 
