@@ -12,12 +12,22 @@ let parseXmlSafe = text => {
     } else throw new Error("parseXmlSafe: XML Parser Not Found.");
 };
 
+//rewrite from https://githuab.com/jonbern/fetch-retry
+let fetchretry = (url, options) => {
+    var retries = (options && options.retries) ? options.retries : 3;
+    var retryDelay = (options && options.retryDelay) ? options.retryDelay : 500;
+    return new Promise((resolve, reject) => {
+        let wrappedFetch = n => fetch(url, options).then(response => resolve(response)).catch(error => n > 0 ? setTimeout(() => wrappedFetch(--n), retryDelay) : reject(error));
+        wrappedFetch(retries);
+    });
+};
+
 //get error of cors
 /* Usage:
  * mergeAllCommentsinHistory(cid) to download all comments in history as cid + "_full.xml"
  * mergeAllCommentsinHistory(cid, filename) to download all comments in history as filename
  * mergeAllCommentsinHistory(cid, filename, true) to merge but not download
- * Example :mergeAllCommentsinHistory(1725101,null,1).then(array=>array.map(data=>data.then(text=>text?callback(text):null)))
+ * Example :mergeAllCommentsinHistory(1725101,null,1).then(res=>console.log(res))
  * Use your callback function as callback
  */
 /* Batch Download (in pages like http://api.bilibili.com/view?type=json&batch=true&id=371561&page=1&appkey=)
@@ -61,15 +71,15 @@ function mergeAllCommentsinHistory(cid, filename, nodownload) {
         }
         return xmltext;
     };
-    return fetch(rolldate).then(res => res.json().then(json => {
+    return fetchretry(rolldate).then(res => res.json().then(json => {
         for (let i in json)
             if (json[i].timestamp) dmroll.push('http://comment.bilibili.com/dmroll,' + json[i].timestamp + ',' + cid);
-        return dmroll.map(url => fetch(url).then(res => res.text()).then(res => {
+        return Promise.all(dmroll.map(url => fetchretry(url).then(res => res.text()).then(res => {
             let response = parseXmlSafe(res);
             let comments = response.getElementsByTagName('d');
             let array = x => Array.prototype.slice.call(x);
             commentsAll = commentsAll.concat(array(comments).map(e => e.outerHTML));
             return checkCount(++count, dmroll);
-        }).catch(e => checkCount(++count, dmroll)));
+        }).catch(e => checkCount(++count, dmroll))));
     }));
 }
