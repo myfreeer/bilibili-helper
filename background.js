@@ -358,7 +358,7 @@ let fetchretry = (url, options) => {
 
 function getDownloadLink(request) {
     var urls = [
-        request.token ? 'https://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5&token=' + request.token : 'https://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5',
+        request.token ? 'https://api.bilibili.com/playurl?aid=' + request.avid + '&page=' + request.pg + '&platform=html5&vtype=mp4&token=' + request.token : 'https://api.bilibili.com/playurl?aid=' + request.avid + '&page=' + request.pg + '&platform=html5&vtype=mp4',
         "https://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + appsec),
         getOption("dlquality") == 'flv' && use_SECRETKEY_MINILOADER ? "https://interface.bilibili.com/playurl?&cid=" + request.cid + "&from=miniplay&otype=json&player=1&sign=" + md5("cid=" + request.cid + "&from=miniplay&otype=json&player=1" + SECRETKEY_MINILOADER) : "https://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + appsec)
     ];
@@ -366,7 +366,7 @@ function getDownloadLink(request) {
         cidHackType[request.cid] = request.cidHack;
     }
     if (getOption("dlquality") == 'mp4') urls.pop();
-    return Promise.all(urls.map(url => fetchretry(url).then(response => response.json())));
+    return Promise.all(urls.map(url => fetchretry(url, {credentials: 'include'}).then(response => response.json())));
 }
 
 Live.treasure = {};
