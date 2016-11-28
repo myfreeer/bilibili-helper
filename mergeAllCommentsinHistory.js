@@ -12,7 +12,7 @@ let parseXmlSafe = text => {
     } else throw new Error("parseXmlSafe: XML Parser Not Found.");
 };
 
-//rewrite from https://githuab.com/jonbern/fetch-retry
+//rewrite from https://github.com/jonbern/fetch-retry
 let fetchretry = (url, options) => {
     var retries = (options && options.retries) ? options.retries : 3;
     var retryDelay = (options && options.retryDelay) ? options.retryDelay : 500;
