@@ -72,13 +72,6 @@ URL.prototype.__defineGetter__('query', function() {
     return parsedObj;
 });
 
-var randomIP = function(fakeip) {
-    var ip_addr = '220.181.111.';
-    if (fakeip == 2) ip_addr = '59.152.193.';
-    ip_addr += Math.floor(Math.random() * 254 + 1);
-    return ip_addr;
-};
-
 function getFileData(url, callback, method) {
     var m = 'GET';
     var retry = 0;
@@ -101,44 +94,6 @@ function getFileData(url, callback, method) {
     xmlhttp.ontimeout = xmlhttp.onerror;
     xmlhttp.timeout = 3000;
     xmlhttp.send();
-}
-
-// http://stackoverflow.com/questions/6832596/how-to-compare-software-version-number-using-js-only-number/6832706#6832706
-
-function compareVersion(a, b) {
-    if (a === b) {
-        return 0;
-    }
-
-    var a_components = a.split(".");
-    var b_components = b.split(".");
-
-    var len = Math.min(a_components.length, b_components.length);
-
-    // loop while the components are equal
-    for (var i = 0; i < len; i++) {
-        // A bigger than B
-        if (parseInt(a_components[i]) > parseInt(b_components[i])) {
-            return 1;
-        }
-
-        // B bigger than A
-        if (parseInt(a_components[i]) < parseInt(b_components[i])) {
-            return -1;
-        }
-    }
-
-    // If one's a prefix of the other, the longer one is greater.
-    if (a_components.length > b_components.length) {
-        return 1;
-    }
-
-    if (a_components.length < b_components.length) {
-        return -1;
-    }
-
-    // Otherwise they are the same.
-    return 0;
 }
 
 function postFileData(url, data, callback) {
@@ -605,39 +560,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             else sendResponse({
                 result: "disabled"
             });
-            return true;/*
-        case "playHdFlv":
-            chrome.tabs.executeScript(sender.tab.id, {
-                file: "bundle.js"
-            });
-            return true;*/
-/*        case "getLowResVideo":
-            //fetch('http://api.bilibili.com/playurl?&aid='+request.avid+'&page='+request.pg+'&platform=html5').then;
-            try {
-                getFileData('http://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5', function(avDownloadLink) {
-                    avDownloadLink = JSON.parse(avDownloadLink);
-                    if (avDownloadLink.durl[0].url.match('mp4')) {
-                        var cid = avDownloadLink.cid.match(/\/[0-9]+\.xml/)[0];
-                        cid = cid.substring(1, cid.length - 4);
-                        sendResponse({
-                            link: avDownloadLink.durl[0].url,
-                            cid: cid,
-                            img: avDownloadLink.img,
-                            comment: avDownloadLink.cid,
-                            length: avDownloadLink.durl[0].length,
-                            size: avDownloadLink.durl[0].size,
-                            src: avDownloadLink
-                        });
-                    };
-                });
-            } catch (e) {
-                sendResponse({
-                    fails: 1,
-                    msg: e
-                });
-                console.error(e);
-            };
-            return true;*/
+            return true;
         case "getVideoInfo":
             getVideoInfo(request.avid, request.pg, request.isBangumi, function(avInfo) {
                 sendResponse({
