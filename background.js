@@ -358,14 +358,14 @@ let fetchretry = (url, options) => {
 
 function getDownloadLink(request) {
     var urls = [
-        request.token ? 'https://api.bilibili.com/playurl?aid=' + request.avid + '&page=' + request.pg + '&platform=html5&vtype=mp4&token=' + request.token : 'https://api.bilibili.com/playurl?aid=' + request.avid + '&page=' + request.pg + '&platform=html5&vtype=mp4',
-        "https://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + appsec),
+        'https://api.prprpr.me/dplayer/video/bilibili?cid=' + request.cid,
+        'http://www.kanbilibili.com/api/video/' + request.avid + '/download?cid=' + request.cid,
         getOption("dlquality") == 'flv' && use_SECRETKEY_MINILOADER ? "https://interface.bilibili.com/playurl?&cid=" + request.cid + "&from=miniplay&otype=json&player=1&sign=" + md5("cid=" + request.cid + "&from=miniplay&otype=json&player=1" + SECRETKEY_MINILOADER) : "https://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + appsec)
     ];
     if (request.cidHack && request.cidHack != locale) {
         cidHackType[request.cid] = request.cidHack;
     }
-    if (getOption("dlquality") == 'mp4') urls.pop();
+    urls.pop();
     return Promise.all(urls.map(url => fetchretry(url, {credentials: 'include'}).then(response => response.json())));
 }
 
@@ -544,8 +544,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         case "getDownloadLink":
             getDownloadLink(request).then(array => {
                 var avLowResLink = array[0],
-                    avPlaybackLink = array[1];
-                var avDownloadLink = (getOption("dlquality") == 'mp4') ? avPlaybackLink : array[2];
+                    avPlaybackLink = array[1].data;
+                var avDownloadLink = avPlaybackLink;
                 resolvePlaybackLink(avPlaybackLink, function(avRealPlaybackLink) {
                     sendResponse({
                         download: avDownloadLink,
