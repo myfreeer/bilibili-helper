@@ -402,7 +402,7 @@
 	let mp4mux = __webpack_require__(/*! ./mp4mux */ 3)
 	let fetch = __webpack_require__(/*! ./http */ 4).fetch;
 	const cacheTimeLength = 360;
-	let xhrTimeout = 1500;
+	let xhrTimeout = 500;
 	const firstxhrTimeout = xhrTimeout;
 	
 	let app = {}
@@ -640,18 +640,16 @@
 					
 					xhr.onerror = () => {
 						xhr.abort();
-						xhrTimeout = firstxhrTimeout + 3500;
+						xhrTimeout = firstxhrTimeout + 2500;
 						xhr.timeout = xhrTimeout;
 						setTimeout(() => request(i), 150);
-						//console.log(xhr);
 					}
 					
 					xhr.ontimeout = xhr.onerror;
 					xhr.timeout = xhrTimeout;
 					xhr.onreadystatechange = () => {
 						//32768 = 256 / 8 * 1024 ,simulating a 256kbps network (hardly to find a network slower than this)
-						if (xhr.readyState == 3) xhr.timeout = xhrTimeout + (end - start) / 32768 + 1000;
-						//size = parseInt(xhr.getResponseHeader('Content-Range').match(/(\d+$)/));
+						if (xhr.readyState == 3) xhr.timeout = xhrTimeout + (end - start) / 32768 + 500;
 						if (xhr.getResponseHeader('Content-Length') > end - start + 1000) xhr.onerror();
 					}
 	
