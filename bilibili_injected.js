@@ -851,6 +851,7 @@
 		    comments = comments ? comments : biliHelper.commentsUrl ? biliHelper.commentsUrl : 'http://comment.bilibili.com/' + biliHelper.cid + '.xml';
 		    fetch(comments).then(res => res.text()).then(res => {
 		        var response = parseXmlSafe(res);
+		        biliHelper.commentsUrl = 'data:application/xml;charset=utf-8,' + res;
 		        var assData;
 		        var assBtn = $('<a class="b-btn w">下载 ASS 格式弹幕</a>').attr('download', biliHelper.downloadFileName.replace('.xml', '.ass')).attr('href', null).click(function(e) {
 		            e.preventDefault();
@@ -1035,7 +1036,8 @@
 						prob.id = "page-prob";
 						prob.innerHTML = "$('.player-wrapper .v-plist').attr('length', window.VideoPart.nodedata.length);$('#page-prob').remove();";
 						setTimeout(function() {
-							document.body.appendChild(prob);
+							var body = document.body || document.getElementsByTagName('body')[0];
+							body.appendChild(prob); 
 							biliHelper.genPage = false;
 							if (!videoInfo.bangumi) {
 								$('.bangumi-content .v_bgm_list').empty();
