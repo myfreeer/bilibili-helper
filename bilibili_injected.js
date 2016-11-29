@@ -10,6 +10,44 @@
 	    ff_status_id = 0,
 	    ff_embed_stack = null,
 	    ff_embed_stack_style = null;
+	let fetchretry = (url, options) => {
+	    var retries = (options && options.retries) ? options.retries : 3;
+	    var retryDelay = (options && options.retryDelay) ? options.retryDelay : 500;
+	    return new Promise((resolve, reject) => {
+	        let wrappedFetch = n => fetch(url, options).then(response => resolve(response)).catch(error => n > 0 ? setTimeout(() => wrappedFetch(--n), retryDelay) : reject(error));
+	        wrappedFetch(retries);
+	    });
+	};
+
+	function mergeAllCommentsinHistory(cid) {
+	    if (!cid) return false;
+	    if (sessionStorage["CommentsinHistory_" + cid]) return new Promise((fulfill, reject) => fulfill([sessionStorage["CommentsinHistory_" + cid]]));
+	    var startTime = performance.now();
+	    var xmltext;
+	    var commentsAll = [];
+	    var rolldate = "http://comment.bilibili.com/rolldate," + cid;
+	    var dmroll = ['http://comment.bilibili.com/' + cid + '.xml'];
+	    var count = 0;
+	    let checkCount = (count, array) => {
+	        if (count < array.length) return;
+	        commentsAll = [...new Set(commentsAll)];
+	        sessionStorage["CommentsinHistory_" + cid] = decodeURIComponent("%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E<i><chatserver>chat.bilibili.com</chatserver><chatid>") + cid + "</chatid><mission>0</mission><maxlimit>" + commentsAll.length + "</maxlimit>\n" + commentsAll.join('\n') + "\n</i>";
+
+	        console.log("mergeAllCommentsinHistory: took " + (performance.now() - startTime) + " milliseconds.");
+	        return sessionStorage["CommentsinHistory_" + cid];
+	    };
+	    return fetchretry(rolldate).then(res => res.json().then(json => {
+	        for (let i in json)
+	            if (json[i].timestamp) dmroll.push('http://comment.bilibili.com/dmroll,' + json[i].timestamp + ',' + cid);
+	        return Promise.all(dmroll.map(url => fetchretry(url).then(res => res.text()).then(res => {
+	            let response = parseXmlSafe(res);
+	            let comments = response.getElementsByTagName('d');
+	            let array = x => Array.prototype.slice.call(x);
+	            commentsAll = commentsAll.concat(array(comments).map(e => e.outerHTML));
+	            return checkCount(++count, dmroll);
+	        }).catch(e => checkCount(++count, dmroll))));
+	    }));
+	}
 
 	var CRC32 = {};
 	(function(CRC32) {
@@ -837,7 +875,7 @@
 
 		biliHelper.loadComments = function(comments) {
 		    comments = comments ? comments : biliHelper.commentsUrl ? biliHelper.commentsUrl : 'http://comment.bilibili.com/' + biliHelper.cid + '.xml';
-		    fetch(comments).then(res => res.text()).then(res => {
+		    mergeAllCommentsinHistory(biliHelper.cid).then(array=>{let t;array.map(text=>text?t=text:null);return t}).then(res => {
 		        var response = parseXmlSafe(res);
 		        biliHelper.commentsUrl = 'data:application/xml;charset=utf-8,' + res;
 		        var assData;
