@@ -1,17 +1,29 @@
 var ABP = {
 	"version": "0.8.0"
 };
-
+var parseXmlSafe = function parseXmlSafe(text) {
+    "use strict";
+    text = text.replace(/[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]/g, "");
+    if (window.DOMParser) return new window.DOMParser().parseFromString(text, "text/xml");
+    else if (ActiveXObject) {
+        var activeXObject = new ActiveXObject("Microsoft.XMLDOM");
+        activeXObject.async = false;
+        activeXObject.loadXML(text);
+        return activeXObject;
+    } else throw new Error("parseXmlSafe: XML Parser Not Found.");
+};
 /***********************
 * XMLParser
 * == Licensed Under the MIT License : /LICENSING
 * Copyright (c) 2012 Jim Chen ( CQZ, Jabbany )
 ************************/
 function CommentLoader(url, xcm, callback) {
+    var cm = xcm;
     if (callback == null)
         callback = function() {
             return;
         };
+    if (url.indexOf('data:application/xml;charset=utf-8,') === 0) return callback(cm.load(BilibiliParser(parseXmlSafe(url.substring(35)))));
     var xmlhttp = null;
     var retry = 0;
     if (window.XMLHttpRequest) {
@@ -27,21 +39,11 @@ function CommentLoader(url, xcm, callback) {
     };
     xmlhttp.ontimeout = xmlhttp.onerror;
     xmlhttp.send();
-    var cm = xcm;
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            if (navigator.appName == 'Microsoft Internet Explorer') {
-                var f = new ActiveXObject("Microsoft.XMLDOM");
-                f.async = false;
-                f.loadXML(xmlhttp.responseText);
-                cm.load(BilibiliParser(f));
-                callback();
-            } else {
-                var standarizedXML = xmlhttp.responseXML == null ? (new window.DOMParser()).parseFromString(xmlhttp.responseText.replace(/[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]/g,""), "text/xml") : xmlhttp.responseXML;
-                cm.load(BilibiliParser(standarizedXML));
-                //console.log(standarizedXML);
-                callback();
-            }
+            var standarizedXML = xmlhttp.responseXML == null ? parseXmlSafe(xmlhttp.responseText) : xmlhttp.responseXML;
+            cm.load(BilibiliParser(standarizedXML));
+            callback();
         }
     }
 }
