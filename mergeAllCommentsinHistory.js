@@ -80,6 +80,6 @@ function mergeAllCommentsinHistory(cid, filename, nodownload) {
             let array = x => Array.prototype.slice.call(x);
             commentsAll = commentsAll.concat(array(comments).map(e => e.outerHTML));
             return checkCount(++count, dmroll);
-        }).catch(e => checkCount(++count, dmroll))));
+        }).catch(e => checkCount(++count, dmroll)))).then(array=>{let t;array.map(text => text ? t = text : null);return t});
     }));
 }
