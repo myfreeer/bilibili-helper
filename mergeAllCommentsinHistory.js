@@ -22,19 +22,42 @@ let fetchretry = (url, options) => {
     });
 };
 
+let downloadStringAsFile = (str, filename) => {
+    if (filename && !filename.match(/\.xml$/)) filename += '.xml';
+    if (!filename) console.warn('downloadStringAsFile: No filename provided.');
+    let blob = new Blob([str], {
+        type: "application/octet-stream"
+    });
+    let objectURL = window.URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = objectURL;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    if (filename) a.download = filename;
+    try {
+        a.click();
+        setTimeout(() => a.parentNode.removeChild(a), 1000);
+    } catch (e) {
+        a.parentNode.removeChild(a);
+        window.navigator.msSaveOrOpenBlob(blob, filename);
+    }
+    return str;
+};
+
 //get error of cors
-/* Usage:
- * mergeAllCommentsinHistory(cid) to download all comments in history as cid + "_full.xml"
- * mergeAllCommentsinHistory(cid, filename) to download all comments in history as filename
- * mergeAllCommentsinHistory(cid, filename, true) to merge but not download
- * Example :mergeAllCommentsinHistory(1725101,null,1).then(res=>console.log(res))
+/* Promise mergeAllCommentsinHistory
+ * Usage:
+ * mergeAllCommentsinHistory(cid).then(str=>downloadStringAsFile(str, cid + "_full.xml")) to download all comments in history as cid + "_full.xml"
+ * mergeAllCommentsinHistory(cid).then(str=>downloadStringAsFile(str, filename)) to download all comments in history as filename
+ * mergeAllCommentsinHistory(cid) to merge but not download
+ * Example :mergeAllCommentsinHistory(1725101).then(res=>console.log(res))
  * Use your callback function as callback
  */
 /* Batch Download (in pages like http://api.bilibili.com/view?type=json&batch=true&id=371561&page=1&appkey=)
    var q=JSON.parse(document.body.innerText);
-   q.list.map((e,index)=>setTimeout(()=>mergeAllCommentsinHistory(e.cid,(index + 1) + '、' + e.part),index*5000));
+   q.list.map((e,index)=>setTimeout(()=>mergeAllCommentsinHistory(e.cid, ,true, (index + 1) + '、' + e.part),index*10000));
  */
-function mergeAllCommentsinHistory(cid, filename, nodownload) {
+function mergeAllCommentsinHistory(cid) {
     if (!cid) return false;
     var startTime = performance.now();
     var xmltext;
@@ -42,33 +65,11 @@ function mergeAllCommentsinHistory(cid, filename, nodownload) {
     var rolldate = "http://comment.bilibili.com/rolldate," + cid;
     var dmroll = ['http://comment.bilibili.com/' + cid + '.xml'];
     var count = 0;
-    if (filename && !filename.match(/\.xml$/)) filename += '.xml';
-    if (!filename) filename = cid + "_full.xml";
     let checkCount = (count, array) => {
         if (count < array.length) return;
         commentsAll = [...new Set(commentsAll)];
         xmltext = decodeURIComponent("%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E<i><chatserver>chat.bilibili.com</chatserver><chatid>") + cid + "</chatid><mission>0</mission><maxlimit>" + commentsAll.length + "</maxlimit>\n" + commentsAll.join('\n') + "\n</i>";
-        if (nodownload) {
-            console.log("mergeAllCommentsinHistory: took " + (performance.now() - startTime) + " milliseconds.");
-            return xmltext;
-        }
-        let blob = new Blob([xmltext], {
-            type: "application/octet-stream"
-        });
-        let objectURL = window.URL.createObjectURL(blob);
-        var a = document.createElement("a");
-        a.href = objectURL;
-        a.style.display = "none";
-        document.body.appendChild(a);
-        a.download = filename;
-        console.log("mergeAllCommentsinHistory: took " + (performance.now() - startTime) + " milliseconds.");
-        try {
-            a.click();
-            setTimeout(() => a.parentNode.removeChild(a), 1000);
-        } catch (e) {
-            a.parentNode.removeChild(a);
-            window.navigator.msSaveOrOpenBlob(blob, filename);
-        }
+        console.log("mergeAllCommentsinHistory: took", (performance.now() - startTime), "milliseconds.");
         return xmltext;
     };
     return fetchretry(rolldate).then(res => res.json().then(json => {
