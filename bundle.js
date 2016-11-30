@@ -402,7 +402,7 @@
 	let mp4mux = __webpack_require__(/*! ./mp4mux */ 3)
 	let fetch = __webpack_require__(/*! ./http */ 4).fetch;
 	const cacheTimeLength = 360;
-	let xhrTimeout = 500;
+	let xhrTimeout = 1500;
 	const firstxhrTimeout = xhrTimeout;
 	
 	let app = {}
@@ -471,7 +471,7 @@
 					}
 				});
 			}
-			return fetch(url, {headers: {Range: 'bytes=0-5000000'}, retries: 128}).then(res => {
+			return fetch(url, {headers: {Range: 'bytes=0-5000000'}, retries: 128, credentials: 'include'}).then(res => {
 				return pump(res.body.getReader())
 			});
 		}
@@ -2423,7 +2423,7 @@
 				return;
 	
 			let ts = Math.ceil(Date.now()/1000)
-			return fetch(`https://interface.bilibili.com/playurl?${interfaceUrl(cid,ts)}&sign=${calcSign(cid,ts)}`)
+			return fetch(`https://interface.bilibili.com/playurl?${interfaceUrl(cid,ts)}&sign=${calcSign(cid,ts)}`, {credentials: 'include', retries: 5})
 			.then(res => res.text()).then(res => {
 				let parser = new DOMParser();
 				let doc = parser.parseFromString(res, 'text/xml');
@@ -2449,7 +2449,7 @@
 			return getVideosByCid(cid)
 		} catch (e) {
 			console.log(e);
-		return fetch(url, {credentials: 'include'}).then(res => res.text()).then(res => {
+		return fetch(url, {credentials: 'include', retries: 5}).then(res => res.text()).then(res => {
 			let cid = res.match(/cid=(\d+)/);
 			if (typeof cid == 'undefined') cid = document.querySelector('#bilibili_helper > div > div.main > div.section.video.hidden > p > span:nth-child(4)').innerText.match(/cid[:= ]*([0-9]+)/) || document.body.innerHTML.match(/cid[:= ]*([0-9]+)/);
 			if (cid)

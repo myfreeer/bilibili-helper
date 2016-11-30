@@ -845,7 +845,8 @@
 		            e.preventDefault();
 		            if (!assData) assData = '\ufeff' + generateASS(setPosition(parseXML('', response)), {
 		                'title': getNiceSectionFilename(biliHelper.avid, biliHelper.page, biliHelper.totalPage, 1, 1),
-		                'ori': location.href
+		                'ori': location.href,
+		                'opacity': biliHelper.playerConfig.opacity
 		            });
 		            var assBlob = new Blob([assData], {
 		                    type: 'application/octet-stream'

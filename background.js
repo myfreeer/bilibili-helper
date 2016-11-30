@@ -348,8 +348,8 @@ function checkSecurePlayer() {
 
 //rewrite from https://github.com/jonbern/fetch-retry
 let fetchretry = (url, options) => {
-    var retries = (options && options.retries) ? options.retries : 3;
-    var retryDelay = (options && options.retryDelay) ? options.retryDelay : 300;
+    var retries = (options && options.retries) ? options.retries : 5;
+    var retryDelay = (options && options.retryDelay) ? options.retryDelay : 500;
     return new Promise((resolve, reject) => {
         let wrappedFetch = n => fetch(url, options).then(response => resolve(response)).catch(error => n > 0 ? setTimeout(() => wrappedFetch(--n), retryDelay) : reject(error));
         wrappedFetch(retries);
@@ -358,7 +358,7 @@ let fetchretry = (url, options) => {
 
 function getDownloadLink(request) {
     var urls = [
-        request.token ? 'https://api.bilibili.com/playurl?aid=' + request.avid + '&page=' + request.pg + '&platform=html5&vtype=mp4&token=' + request.token : 'https://api.bilibili.com/playurl?aid=' + request.avid + '&page=' + request.pg + '&platform=html5&vtype=mp4',
+        request.token ? 'http://api.bilibili.com/playurl?aid=' + request.avid + '&page=' + request.pg + '&platform=html5&vtype=mp4&token=' + request.token : 'http://api.bilibili.com/playurl?aid=' + request.avid + '&page=' + request.pg + '&platform=html5&vtype=mp4',
         "https://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + appsec),
         getOption("dlquality") == 'flv' && use_SECRETKEY_MINILOADER ? "https://interface.bilibili.com/playurl?&cid=" + request.cid + "&from=miniplay&otype=json&player=1&sign=" + md5("cid=" + request.cid + "&from=miniplay&otype=json&player=1" + SECRETKEY_MINILOADER) : "https://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + appsec)
     ];
@@ -792,6 +792,25 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 }, {
     urls: ["http://tajs.qq.com/stats*"]
 }, ["blocking"]);
+
+chrome.webRequest.onBeforeSendHeaders.addListener(function(details) {
+    for (var i in details.requestHeaders)
+        if (details.requestHeaders[i].name.toLowerCase() == "x-requested-with") {
+            details.requestHeaders[i].value = "ShockwaveFlash/23.0.0.162";
+            return {
+                requestHeaders: details.requestHeaders
+            };
+        };
+    details.requestHeaders.push({
+        name: "X-Requested-With",
+        value: "ShockwaveFlash/23.0.0.163"
+    });
+    return {
+        requestHeaders: details.requestHeaders
+    };
+}, {
+    urls: videoPlaybackHosts
+}, ["requestHeaders", "blocking"]);
 
 function receivedHeaderModifier(details) {
     var hasCORS = false;
