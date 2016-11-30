@@ -36,7 +36,6 @@ var CRC32 = {};
     //CRC32.table = T;
     CRC32.bstr = crc32_bstr;
 })(CRC32);
-
 /* Usage: checkCRCHash(String hash)
  * the return value would be mid, or -1 if process fails
  * Speed test:
@@ -44,9 +43,10 @@ var CRC32 = {};
    checkCRCHash('444283f9');//should be 40000000
    console.log("Call to checkCRCHash took " + (performance.now() - t0) + " milliseconds.");
  */
-var checkCRCHash = new (function () {
+var checkCRCHash = new(function () {
     'use strict';
     var startTime = performance.now();
+
     function signed_crc_table() {
         var c = 0,
             table = typeof Int32Array !== 'undefined' ? new Int32Array(256) : new Array(256);
@@ -108,12 +108,19 @@ var checkCRCHash = new (function () {
         };
     var index = new Array(4);
     console.log('初始化耗时：' + (performance.now() - startTime));
-    return function(input) {
+    return function (input) {
         var ht = parseInt(input, 16) ^ 0xffffffff,
             snum,
             i,
             lastindex,
             deepCheckData;
+        var hashint = parseInt(hash, 16);
+        if (!hashint) return false;
+        for (var i = 0; i < 100 + 1; i++) {
+            if ((CRC32.bstr("" + i) >>> 0) === hashint) {
+                return i;
+            }
+        }
         for (i = 3; i >= 0; i--) {
             index[3 - i] = getcrcindex(ht >>> i * 8);
             snum = crctable[index[3 - i]];
