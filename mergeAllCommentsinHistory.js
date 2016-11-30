@@ -48,6 +48,22 @@ let downloadStringAsFile = (str, filename) => {
     return str;
 };
 
+//http://stackoverflow.com/a/9229821/6848772
+function uniq_fast(a) {
+    var seen = {};
+    var out = [];
+    var len = a.length;
+    var j = 0;
+    for(var i = 0; i < len; i++) {
+         var item = a[i];
+         if(seen[item] !== 1) {
+               seen[item] = 1;
+               out[j++] = item;
+         }
+    }
+    return out;
+}
+
 //get error of cors
 /* Promise mergeAllCommentsinHistory
  * Usage:
@@ -71,7 +87,7 @@ function mergeAllCommentsinHistory(cid) {
     var count = 0;
     let checkCount = (count, array) => {
         if (count < array.length) return;
-        commentsAll = [...new Set(commentsAll)];
+        commentsAll = window.Set ? [...new Set(commentsAll)] : uniq_fast(commentsAll);
         xmltext = decodeURIComponent("%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E<i><chatserver>chat.bilibili.com</chatserver><chatid>") + cid + "</chatid><mission>0</mission><maxlimit>" + commentsAll.length + "</maxlimit>\n" + commentsAll.join('\n') + "\n</i>";
         console.log("mergeAllCommentsinHistory: took", (performance.now() - startTime), "milliseconds.");
         return xmltext;
