@@ -33,12 +33,16 @@ let downloadStringAsFile = (str, filename) => {
     a.href = objectURL;
     a.style.display = "none";
     document.body.appendChild(a);
+    let cleanup = (element, url) => {
+        if (element) element.parentNode.removeChild(element);
+        if (url) window.URL.revokeObjectURL(url);
+    };
     if (filename) a.download = filename;
     try {
         a.click();
-        setTimeout(() => a.parentNode.removeChild(a), 1000);
+        setTimeout(() => cleanup(a, blob), 1000);
     } catch (e) {
-        a.parentNode.removeChild(a);
+        cleanup(a, blob);
         window.navigator.msSaveOrOpenBlob(blob, filename);
     }
     return str;
