@@ -75,8 +75,37 @@ function uniq_fast(a) {
  * Use your callback function as callback
  */
 /* Batch Download (in pages like http://api.bilibili.com/view?type=json&batch=true&id=371561&page=1&appkey=)
-   var q=JSON.parse(document.body.innerText);
-   q.list.map((e,index)=>setTimeout(()=>mergeAllCommentsinHistory(e.cid, ,true, (index + 1) + '、' + e.part),index*10000));
+var url = location.href;
+var jsonText = document.body.innerText;
+var json, myPromise;
+if (url.match('api.bilibili.com/view') || url.match('biliplus.com/api/view')) {
+    json = JSON.parse(jsonText);
+    myPromise = e => new Promise((resolve, reject) => {
+        let j = mergeAllCommentsinHistory(e.cid);
+        j.then(str => downloadStringAsFile(str, e.part + '.full.xml')).then(e => resolve());//using resolve(e) here may increase memory cost.
+    });
+} else if (url.match('bilibilijj.com/Api/AvToCid/')) {
+    json = JSON.parse(jsonText);
+    myPromise = e => new Promise((resolve, reject) => {
+        let j = mergeAllCommentsinHistory(e.CID);
+        j.then(str => downloadStringAsFile(str, e.Title + '.full.xml')).then(e => resolve());
+    });
+} else if (url.match('kanbilibili.com/api/video/')) {
+    json = JSON.parse(jsonText).data;
+    myPromise = e => new Promise((resolve, reject) => {
+        let j = mergeAllCommentsinHistory(e.cid);
+        j.then(str => downloadStringAsFile(str, e.part + '.full.xml')).then(e => resolve());
+    });
+}
+let resolvePromiseArrayWait = (array, myPromise, timeout) => {
+    timeout = parseInt(timeout) || 0;
+    return new Promise((resolve, reject) => {
+        let resultArray = [];
+        let myResolver = index => myPromise(array[index]).then(result => resultArray[index] = (result)).then(e => array[++index] ? setTimeout(() => myResolver(index), timeout) : resolve(resultArray));
+        myResolver(0);
+    });
+};
+resolvePromiseArrayWait(json.list, myPromise, 1000);
  */
 function mergeAllCommentsinHistory(cid) {
     if (!cid) return false;
