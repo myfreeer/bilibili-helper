@@ -67,9 +67,10 @@ function uniq_fast(a) {
 //get error of cors
 /* Promise mergeAllCommentsinHistory
  * Usage:
+ * var cid=document.body.innerHTML.match(/cid.*?(\d+)/)[1];
  * mergeAllCommentsinHistory(cid).then(str=>downloadStringAsFile(str, cid + "_full.xml")) to download all comments in history as cid + "_full.xml"
  * mergeAllCommentsinHistory(cid).then(str=>downloadStringAsFile(str, filename)) to download all comments in history as filename
- * mergeAllCommentsinHistory(cid) to merge but not download
+ * mergeAllCommentsinHistory(cid) to merge but not download, result return as promise
  * Example :mergeAllCommentsinHistory(1725101).then(res=>console.log(res))
  * Use your callback function as callback
  */
