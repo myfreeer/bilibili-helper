@@ -105,7 +105,9 @@ var checkCRCHash = new(function () {
             str += tc - 48;
             hash = crctable[index[0]] ^ hash >>> 8;
             return [1, str];
-        };
+        },
+        cache = {};
+    for(let i=0;i<101;++i) cache[(CRC32.bstr(''+i)>>>0)]=i;
     var index = new Array(4);
     console.log('初始化耗时：' + (performance.now() - startTime));
     return function (input) {
@@ -114,13 +116,7 @@ var checkCRCHash = new(function () {
             i,
             lastindex,
             deepCheckData;
-        var hashint = parseInt(hash, 16);
-        if (!hashint) return false;
-        for (var i = 0; i < 100 + 1; i++) {
-            if ((CRC32.bstr("" + i) >>> 0) === hashint) {
-                return i;
-            }
-        }
+        if (cache[parseInt(input, 16)]) return cache[parseInt(input, 16)];
         for (i = 3; i >= 0; i--) {
             index[3 - i] = getcrcindex(ht >>> i * 8);
             snum = crctable[index[3 - i]];
