@@ -107,7 +107,7 @@ var checkCRCHash = new(function () {
             return [1, str];
         },
         cache = {};
-    for(let i=0;i<101;++i) cache[(CRC32.bstr(''+i)>>>0)]=i;
+    for(let i=0;i<1001;++i) cache[(CRC32.bstr(''+i)>>>0)]=i;
     var index = new Array(4);
     console.log('初始化耗时：' + (performance.now() - startTime));
     return function (input) {
