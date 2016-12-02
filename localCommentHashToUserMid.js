@@ -1,53 +1,20 @@
-/* crc32.js (C) 2014-present SheetJS -- http://sheetjs.com */
-/* vim: set ts=2: */
-/*exported CRC32 */
-// https://github.com/SheetJS/js-crc32
-var CRC32 = {};
-(function(CRC32) {
-    //CRC32.version = '1.0.1';
-    /* see perf/crc32table.js */
-    /*global Int32Array */
-    function signed_crc_table() {
-        var c = 0,
-            table = new Array(256);
-
-        for (var n = 0; n != 256; ++n) {
-            c = n;
-            for (var x = 0; x < 8; x++) c = ((c & 1) ? (-306674912 ^ (c >>> 1)) : (c >>> 1));
-            table[n] = c;
-        }
-
-        return typeof Int32Array !== 'undefined' ? new Int32Array(table) : table;
-    }
-
-    var T = signed_crc_table();
-
-    function crc32_bstr(bstr, seed) {
-        var C = seed ^ -1,
-            L = bstr.length - 1;
-        for (var i = 0; i < L;) {
-            C = (C >>> 8) ^ T[(C ^ bstr.charCodeAt(i++)) & 0xFF];
-            C = (C >>> 8) ^ T[(C ^ bstr.charCodeAt(i++)) & 0xFF];
-        }
-        if (i === L) C = (C >>> 8) ^ T[(C ^ bstr.charCodeAt(i)) & 0xFF];
-        return C ^ -1;
-    }
-
-    //CRC32.table = T;
-    CRC32.bstr = crc32_bstr;
-})(CRC32);
 /* Usage: checkCRCHash(String hash)
  * the return value would be mid, or -1 if process fails
  * Speed test:
-   var t0 = performance.now();
-   checkCRCHash('444283f9');//should be 40000000
-   console.log("Call to checkCRCHash took " + (performance.now() - t0) + " milliseconds.");
+var t0 = performance.now();
+var a=[];
+for (let i=0;i<1000;++i)a.push((Math.random()*100000000)>>>0);
+var b=a.map(e=>(CRC32.bstr(''+e)>>>0).toString(16).padStart(8,'0'));
+var c=b.map(e=>checkCRCHash(e));
+var d=c.map(e=>Number(e));
+var x=d.map((e,i)=>e===a[i]);
+var y=d.map((e,i)=>(CRC32.bstr(''+e)>>>0).toString(16).padStart(8,'0')===b[i]);
+console.log("Call to checkCRCHash took", (performance.now() - t0), "milliseconds.",y.indexOf(!1)===-1);
  */
-var checkCRCHash = new(function () {
+(function (root) {
     'use strict';
     var startTime = performance.now();
-
-    function signed_crc_table() {
+    var crctable = function () {
         var c = 0,
             table = typeof Int32Array !== 'undefined' ? new Int32Array(256) : new Array(256);
         for (var n = 0; n != 256; ++n) {
@@ -58,64 +25,73 @@ var checkCRCHash = new(function () {
             table[n] = c;
         }
         return table;
+    }();
+    var crcIndex = new crctable.constructor(256);
+    for (var f in crctable) crcIndex[f] = crctable[f] >>> 24;
+
+    function crc32(input) {
+        if (typeof input != 'string') input = "" + input;
+        var crcstart = 0xFFFFFFFF,
+            len = input.length,
+            index;
+        for (var _i = 0; _i < len; ++_i) {
+            index = (crcstart ^ input.charCodeAt(_i)) & 0xff;
+            crcstart = crcstart >>> 8 ^ crctable[index];
+        }
+        return crcstart;
     }
-    var crctable = signed_crc_table();
-    var crc32 = function crc32(input) {
-            if (typeof input != 'string') input = "" + input;
-            var crcstart = 0xFFFFFFFF,
-                len = input.length,
-                index;
-            for (var i = 0; i < len; ++i) {
-                index = (crcstart ^ input.charCodeAt(i)) & 0xff;
-                crcstart = crcstart >>> 8 ^ crctable[index];
-            }
-            return crcstart;
-        },
-        crc32lastindex = function crc32lastindex(input) {
-            if (typeof input != 'string') input = "" + input;
-            var crcstart = 0xFFFFFFFF,
-                len = input.length,
-                index;
-            for (var i = 0; i < len; ++i) {
-                index = (crcstart ^ input.charCodeAt(i)) & 0xff;
-                crcstart = crcstart >>> 8 ^ crctable[index];
-            }
-            return index;
-        },
-        getcrcindex = function getcrcindex(t) {
-            for (var i = 0; i < 256; i++) {
-                if (crctable[i] >>> 24 == t) return i;
-            }
-            return -1;
-        },
-        deepCheck = function deepCheck(i, index) {
-            var tc = 0x00,
-                str = '',
-                hash = crc32(i);
-            tc = hash & 0xff ^ index[2];
-            if (!(tc <= 57 && tc >= 48)) return [0];
+
+    function crc32lastindex(input) {
+        if (typeof input != 'string') input = "" + input;
+        var crcstart = 0xFFFFFFFF,
+            len = input.length,
+            index;
+        for (var _i2 = 0; _i2 < len; ++_i2) {
+            index = (crcstart ^ input.charCodeAt(_i2)) & 0xff;
+            crcstart = crcstart >>> 8 ^ crctable[index];
+        }
+        return index;
+    }
+
+    function getcrcindex(t) {
+        for (var _i3 = 0; _i3 < 256; _i3++)
+            if (crcIndex[_i3] == t) return _i3;
+
+        return -1;
+    }
+
+    function deepCheck(i, index) {
+        var tc = 0x00,
+            str = '',
+            hash = crc32(i);
+        for (var _i4 = 2; _i4 > -1; _i4--) {
+            tc = hash & 0xff ^ index[_i4];
+            if (tc > 57 || tc < 48) return [!1];
             str += tc - 48;
-            hash = crctable[index[2]] ^ hash >>> 8;
-            tc = hash & 0xff ^ index[1];
-            if (!(tc <= 57 && tc >= 48)) return [0];
-            str += tc - 48;
-            hash = crctable[index[1]] ^ hash >>> 8;
-            tc = hash & 0xff ^ index[0];
-            if (!(tc <= 57 && tc >= 48)) return [0];
-            str += tc - 48;
-            hash = crctable[index[0]] ^ hash >>> 8;
-            return [1, str];
-        },
-        cache = {};
-    for(let i=0;i<1001;++i) cache[(CRC32.bstr(''+i)>>>0)]=i;
+            hash = crctable[index[_i4]] ^ hash >>> 8;
+        }
+        return [!0, str];
+    }
+
+    function crc32_bstr(bstr, seed) {
+        var C = seed ^ -1,
+            L = bstr.length - 1;
+        for (var i = 0; i < L;) {
+            C = C >>> 8 ^ crctable[(C ^ bstr.charCodeAt(i++)) & 0xFF];
+            C = C >>> 8 ^ crctable[(C ^ bstr.charCodeAt(i++)) & 0xFF];
+        }
+        if (i === L) C = C >>> 8 ^ crctable[(C ^ bstr.charCodeAt(i)) & 0xFF];
+        return C ^ -1;
+    }
+    var CRC32 = {};
+    CRC32.bstr = crc32_bstr;
+    var cache = {};
+    for (var s = 0; s < 1000; ++s) cache[CRC32.bstr('' + s) >>> 0] = s;
+
     var index = new Array(4);
-    console.log('初始化耗时：' + (performance.now() - startTime));
-    return function (input) {
-        var ht = parseInt(input, 16) ^ 0xffffffff,
-            snum,
-            i,
-            lastindex,
-            deepCheckData;
+    console.log('初始化耗时:', performance.now() - startTime, 'ms');
+    var checkCRCHash = function checkCRCHash(input) {
+        var snum, i, lastindex, deepCheckData, ht = parseInt(input, 16) ^ 0xffffffff;
         if (cache[parseInt(input, 16)]) return cache[parseInt(input, 16)];
         for (i = 3; i >= 0; i--) {
             index[3 - i] = getcrcindex(ht >>> i * 8);
@@ -132,7 +108,10 @@ var checkCRCHash = new(function () {
         if (i == 100000) return -1;
         return i + '' + deepCheckData[1];
     };
-})();
+
+    root.CRC32 = CRC32;
+    root.checkCRCHash = checkCRCHash;
+})(window);
 
 /* Usage: checkCommentHash(String hash, int maximumMid, int minimumMid)
  * argument hash is required, maximumMid and minimumMid is optional
