@@ -68,7 +68,7 @@ function uniq_fast(a) {
 /* Promise mergeAllCommentsinHistory
  * Usage:
    var cid=document.body.innerHTML.match(/cid.*?(\d+)/)[1];
-   mergeAllCommentsinHistory(cid).then(str=>downloadStringAsFile(str, document.title + cid + ".full.xml")) //to download all comments in history as document.title + cid + ".full.xml"
+   mergeAllCommentsinHistory(cid).then(str=>downloadStringAsFile(str, document.title + '_' + cid + ".full.xml")) //to download all comments in history
  * mergeAllCommentsinHistory(cid).then(str=>downloadStringAsFile(str, filename)) //to download all comments in history as filename
  * mergeAllCommentsinHistory(cid) //to merge but not download, result return as promise
  * Example :mergeAllCommentsinHistory(1725101).then(res=>console.log(res))
