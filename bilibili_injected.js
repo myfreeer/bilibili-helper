@@ -1,3 +1,102 @@
+(function (root) {
+    'use strict';
+    var crctable = function () {
+        var c = 0,
+            table = typeof Int32Array !== 'undefined' ? new Int32Array(256) : new Array(256);
+        for (var n = 0; n != 256; ++n) {
+            c = n;
+            for (var x = 0; x < 8; x++) {
+                c = c & 1 ? -306674912 ^ c >>> 1 : c >>> 1;
+            }
+            table[n] = c;
+        }
+        return table;
+    }();
+    var crcIndex = new crctable.constructor(256);
+    for (var f in crctable) crcIndex[f] = crctable[f] >>> 24;
+
+    function crc32(input) {
+        if (typeof input != 'string') input = "" + input;
+        var crcstart = 0xFFFFFFFF,
+            len = input.length,
+            index;
+        for (var _i = 0; _i < len; ++_i) {
+            index = (crcstart ^ input.charCodeAt(_i)) & 0xff;
+            crcstart = crcstart >>> 8 ^ crctable[index];
+        }
+        return crcstart;
+    }
+
+    function crc32lastindex(input) {
+        if (typeof input != 'string') input = "" + input;
+        var crcstart = 0xFFFFFFFF,
+            len = input.length,
+            index;
+        for (var _i2 = 0; _i2 < len; ++_i2) {
+            index = (crcstart ^ input.charCodeAt(_i2)) & 0xff;
+            crcstart = crcstart >>> 8 ^ crctable[index];
+        }
+        return index;
+    }
+
+    function getcrcindex(t) {
+        for (var _i3 = 0; _i3 < 256; _i3++)
+            if (crcIndex[_i3] == t) return _i3;
+
+        return -1;
+    }
+
+    function deepCheck(i, index) {
+        var tc = 0x00,
+            str = '',
+            hash = crc32(i);
+        for (var _i4 = 2; _i4 > -1; _i4--) {
+            tc = hash & 0xff ^ index[_i4];
+            if (tc > 57 || tc < 48) return [!1];
+            str += tc - 48;
+            hash = crctable[index[_i4]] ^ hash >>> 8;
+        }
+        return [!0, str];
+    }
+
+    function crc32_bstr(bstr, seed) {
+        var C = seed ^ -1,
+            L = bstr.length - 1;
+        for (var i = 0; i < L;) {
+            C = C >>> 8 ^ crctable[(C ^ bstr.charCodeAt(i++)) & 0xFF];
+            C = C >>> 8 ^ crctable[(C ^ bstr.charCodeAt(i++)) & 0xFF];
+        }
+        if (i === L) C = C >>> 8 ^ crctable[(C ^ bstr.charCodeAt(i)) & 0xFF];
+        return C ^ -1;
+    }
+    var CRC32 = {};
+    CRC32.bstr = crc32_bstr;
+    var cache = {};
+    for (var s = 0; s < 1000; ++s) cache[CRC32.bstr('' + s) >>> 0] = s;
+
+    var index = new Array(4);
+    var checkCRCHash = function checkCRCHash(input) {
+        var snum, i, lastindex, deepCheckData, ht = parseInt(input, 16) ^ 0xffffffff;
+        if (cache[parseInt(input, 16)]) return cache[parseInt(input, 16)];
+        for (i = 3; i >= 0; i--) {
+            index[3 - i] = getcrcindex(ht >>> i * 8);
+            snum = crctable[index[3 - i]];
+            ht ^= snum >>> (3 - i) * 8;
+        }
+        for (i = 0; i < 100000; i++) {
+            lastindex = crc32lastindex(i);
+            if (lastindex == index[3]) {
+                deepCheckData = deepCheck(i, index);
+                if (deepCheckData[0]) break;
+            }
+        }
+        if (i == 100000) return -1;
+        return i + '' + deepCheckData[1];
+    };
+
+    root.CRC32 = CRC32;
+    root.checkCRCHash = checkCRCHash;
+})(window);
 (function() {
 	if ($("html").hasClass("bilibili-helper")) return false;
 	var adModeOn = false;
@@ -19,21 +118,35 @@
 	    });
 	};
 
+	function uniq_fast(a) {
+	    var seen = {};
+	    var out = [];
+	    var len = a.length;
+	    var j = 0;
+	    for (var i = 0; i < len; i++) {
+	        var item = a[i];
+	        if (seen[item] !== 1) {
+	            seen[item] = 1;
+	            out[j++] = item;
+	        }
+	    }
+	    return out;
+	}
+
 	function mergeAllCommentsinHistory(cid) {
 	    if (!cid) return false;
 	    if (sessionStorage["CommentsinHistory_" + cid]) return new Promise((fulfill, reject) => fulfill([sessionStorage["CommentsinHistory_" + cid]]));
 	    var startTime = performance.now();
-	    var xmltext;
+	    //var xmltext;
 	    var commentsAll = [];
 	    var rolldate = "http://comment.bilibili.com/rolldate," + cid;
 	    var dmroll = ['http://comment.bilibili.com/' + cid + '.xml'];
 	    var count = 0;
 	    let checkCount = (count, array) => {
 	        if (count < array.length) return;
-	        commentsAll = [...new Set(commentsAll)];
+	        commentsAll = window.Set ? [...new Set(commentsAll)] : uniq_fast(commentsAll);
 	        sessionStorage["CommentsinHistory_" + cid] = decodeURIComponent("%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E<i><chatserver>chat.bilibili.com</chatserver><chatid>") + cid + "</chatid><mission>0</mission><maxlimit>" + commentsAll.length + "</maxlimit>\n" + commentsAll.join('\n') + "\n</i>";
-
-	        console.log("mergeAllCommentsinHistory: took " + (performance.now() - startTime) + " milliseconds.");
+	        console.log("mergeAllCommentsinHistory: took", (performance.now() - startTime), "milliseconds.");
 	        return sessionStorage["CommentsinHistory_" + cid];
 	    };
 	    return fetchretry(rolldate).then(res => res.json().then(json => {
@@ -45,121 +158,13 @@
 	            let array = x => Array.prototype.slice.call(x);
 	            commentsAll = commentsAll.concat(array(comments).map(e => e.outerHTML));
 	            return checkCount(++count, dmroll);
-	        }).catch(e => checkCount(++count, dmroll))));
+	        }).catch(e => checkCount(++count, dmroll)))).then(array => {
+	            let t;
+	            array.map(text => text ? t = text : null);
+	            return t
+	        });
 	    }));
 	}
-
-	var CRC32 = {};
-	(function(CRC32) {
-	    function signed_crc_table() {
-	        var c = 0,
-	            table = new Array(256);
-	        for (var n = 0; n != 256; ++n) {
-	            c = n;
-	            for (var x = 0; x < 8; x++) c = ((c & 1) ? (-306674912 ^ (c >>> 1)) : (c >>> 1));
-	            table[n] = c;
-	        }
-	        return typeof Int32Array !== 'undefined' ? new Int32Array(table) : table;
-	    }
-	    var T = signed_crc_table();
-
-	    function crc32_bstr(bstr, seed) {
-	        var C = seed ^ -1,
-	            L = bstr.length - 1;
-	        for (var i = 0; i < L;) {
-	            C = (C >>> 8) ^ T[(C ^ bstr.charCodeAt(i++)) & 0xFF];
-	            C = (C >>> 8) ^ T[(C ^ bstr.charCodeAt(i++)) & 0xFF];
-	        }
-	        if (i === L) C = (C >>> 8) ^ T[(C ^ bstr.charCodeAt(i)) & 0xFF];
-	        return C ^ -1;
-	    }
-	    CRC32.bstr = crc32_bstr;
-	})(CRC32);
-
-	var checkCRCHash = new(function() {
-	    'use strict';
-	    function signed_crc_table() {
-	        var c = 0,
-	            table = typeof Int32Array !== 'undefined' ? new Int32Array(256) : new Array(256);
-	        for (var n = 0; n != 256; ++n) {
-	            c = n;
-	            for (var x = 0; x < 8; x++) {
-	                c = c & 1 ? -306674912 ^ c >>> 1 : c >>> 1;
-	            }
-	            table[n] = c;
-	        }
-	        return table;
-	    }
-	    var crctable = signed_crc_table();
-	    var crc32 = function crc32(input) {
-	            if (typeof input != 'string') input = "" + input;
-	            var crcstart = 0xFFFFFFFF,
-	                len = input.length,
-	                index;
-	            for (var i = 0; i < len; ++i) {
-	                index = (crcstart ^ input.charCodeAt(i)) & 0xff;
-	                crcstart = crcstart >>> 8 ^ crctable[index];
-	            }
-	            return crcstart;
-	        },
-	        crc32lastindex = function crc32lastindex(input) {
-	            if (typeof input != 'string') input = "" + input;
-	            var crcstart = 0xFFFFFFFF,
-	                len = input.length,
-	                index;
-	            for (var i = 0; i < len; ++i) {
-	                index = (crcstart ^ input.charCodeAt(i)) & 0xff;
-	                crcstart = crcstart >>> 8 ^ crctable[index];
-	            }
-	            return index;
-	        },
-	        getcrcindex = function getcrcindex(t) {
-	            for (var i = 0; i < 256; i++) {
-	                if (crctable[i] >>> 24 == t) return i;
-	            }
-	            return -1;
-	        },
-	        deepCheck = function deepCheck(i, index) {
-	            var tc = 0x00,
-	                str = '',
-	                hash = crc32(i);
-	            tc = hash & 0xff ^ index[2];
-	            if (!(tc <= 57 && tc >= 48)) return [0];
-	            str += tc - 48;
-	            hash = crctable[index[2]] ^ hash >>> 8;
-	            tc = hash & 0xff ^ index[1];
-	            if (!(tc <= 57 && tc >= 48)) return [0];
-	            str += tc - 48;
-	            hash = crctable[index[1]] ^ hash >>> 8;
-	            tc = hash & 0xff ^ index[0];
-	            if (!(tc <= 57 && tc >= 48)) return [0];
-	            str += tc - 48;
-	            hash = crctable[index[0]] ^ hash >>> 8;
-	            return [1, str];
-	        };
-	    var index = new Array(4);
-	    return function(input) {
-	        var ht = parseInt(input, 16) ^ 0xffffffff,
-	            snum,
-	            i,
-	            lastindex,
-	            deepCheckData;
-	        for (i = 3; i >= 0; i--) {
-	            index[3 - i] = getcrcindex(ht >>> i * 8);
-	            snum = crctable[index[3 - i]];
-	            ht ^= snum >>> (3 - i) * 8;
-	        }
-	        for (i = 0; i < 100000; i++) {
-	            lastindex = crc32lastindex(i);
-	            if (lastindex == index[3]) {
-	                deepCheckData = deepCheck(i, index);
-	                if (deepCheckData[0]) break;
-	            }
-	        }
-	        if (i == 100000) return -1;
-	        return i + '' + deepCheckData[1];
-	    };
-	})();
 
 	function formatInt(Source, Length) {
 		var strTemp = "";
@@ -875,7 +880,7 @@
 
 		biliHelper.loadComments = function(comments) {
 		    comments = comments ? comments : biliHelper.commentsUrl ? biliHelper.commentsUrl : 'http://comment.bilibili.com/' + biliHelper.cid + '.xml';
-		    mergeAllCommentsinHistory(biliHelper.cid).then(array=>{let t;array.map(text=>text?t=text:null);return t}).then(res => {
+		    mergeAllCommentsinHistory(biliHelper.cid).then(res => {
 		        var response = parseXmlSafe(res);
 		        biliHelper.commentsUrl = 'data:application/xml;charset=utf-8,' + res;
 		        var assData;
