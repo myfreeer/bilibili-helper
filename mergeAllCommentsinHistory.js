@@ -96,11 +96,14 @@ if (url.match('api.bilibili.com/view') || url.match('biliplus.com/api/view')) {
         j.then(str => downloadStringAsFile(str, e.part + '.full.xml')).then(e => resolve());
     });
 }
-let resolvePromiseArrayWait = (array, myPromise, timeout) => {
-    timeout = parseInt(timeout) || 0;
+
+//resolvePromiseArrayWait: https://gist.github.com/myfreeer/019ce116d241a0ec640db0f412e2c741
+let resolvePromiseArrayWait = (array, myPromise, timeout = 0, retries = 0) => {
     return new Promise((resolve, reject) => {
         let resultArray = [];
-        let myResolver = index => myPromise(array[index]).then(result => resultArray[index] = (result)).then(e => array[++index] ? setTimeout(() => myResolver(index), timeout) : resolve(resultArray));
+        let resolver = index => setTimeout(() => myResolver(index), timeout);
+        let fails = (index, e) => array[index + 1] ? console.warn('resolvePromiseArrayWait: index', index, 'failed! ', ', target:', array[index], ', error:', e, ',continue to next.', resolver(++index)) : console.warn('resolvePromiseArrayWait: index', index, 'failed! ', 'target:', array[index], ', error:', e, ', process done.', resolve(resultArray));
+        let myResolver = index => myPromise(array[index]).then(result => resultArray[index] = (result)).then(e => typeof (array[++index]) === "undefined" ? resolve(resultArray) : resolver(index)).catch(e => retries-- > 0 ? resolver(index) : fails(index, e));
         myResolver(0);
     });
 };
