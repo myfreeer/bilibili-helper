@@ -48,27 +48,11 @@ let downloadStringAsFile = (str, filename) => {
     return str;
 };
 
-//http://stackoverflow.com/a/9229821/6848772
-function uniq_fast(a) {
-    var seen = {};
-    var out = [];
-    var len = a.length;
-    var j = 0;
-    for(var i = 0; i < len; i++) {
-         var item = a[i];
-         if(seen[item] !== 1) {
-               seen[item] = 1;
-               out[j++] = item;
-         }
-    }
-    return out;
-}
-
 //get error of cors
 /* Promise mergeAllCommentsinHistory
  * Usage:
    var cid=document.body.innerHTML.match(/cid.*?(\d+)/)[1];
-   mergeAllCommentsinHistory(cid).then(str=>downloadStringAsFile(str, document.title + '_' + cid + ".full.xml")) //to download all comments in history
+   mergeAllCommentsinHistory(cid).then(str=>downloadStringAsFile(str, document.title + '.' + cid + "_full.xml")) //to download all comments in history
  * mergeAllCommentsinHistory(cid).then(str=>downloadStringAsFile(str, filename)) //to download all comments in history as filename
  * mergeAllCommentsinHistory(cid) //to merge but not download, result return as promise
  * Example :mergeAllCommentsinHistory(1725101).then(res=>console.log(res))
@@ -114,12 +98,13 @@ function mergeAllCommentsinHistory(cid) {
     var startTime = performance.now();
     var xmltext;
     var commentsAll = [];
+    var dbids = {};
     var rolldate = "http://comment.bilibili.com/rolldate," + cid;
     var dmroll = ['http://comment.bilibili.com/' + cid + '.xml'];
     var count = 0;
     let checkCount = (count, array) => {
         if (count < array.length) return;
-        commentsAll = window.Set ? [...new Set(commentsAll)] : uniq_fast(commentsAll);
+        commentsAll = commentsAll;
         xmltext = decodeURIComponent("%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E<i><chatserver>chat.bilibili.com</chatserver><chatid>") + cid + "</chatid><mission>0</mission><maxlimit>" + commentsAll.length + "</maxlimit>\n" + commentsAll.join('\n') + "\n</i>";
         console.log("mergeAllCommentsinHistory: took", (performance.now() - startTime), "milliseconds.");
         return xmltext;
@@ -131,8 +116,18 @@ function mergeAllCommentsinHistory(cid) {
             let response = parseXmlSafe(res);
             let comments = response.getElementsByTagName('d');
             let array = x => Array.prototype.slice.call(x);
-            commentsAll = commentsAll.concat(array(comments).map(e => e.outerHTML));
+            commentsAll = commentsAll.concat(array(comments).filter(e => {
+                let opt = e.getAttribute('p');
+                if (!opt) return true;
+                opt = opt.split(',');
+                let dbid = parseInt(opt[7], 10);
+                if (!dbid) return true;
+                if (dbids[dbid] !== 1) {
+                    dbids[dbid] = 1;
+                    return true;
+                }
+            }).map(e => e.outerHTML));
             return checkCount(++count, dmroll);
-        }).catch(e => checkCount(++count, dmroll)))).then(array=>{let t;array.map(text => text ? t = text : null);return t});
+        }).catch(e => checkCount(++count, dmroll)))).then(array => array.filter(e => e === 0 || e).reduce(e => e));
     }));
 }
