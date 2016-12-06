@@ -104,7 +104,6 @@ function mergeAllCommentsinHistory(cid) {
     var count = 0;
     let checkCount = (count, array) => {
         if (count < array.length) return;
-        commentsAll = commentsAll;
         xmltext = decodeURIComponent("%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E<i><chatserver>chat.bilibili.com</chatserver><chatid>") + cid + "</chatid><mission>0</mission><maxlimit>" + commentsAll.length + "</maxlimit>\n" + commentsAll.join('\n') + "\n</i>";
         console.log("mergeAllCommentsinHistory: took", (performance.now() - startTime), "milliseconds.");
         return xmltext;
