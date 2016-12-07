@@ -48,6 +48,56 @@ let downloadStringAsFile = (str, filename) => {
     return str;
 };
 
+//resolvePromiseArrayWait: https://gist.github.com/myfreeer/019ce116d241a0ec640db0f412e2c741
+let resolvePromiseArrayWait = (array, myPromise, timeout = 0, retries = 0) => {
+    return new Promise((resolve, reject) => {
+        let resultArray = [];
+        let resolver = index => setTimeout(() => myResolver(index), timeout);
+        let fails = (index, e) => array[index + 1] ? console.warn('resolvePromiseArrayWait: index', index, 'failed! ', ', target:', array[index], ', error:', e, ',continue to next.', resolver(++index)) : console.warn('resolvePromiseArrayWait: index', index, 'failed! ', 'target:', array[index], ', error:', e, ', process done.', resolve(resultArray));
+        let myResolver = index => myPromise(array[index]).then(result => resultArray[index] = (result)).then(e => typeof (array[++index]) === "undefined" ? resolve(resultArray) : resolver(index)).catch(e => retries-- > 0 ? resolver(index) : fails(index, e));
+        myResolver(0);
+    });
+};
+
+'use strict';
+class CommentsInHistory {
+    constructor() {
+        this.xmltext = '';
+        this.commentsAll = [];
+        this.dbids = {};
+    }
+    array(obj) {
+        return Array.prototype.slice.call(obj);
+    }
+    serialize(xmldom) {
+        return (new XMLSerializer()).serializeToString(xmldom);
+    }
+    parseXML(text) {
+        text = text.replace(/[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}]/ug, "");
+        return (new DOMParser()).parseFromString(text, "text/xml");
+    }
+    getResult() {
+        return decodeURIComponent("%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E<i><chatserver>chat.bilibili.com</chatserver><chatid>") + this.cid + "</chatid><mission>0</mission><maxlimit>" + this.commentsAll.length + "</maxlimit>\n" + this.commentsAll.join('\n') + "\n</i>";
+    }
+    add(string) {
+        let response = this.parseXML(string);
+        if (this.cid && this.cid !== this.array(response.getElementsByTagName('chatid')).reduce(e => e).textContent) console.warn('CommentsInHistory: cid not match, continue.');
+        if (!this.cid) this.cid = this.array(response.getElementsByTagName('chatid')).reduce(e => e).textContent;
+        let comments = response.getElementsByTagName('d');
+        this.commentsAll = this.commentsAll.concat(this.array(comments).filter(e => {
+            let opt = e.getAttribute('p');
+            if (!opt) return true;
+            opt = opt.split(',');
+            let dbid = parseInt(opt[7], 10);
+            if (!dbid) return true;
+            if (this.dbids[dbid] !== 1) {
+                this.dbids[dbid] = 1;
+                return true;
+            }
+        }).map(this.serialize));
+    }
+}
+
 //get error of cors
 /* Promise mergeAllCommentsinHistory
  * Usage:
@@ -75,30 +125,18 @@ if (url.match('api.bilibili.com/view') || url.match('biliplus.com/api/view') || 
         j.then(str => downloadStringAsFile(str, e.P + '、'+ e.Title + '.full.xml')).then(e => resolve());
     });
 }
-//resolvePromiseArrayWait: https://gist.github.com/myfreeer/019ce116d241a0ec640db0f412e2c741
-let resolvePromiseArrayWait = (array, myPromise, timeout = 0, retries = 0) => {
-    return new Promise((resolve, reject) => {
-        let resultArray = [];
-        let resolver = index => setTimeout(() => myResolver(index), timeout);
-        let fails = (index, e) => array[index + 1] ? console.warn('resolvePromiseArrayWait: index', index, 'failed! ', ', target:', array[index], ', error:', e, ',continue to next.', resolver(++index)) : console.warn('resolvePromiseArrayWait: index', index, 'failed! ', 'target:', array[index], ', error:', e, ', process done.', resolve(resultArray));
-        let myResolver = index => myPromise(array[index]).then(result => resultArray[index] = (result)).then(e => typeof (array[++index]) === "undefined" ? resolve(resultArray) : resolver(index)).catch(e => retries-- > 0 ? resolver(index) : fails(index, e));
-        myResolver(0);
-    });
-};
 resolvePromiseArrayWait(json.list, myPromise, 1000);
  */
 function mergeAllCommentsinHistory(cid) {
     if (!cid) return false;
     var startTime = performance.now();
-    var xmltext;
-    var commentsAll = [];
-    var dbids = {};
     var rolldate = "http://comment.bilibili.com/rolldate," + cid;
     var dmroll = ['http://comment.bilibili.com/' + cid + '.xml'];
     var count = 0;
+    var cmts = new CommentsInHistory();
     let checkCount = (count, array) => {
         if (count < array.length) return;
-        xmltext = decodeURIComponent("%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E<i><chatserver>chat.bilibili.com</chatserver><chatid>") + cid + "</chatid><mission>0</mission><maxlimit>" + commentsAll.length + "</maxlimit>\n" + commentsAll.join('\n') + "\n</i>";
+        let xmltext = cmts.getResult();
         console.log("mergeAllCommentsinHistory: took", (performance.now() - startTime), "milliseconds.");
         return xmltext;
     };
@@ -106,20 +144,7 @@ function mergeAllCommentsinHistory(cid) {
         for (let i in json)
             if (json[i].timestamp) dmroll.push('http://comment.bilibili.com/dmroll,' + json[i].timestamp + ',' + cid);
         return Promise.all(dmroll.map(url => fetchretry(url).then(res => res.text()).then(res => {
-            let response = parseXmlSafe(res);
-            let comments = response.getElementsByTagName('d');
-            let array = x => Array.prototype.slice.call(x);
-            commentsAll = commentsAll.concat(array(comments).filter(e => {
-                let opt = e.getAttribute('p');
-                if (!opt) return true;
-                opt = opt.split(',');
-                let dbid = parseInt(opt[7], 10);
-                if (!dbid) return true;
-                if (dbids[dbid] !== 1) {
-                    dbids[dbid] = 1;
-                    return true;
-                }
-            }).map(e => e.outerHTML));
+            cmts.add(res);
             return checkCount(++count, dmroll);
         }).catch(e => checkCount(++count, dmroll)))).then(array => array.filter(e => e === 0 || e).reduce(e => e));
     }));
