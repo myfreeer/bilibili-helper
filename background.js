@@ -18,7 +18,6 @@ var appkey = '85eb6835b0a1034e';
 var appsec = '2ad42749773c441109bdc0191257a664';
 //https://github.com/soimort/you-get/blob/develop/src/you_get/extractors/bilibili.py
 var SECRETKEY_MINILOADER = '1c15888dc316e05a15fdd0a02ed6584f';
-var use_SECRETKEY_MINILOADER=true;
 
 Live.set = function(n, k, v) {
     if (!window.localStorage || !n) return;
@@ -101,44 +100,6 @@ function getFileData(url, callback, method) {
     xmlhttp.ontimeout = xmlhttp.onerror;
     xmlhttp.timeout = 3000;
     xmlhttp.send();
-}
-
-// http://stackoverflow.com/questions/6832596/how-to-compare-software-version-number-using-js-only-number/6832706#6832706
-
-function compareVersion(a, b) {
-    if (a === b) {
-        return 0;
-    }
-
-    var a_components = a.split(".");
-    var b_components = b.split(".");
-
-    var len = Math.min(a_components.length, b_components.length);
-
-    // loop while the components are equal
-    for (var i = 0; i < len; i++) {
-        // A bigger than B
-        if (parseInt(a_components[i]) > parseInt(b_components[i])) {
-            return 1;
-        }
-
-        // B bigger than A
-        if (parseInt(a_components[i]) < parseInt(b_components[i])) {
-            return -1;
-        }
-    }
-
-    // If one's a prefix of the other, the longer one is greater.
-    if (a_components.length > b_components.length) {
-        return 1;
-    }
-
-    if (a_components.length < b_components.length) {
-        return -1;
-    }
-
-    // Otherwise they are the same.
-    return 0;
 }
 
 function postFileData(url, data, callback) {
@@ -303,7 +264,7 @@ function resolvePlaybackLink(avPlaybackLink, callback) {
     xmlhttp.onreadystatechange = xmlChange;
     xmlhttp.ontimeout = xmlChange;
     xmlhttp.onerror = xmlChange;
-    //xmlhttp.timeout = 3000;
+    xmlhttp.timeout = 5000;
     xmlhttp.send();
 }
 
@@ -318,115 +279,65 @@ function getVideoInfo(avid, page, isbangumi, callback) {
     }
     bangumi = isbangumi;
     resetVideoHostList();
+    var parseVideoInfo = function(avInfo) {
+        avInfo = JSON.parse(avInfo);
+        if (typeof avInfo.code != "undefined" && avInfo.code == -503) {
+            return setTimeout(function() {
+                getVideoInfo(avid, page, isbangumi, callback);
+            }, 1000);
+        } else {
+            if (typeof avInfo.list == "object") {
+                avInfo.pages = avInfo.list.length;
+                for (var i = 0; i < avInfo.pages; i++) {
+                    if (avInfo.list[i].page == page) {
+                        avInfo.cid = avInfo.list[i].cid;
+                        break;
+                    }
+                }
+            }
+            if (typeof avInfo.cid == "number") {
+                viCache[avid + '-' + page] = {
+                    mid: avInfo.mid,
+                    tid: avInfo.tid,
+                    cid: avInfo.cid,
+                    pic: avInfo.pic,
+                    pages: avInfo.pages,
+                    title: avInfo.title,
+                    list: avInfo.list,
+                    sp_title: avInfo.sp_title,
+                    spid: avInfo.spid,
+                    season_id: avInfo.season_id,
+                    created_at: avInfo.created_at,
+                    description: avInfo.description,
+                    tag: avInfo.tag,
+                    ts: currTime,
+                    bangumi: false
+                };
+                if (typeof avInfo.bangumi == "object" && avInfo.spid) {
+                    getFileData("http://api.bilibili.cn/sp?spid=" + avInfo.spid, function(spInfo) {
+                        spInfo = JSON.parse(spInfo);
+                        if (spInfo.isbangumi == 1) {
+                            viCache[avid + '-' + page].bangumi = {
+                                cover: spInfo.cover,
+                                desc: spInfo.description
+                            };
+                        }
+                        callback(viCache[avid + '-' + page]);
+                    });
+                } else callback(viCache[avid + '-' + page]);
+            } else {
+                callback(avInfo);
+            }
+        }
+    };
     if (isbangumi) {
         getFileData("http://bangumi.bilibili.com/web_api/episode/get_source?episode_id=" + avid, function(result) {
             result = JSON.parse(result)['result'];
             avid = result.aid;
-            getFileData("http://api.bilibili.com/view?type=json&appkey=8e9fc618fbd41e28&id=" + avid + "&page=" + page + "&batch=true", function(avInfo) {
-                avInfo = JSON.parse(avInfo);
-                if (typeof avInfo.code != "undefined" && avInfo.code == -503) {
-                    setTimeout(function() {
-                        getVideoInfo(avid, page, isbangumi, callback);
-                    }, 1000);
-                } else {
-                    if (typeof avInfo.list == "object") {
-                        avInfo.pages = avInfo.list.length;
-                        for (var i = 0; i < avInfo.pages; i++) {
-                            if (avInfo.list[i].page == page) {
-                                avInfo.cid = avInfo.list[i].cid;
-                                break;
-                            }
-                        }
-                    }
-                    if (typeof avInfo.cid == "number") {
-                        viCache[avid + '-' + page] = {
-                            avid: avid,
-                            mid: avInfo.mid,
-                            tid: avInfo.tid,
-                            cid: avInfo.cid,
-                            pic: avInfo.pic,
-                            pages: avInfo.pages,
-                            title: avInfo.title,
-                            list: avInfo.list,
-                            sp_title: avInfo.sp_title,
-                            spid: avInfo.spid,
-                            season_id: avInfo.season_id,
-                            created_at: avInfo.created_at,
-                            description: avInfo.description,
-                            tag: avInfo.tag,
-                            ts: currTime,
-                            bangumi: false
-                        };
-                        if (typeof avInfo.bangumi == "object" && avInfo.spid) {
-                            getFileData("http://api.bilibili.cn/sp?spid=" + avInfo.spid, function(spInfo) {
-                                spInfo = JSON.parse(spInfo);
-                                if (spInfo.isbangumi == 1) {
-                                    viCache[avid + '-' + page].bangumi = {
-                                        cover: spInfo.cover,
-                                        desc: spInfo.description
-                                    };
-                                }
-                                callback(viCache[avid + '-' + page]);
-                            });
-                        } else callback(viCache[avid + '-' + page]);
-                    } else {
-                        callback(avInfo);
-                    }
-                }
-            });
+            getFileData("http://api.bilibili.com/view?type=json&appkey=8e9fc618fbd41e28&id=" + avid + "&page=" + page + "&batch=true", parseVideoInfo);
         });
     } else
-        getFileData("http://api.bilibili.com/view?type=json&appkey=8e9fc618fbd41e28&id=" + avid + "&page=" + page + "&batch=true", function(avInfo) {
-            avInfo = JSON.parse(avInfo);
-            if (typeof avInfo.code != "undefined" && avInfo.code == -503) {
-                setTimeout(function() {
-                    getVideoInfo(avid, page, isbangumi, callback);
-                }, 1000);
-            } else {
-                if (typeof avInfo.list == "object") {
-                    avInfo.pages = avInfo.list.length;
-                    for (var i = 0; i < avInfo.pages; i++) {
-                        if (avInfo.list[i].page == page) {
-                            avInfo.cid = avInfo.list[i].cid;
-                            break;
-                        }
-                    }
-                }
-                if (typeof avInfo.cid == "number") {
-                    viCache[avid + '-' + page] = {
-                        mid: avInfo.mid,
-                        tid: avInfo.tid,
-                        cid: avInfo.cid,
-                        pic: avInfo.pic,
-                        pages: avInfo.pages,
-                        title: avInfo.title,
-                        list: avInfo.list,
-                        sp_title: avInfo.sp_title,
-                        spid: avInfo.spid,
-                        season_id: avInfo.season_id,
-                        created_at: avInfo.created_at,
-                        description: avInfo.description,
-                        tag: avInfo.tag,
-                        ts: currTime,
-                        bangumi: false
-                    };
-                    if (typeof avInfo.bangumi == "object" && avInfo.spid) {
-                        getFileData("http://api.bilibili.cn/sp?spid=" + avInfo.spid, function(spInfo) {
-                            spInfo = JSON.parse(spInfo);
-                            if (spInfo.isbangumi == 1) {
-                                viCache[avid + '-' + page].bangumi = {
-                                    cover: spInfo.cover,
-                                    desc: spInfo.description
-                                };
-                            }
-                            callback(viCache[avid + '-' + page]);
-                        });
-                    } else callback(viCache[avid + '-' + page]);
-                } else {
-                    callback(avInfo);
-                }
-            }
-        });
+        getFileData("http://api.bilibili.com/view?type=json&appkey=8e9fc618fbd41e28&id=" + avid + "&page=" + page + "&batch=true", parseVideoInfo);
     return true;
 }
 
@@ -439,6 +350,64 @@ function checkSecurePlayer() {
         }
     };
     xmlhttp.send();
+}
+
+//rewrite from https://github.com/jonbern/fetch-retry
+let fetchretry = (url, options) => {
+    var retries = (options && options.retries) ? options.retries : 5;
+    var retryDelay = (options && options.retryDelay) ? options.retryDelay : 500;
+    return new Promise((resolve, reject) => {
+        let wrappedFetch = n => fetch(url, options).then(response => resolve(response)).catch(error => n > 0 ? setTimeout(() => wrappedFetch(--n), retryDelay) : reject(error));
+        wrappedFetch(retries);
+    });
+};
+
+let getVideosByCid = function (cid) {
+    if (!cid) return;
+    let interfaceUrl = (cid, ts) => `cid=${cid}&player=1&ts=${ts}`;
+    let calcSign = (cid, ts) => md5(`${interfaceUrl(cid,ts)}${SECRETKEY_MINILOADER}`);
+    let ts = Math.ceil(Date.now() / 1000);
+    return fetchretry(`http://interface.bilibili.com/playurl?${interfaceUrl(cid,ts)}&sign=${calcSign(cid,ts)}`, {
+            credentials: 'include',
+            retries: 5
+        })
+        .then(res => res.text()).then(res => {
+            let parser = new DOMParser();
+            let doc = parser.parseFromString(res, 'text/xml');
+            let array = x => Array.prototype.slice.call(x);
+            var mediaDataSource = {
+                "type": "flv",
+                "duration": Number(doc.querySelector('timelength').textContent),
+                "segments": [],
+                "withCredentials": true
+            };
+            let urls = array(doc.querySelectorAll('durl > url')).map(res => /*res.textContent.match("ws.acgvideo.com") ? res.textContent : */res.textContent/*.replace(/^http:\/\//,"https://")/*.replace("dynamic=1", "")*/);
+            let lengths = array(doc.querySelectorAll('durl > length')).map(res => Number(res.textContent));
+            let sizes = array(doc.querySelectorAll('durl > size')).map(res => Number(res.textContent));
+            for (let i in urls) mediaDataSource.segments.push({
+                "duration": lengths[i],
+                "filesize": sizes[i],
+                "url": urls[i]
+            });
+            //if (mediaDataSource.segments.length ===1 && mediaDataSource.segments.url.match('\.mp4')) mediaDataSource.type = 'mp4';
+            return mediaDataSource
+        })
+};
+
+function getDownloadLink(request) {
+    var urls = [
+        request.token ? 'http://api.bilibili.com/playurl?aid=' + request.avid + '&page=' + request.pg + '&platform=html5&vtype=mp4&token=' + request.token : 'http://api.bilibili.com/playurl?aid=' + request.avid + '&page=' + request.pg + '&platform=html5&vtype=mp4',
+        "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + appsec),
+        "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + appsec)
+    ];
+
+    if (request.cidHack && request.cidHack != locale) {
+        cidHackType[request.cid] = request.cidHack;
+    }
+    if (getOption("dlquality") == 'mp4') urls.pop();
+    var fetchArray = urls.map(url => fetchretry(url, {credentials: 'include'}).then(response => response.json()));
+    fetchArray.push(getVideosByCid(request.cid));
+    return Promise.all(fetchArray);
 }
 
 Live.treasure = {};
@@ -605,39 +574,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             else sendResponse({
                 result: "disabled"
             });
-            return true;/*
-        case "playHdFlv":
-            chrome.tabs.executeScript(sender.tab.id, {
-                file: "bundle.js"
-            });
-            return true;*/
-/*        case "getLowResVideo":
-            //fetch('http://api.bilibili.com/playurl?&aid='+request.avid+'&page='+request.pg+'&platform=html5').then;
-            try {
-                getFileData('http://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5', function(avDownloadLink) {
-                    avDownloadLink = JSON.parse(avDownloadLink);
-                    if (avDownloadLink.durl[0].url.match('mp4')) {
-                        var cid = avDownloadLink.cid.match(/\/[0-9]+\.xml/)[0];
-                        cid = cid.substring(1, cid.length - 4);
-                        sendResponse({
-                            link: avDownloadLink.durl[0].url,
-                            cid: cid,
-                            img: avDownloadLink.img,
-                            comment: avDownloadLink.cid,
-                            length: avDownloadLink.durl[0].length,
-                            size: avDownloadLink.durl[0].size,
-                            src: avDownloadLink
-                        });
-                    };
-                });
-            } catch (e) {
-                sendResponse({
-                    fails: 1,
-                    msg: e
-                });
-                console.error(e);
-            };
-            return true;*/
+            return true;
         case "getVideoInfo":
             getVideoInfo(request.avid, request.pg, request.isBangumi, function(avInfo) {
                 sendResponse({
@@ -646,47 +583,21 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             });
             return true;
         case "getDownloadLink":
-            var url = {
-                download: getOption("dlquality") == 'flv' && use_SECRETKEY_MINILOADER ? "https://interface.bilibili.com/playurl?&cid=" + request.cid + "&from=miniplay&otype=json&player=1&sign=" + md5("cid=" + request.cid + "&from=miniplay&otype=json&player=1" + SECRETKEY_MINILOADER) : "https://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + appsec),
-                playback: "https://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + appsec),
-                lowres: request.token ? 'https://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5&token=' + request.token : 'https://api.bilibili.com/playurl?&aid=' + request.avid + '&page=' + request.pg + '&platform=html5'
-            };
-            if (request.cidHack && request.cidHack != locale) {
-                cidHackType[request.cid] = request.cidHack;
-            }
-            getFileData(url["download"], function(avDownloadLink) {
-                avDownloadLink = JSON.parse(avDownloadLink);
-                if (getOption("dlquality") == 'mp4') {
-                    if (avDownloadLink)
-                        getFileData(url["lowres"], function(avLowResLink) {
-                            avLowResLink = JSON.parse(avLowResLink);
-                            resolvePlaybackLink(avDownloadLink, function(avRealPlaybackLink) {
-                                sendResponse({
-                                    download: avDownloadLink,
-                                    playback: avRealPlaybackLink,
-                                    lowres: avLowResLink,
-                                    dlquality: getOption("dlquality"),
-                                    rel_search: getOption("rel_search")
-                                });
-                            });
-                        });
-                } else {
-                    getFileData(url["playback"], function(avPlaybackLink) {
-                        avPlaybackLink = JSON.parse(avPlaybackLink);
-                        getFileData(url["lowres"], function(avLowResLink) {
-                            avLowResLink = JSON.parse(avLowResLink);
-                            resolvePlaybackLink(avPlaybackLink, function(avRealPlaybackLink) {
-                                sendResponse({
-                                    download: avDownloadLink,
-                                    playback: avRealPlaybackLink,
-                                    lowres: avLowResLink,
-                                    dlquality: getOption("dlquality"),
-                                    rel_search: getOption("rel_search")
-                                });
-                            });
-                        });
+            getDownloadLink(request).then(array => {
+                var avLowResLink = array[0],
+                    avPlaybackLink = array[1];
+              //  if (array[3] && array[2].mode !== "error") array[3].durl = array[3].durl.map((data,index) => array[2].data.map(obj => obj.type == "split" && obj.parts[index].url && obj.parts[index].url.match(request.cid + "-" + (index+1) + ".flv\?") ? data.url = obj.parts[index].url.replace(/^http:\/\//,"https://") :null) ? data : data);
+                var avDownloadLink = (getOption("dlquality") == 'mp4') ? avPlaybackLink : array[2];
+                resolvePlaybackLink(avPlaybackLink, function(avRealPlaybackLink) {
+                    sendResponse({
+                        download: avDownloadLink,
+                        playback: avRealPlaybackLink,
+                        lowres: avLowResLink,
+                        flv: array[array.length-1],
+                        dlquality: getOption("dlquality"),
+                        rel_search: getOption("rel_search")
                     });
-                }
+                });
             });
             return true;
         case "getMyInfo":
@@ -924,7 +835,13 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 }, {
     urls: ["http://tajs.qq.com/stats*"]
 }, ["blocking"]);
-/*
+
+var randomIP = function(fakeip) {
+    var ip_addr = '220.181.111.';
+    if (fakeip == 2) ip_addr = '59.152.193.';
+    ip_addr += Math.floor(Math.random() * 254 + 1);
+    return ip_addr;
+};
 chrome.webRequest.onBeforeSendHeaders.addListener(function(details) {
     var query = new URL(details.url).query;
     var ip = randomIP(cidHackType[query['cid']] == 2 ? 2 : 1);
@@ -943,7 +860,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function(details) {
 }, {
     urls: ["http://interface.bilibili.com/playurl?cid*", "http://interface.bilibili.com/playurl?accel=1&cid=*", "http://interface.bilibili.com/playurl?platform=bilihelper*", "http://www.bilibili.com/video/av*", "http://www.bilibili.com/bangumi/*", "http://app.bilibili.com/bangumi/*", "http://www.bilibili.com/search*", "http://*.acgvideo.com/*", "http://www.bilibili.com/api_proxy*", "http://bangumi.bilibili.com/*", "http://interface.bilibili.com/playurl?platform=android*"]
 }, ['requestHeaders', 'blocking']);
-*/
+
 function receivedHeaderModifier(details) {
     var hasCORS = false;
     details.responseHeaders.forEach(function(v) {

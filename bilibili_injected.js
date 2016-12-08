@@ -1,3 +1,103 @@
+(function (root) {
+    'use strict';
+    var crctable = function () {
+        var c = 0,
+            table = typeof Int32Array !== 'undefined' ? new Int32Array(256) : new Array(256);
+        for (var n = 0; n != 256; ++n) {
+            c = n;
+            for (var x = 0; x < 8; x++) {
+                c = c & 1 ? -306674912 ^ c >>> 1 : c >>> 1;
+            }
+            table[n] = c;
+        }
+        return table;
+    }();
+    var crcIndex = new crctable.constructor(256);
+    for (var f in crctable) crcIndex[f] = crctable[f] >>> 24;
+
+    function crc32(input) {
+        if (typeof input != 'string') input = "" + input;
+        var crcstart = 0xFFFFFFFF,
+            len = input.length,
+            index;
+        for (var _i = 0; _i < len; ++_i) {
+            index = (crcstart ^ input.charCodeAt(_i)) & 0xff;
+            crcstart = crcstart >>> 8 ^ crctable[index];
+        }
+        return crcstart;
+    }
+
+    function crc32lastindex(input) {
+        if (typeof input != 'string') input = "" + input;
+        var crcstart = 0xFFFFFFFF,
+            len = input.length,
+            index;
+        for (var _i2 = 0; _i2 < len; ++_i2) {
+            index = (crcstart ^ input.charCodeAt(_i2)) & 0xff;
+            crcstart = crcstart >>> 8 ^ crctable[index];
+        }
+        return index;
+    }
+
+    function getcrcindex(t) {
+        for (var _i3 = 0; _i3 < 256; _i3++)
+            if (crcIndex[_i3] == t) return _i3;
+
+        return -1;
+    }
+
+    function deepCheck(i, index) {
+        var tc = 0x00,
+            str = '',
+            hash = crc32(i);
+        for (var _i4 = 2; _i4 > -1; _i4--) {
+            tc = hash & 0xff ^ index[_i4];
+            if (tc > 57 || tc < 48) return [!1];
+            str += tc - 48;
+            hash = crctable[index[_i4]] ^ hash >>> 8;
+        }
+        return [!0, str];
+    }
+
+    function crc32_bstr(bstr, seed) {
+        var C = seed ^ -1,
+            L = bstr.length - 1;
+        for (var i = 0; i < L;) {
+            C = C >>> 8 ^ crctable[(C ^ bstr.charCodeAt(i++)) & 0xFF];
+            C = C >>> 8 ^ crctable[(C ^ bstr.charCodeAt(i++)) & 0xFF];
+        }
+        if (i === L) C = C >>> 8 ^ crctable[(C ^ bstr.charCodeAt(i)) & 0xFF];
+        return C ^ -1;
+    }
+    var CRC32 = {};
+    CRC32.bstr = crc32_bstr;
+    var cache = {};
+    for (var s = 0; s < 1000; ++s) cache[CRC32.bstr('' + s) >>> 0] = s;
+
+    var index = new Array(4);
+    var checkCRCHash = function checkCRCHash(input) {
+        var snum, i, lastindex, deepCheckData, ht = parseInt(input, 16) ^ 0xffffffff;
+        if (cache[parseInt(input, 16)]) return cache[parseInt(input, 16)];
+        for (i = 3; i >= 0; i--) {
+            index[3 - i] = getcrcindex(ht >>> i * 8);
+            snum = crctable[index[3 - i]];
+            ht ^= snum >>> (3 - i) * 8;
+        }
+        for (i = 0; i < 100000; i++) {
+            lastindex = crc32lastindex(i);
+            if (lastindex == index[3]) {
+                deepCheckData = deepCheck(i, index);
+                if (deepCheckData[0]) break;
+            }
+        }
+        if (i == 100000) return -1;
+        return i + '' + deepCheckData[1];
+    };
+
+    root.CRC32 = CRC32;
+    root.checkCRCHash = checkCRCHash;
+})(window);
+
 (function() {
 	if ($("html").hasClass("bilibili-helper")) return false;
 	var adModeOn = false;
@@ -10,139 +110,7 @@
 	    ff_status_id = 0,
 	    ff_embed_stack = null,
 	    ff_embed_stack_style = null;
-
-	var CRC32 = {};
-	(function(CRC32) {
-	    function signed_crc_table() {
-	        var c = 0,
-	            table = new Array(256);
-	        for (var n = 0; n != 256; ++n) {
-	            c = n;
-	            for (var x = 0; x < 8; x++) c = ((c & 1) ? (-306674912 ^ (c >>> 1)) : (c >>> 1));
-	            table[n] = c;
-	        }
-	        return typeof Int32Array !== 'undefined' ? new Int32Array(table) : table;
-	    }
-	    var T = signed_crc_table();
-
-	    function crc32_bstr(bstr, seed) {
-	        var C = seed ^ -1,
-	            L = bstr.length - 1;
-	        for (var i = 0; i < L;) {
-	            C = (C >>> 8) ^ T[(C ^ bstr.charCodeAt(i++)) & 0xFF];
-	            C = (C >>> 8) ^ T[(C ^ bstr.charCodeAt(i++)) & 0xFF];
-	        }
-	        if (i === L) C = (C >>> 8) ^ T[(C ^ bstr.charCodeAt(i)) & 0xFF];
-	        return C ^ -1;
-	    }
-	    CRC32.bstr = crc32_bstr;
-	})(CRC32);
-
-	var checkCRCHash = new(function() {
-	    'use strict';
-	    function signed_crc_table() {
-	        var c = 0,
-	            table = typeof Int32Array !== 'undefined' ? new Int32Array(256) : new Array(256);
-	        for (var n = 0; n != 256; ++n) {
-	            c = n;
-	            for (var x = 0; x < 8; x++) {
-	                c = c & 1 ? -306674912 ^ c >>> 1 : c >>> 1;
-	            }
-	            table[n] = c;
-	        }
-	        return table;
-	    }
-	    var crctable = signed_crc_table();
-	    var crc32 = function crc32(input) {
-	            if (typeof input != 'string') input = "" + input;
-	            var crcstart = 0xFFFFFFFF,
-	                len = input.length,
-	                index;
-	            for (var i = 0; i < len; ++i) {
-	                index = (crcstart ^ input.charCodeAt(i)) & 0xff;
-	                crcstart = crcstart >>> 8 ^ crctable[index];
-	            }
-	            return crcstart;
-	        },
-	        crc32lastindex = function crc32lastindex(input) {
-	            if (typeof input != 'string') input = "" + input;
-	            var crcstart = 0xFFFFFFFF,
-	                len = input.length,
-	                index;
-	            for (var i = 0; i < len; ++i) {
-	                index = (crcstart ^ input.charCodeAt(i)) & 0xff;
-	                crcstart = crcstart >>> 8 ^ crctable[index];
-	            }
-	            return index;
-	        },
-	        getcrcindex = function getcrcindex(t) {
-	            for (var i = 0; i < 256; i++) {
-	                if (crctable[i] >>> 24 == t) return i;
-	            }
-	            return -1;
-	        },
-	        deepCheck = function deepCheck(i, index) {
-	            var tc = 0x00,
-	                str = '',
-	                hash = crc32(i);
-	            tc = hash & 0xff ^ index[2];
-	            if (!(tc <= 57 && tc >= 48)) return [0];
-	            str += tc - 48;
-	            hash = crctable[index[2]] ^ hash >>> 8;
-	            tc = hash & 0xff ^ index[1];
-	            if (!(tc <= 57 && tc >= 48)) return [0];
-	            str += tc - 48;
-	            hash = crctable[index[1]] ^ hash >>> 8;
-	            tc = hash & 0xff ^ index[0];
-	            if (!(tc <= 57 && tc >= 48)) return [0];
-	            str += tc - 48;
-	            hash = crctable[index[0]] ^ hash >>> 8;
-	            return [1, str];
-	        };
-	    var index = new Array(4);
-	    return function(input) {
-	        var ht = parseInt(input, 16) ^ 0xffffffff,
-	            snum,
-	            i,
-	            lastindex,
-	            deepCheckData;
-	        for (i = 3; i >= 0; i--) {
-	            index[3 - i] = getcrcindex(ht >>> i * 8);
-	            snum = crctable[index[3 - i]];
-	            ht ^= snum >>> (3 - i) * 8;
-	        }
-	        for (i = 0; i < 100000; i++) {
-	            lastindex = crc32lastindex(i);
-	            if (lastindex == index[3]) {
-	                deepCheckData = deepCheck(i, index);
-	                if (deepCheckData[0]) break;
-	            }
-	        }
-	        if (i == 100000) return -1;
-	        return i + '' + deepCheckData[1];
-	    };
-	})();
-
-	function formatInt(Source, Length) {
-		var strTemp = "";
-		for (i = 1; i <= Length - (Source + "").length; i++) {
-			strTemp += "0";
-		}
-		return strTemp + Source;
-	}
-
-	var parseXmlSafe = function parseXmlSafe(text) {
-	    "use strict";
-	    text = text.replace(/[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]/g, "");
-	    if (window.DOMParser) return new window.DOMParser().parseFromString(text, "text/xml");
-	    else if (ActiveXObject) {
-	        var activeXObject = new ActiveXObject("Microsoft.XMLDOM");
-	        activeXObject.async = false;
-	        activeXObject.loadXML(text);
-	        return activeXObject;
-	    } else throw new Error("parseXmlSafe: XML Parser Not Found.");
-	};
-
+/*
 	function parseJsonforFlvjs(json) {
 		if (!json) return console.warn('parseJsonforFlvjs Failed: No JSON provided.');
 		if (!(flvjs && flvjs.isSupported())) return console.warn('parseJsonforFlvjs Failed: flv.js Not Found or Not Supported.');
@@ -152,7 +120,15 @@
 		if (!json.durl) return console.warn('parseJsonforFlvjs Failed: Nothing to play.');
 		return flvjs.createPlayer(mediaDataSource);
 	}
-	
+*/
+	function formatInt(Source, Length) {
+		var strTemp = "";
+		for (i = 1; i <= Length - (Source + "").length; i++) {
+			strTemp += "0";
+		}
+		return strTemp + Source;
+	}
+
 	function parseSafe(text) {
 		return ('' + text).replace(/&/g, "&amp;").replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 	}
@@ -321,8 +297,8 @@
 				videoPlaybackLink = response["playback"],
 			videoLowResLink = response["lowres"];
 			biliHelper.downloadUrls = [];
-			biliHelper.originalDownloadData = videoDownloadLink;
 			biliHelper.playbackUrls = [];
+			biliHelper.mediaDataSource = response.flv;
 			biliHelper.lowResUrl=videoLowResLink;
 			notifyCidHack();
 			if (typeof videoPlaybackLink == "undefined" || typeof videoPlaybackLink.durl == "undefined" || Number(videoPlaybackLink.code) < 0) {
@@ -523,15 +499,16 @@
 			biliHelper.switcher = {
 				current: "original",
 				set: function(newMode) {
-					if(this.current.match('bilih5')){
+				/*	if(this.current.match('bilih5')){
 						var biliMenu = document.querySelector('.bilibili-player-setting-menu-wrap');
 						if (biliMenu && biliMenu.lastChild && biliMenu.lastChild.getAttribute('value') === "change_flash") biliMenu.lastChild.click();
-					}
+					}*/
 					biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + this.current + '"]').addClass('w');
 					biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + newMode + '"]').removeClass('w');
+					localStorage.removeItem('defaulth5');
+					if (this.current == 'html5' && this.flvPlayer) this.flvPlayer.unload();
 					try{clearInterval(checkFinished);} catch(e){}
 					try{clearInterval(interval);} catch(e){}
-					if (this.current == 'html5' && this.flvPlayer) this.flvPlayer.unload();
 					if (newMode.match('html5')) {
 						biliHelper.mainBlock.speedSection.removeClass('hidden');
 					} else {
@@ -608,7 +585,7 @@
 				},
 				html5: function(type,comments) {
 					var html5VideoUrl;
-					comments = comments ? comments : biliHelper.commentsUrl ? biliHelper.commentsUrl : 'http://comment.bilibili.com/' + biliHelper.cid + '.xml';
+					comments = comments ? comments : biliHelper.commentsXML ? biliHelper.commentsXML : biliHelper.commentsUrl ? biliHelper.commentsUrl : 'http://comment.bilibili.com/' + biliHelper.cid + '.xml';
 					switch(type){
 						case 'html5ld':
 						this.set('html5ld');
@@ -708,17 +685,18 @@
 						}
 					});
 					if (type && type.match(/hd|ld/)) return abp;
-					this.flvPlayer = parseJsonforFlvjs(biliHelper.originalDownloadData);
+					this.flvPlayer= flvjs.createPlayer(biliHelper.mediaDataSource);
+					//if (!this.flvPlayer) this.flvPlayer = parseJsonforFlvjs(biliHelper.originalDownloadData);
+					//if (this.flvPlayer ==='error') return biliHelper.switcher.html5('html5hd',comments);
 				var interval = setInterval(function() {
-				    if (abp.commentObjArray) {
+				    if (abp.commentObjArray && biliHelper.switcher.flvPlayer) {
 				        clearInterval(interval);
 				        //flv.playUrl(location.href);
 				        biliHelper.switcher.flvPlayer.attachMediaElement(abp.video);
 				        biliHelper.switcher.flvPlayer.load();
-				        biliHelper.switcher.flvPlayer.play();
-				        console.log(this);
+				        //biliHelper.switcher.flvPlayer.play();
 				    }
-				}, 600);/*
+				}, 600);
 				var lastTime;
 				var checkFinished = setInterval(function() {
 					if (abp.video.currentTime !== lastTime){
@@ -733,15 +711,15 @@
 							}
 						};
 					};
-				}, 600);*/
+				}, 600);
 				},
 				html5hd: function(comments) {
-					comments = comments ? comments : biliHelper.commentsUrl ? biliHelper.commentsUrl : 'http://comment.bilibili.com/' + biliHelper.cid + '.xml';
+					comments = comments ? comments : biliHelper.commentsXML ? biliHelper.commentsXML : biliHelper.commentsUrl ? biliHelper.commentsUrl : 'http://comment.bilibili.com/' + biliHelper.cid + '.xml';
 					this.set('html5hd');
 					var abp = biliHelper.switcher.html5('html5hd',comments);
 				},
 				html5ld: function(comments) {
-				    comments = comments ? comments : biliHelper.commentsUrl ? biliHelper.commentsUrl : 'http://comment.bilibili.com/' + biliHelper.cid + '.xml';
+				    comments = comments ? comments : biliHelper.commentsXML ? biliHelper.commentsXML : biliHelper.commentsUrl ? biliHelper.commentsUrl : 'http://comment.bilibili.com/' + biliHelper.cid + '.xml';
 				    if (!(biliHelper.lowResUrl && biliHelper.lowResUrl.durl && biliHelper.lowResUrl.durl[0] && biliHelper.lowResUrl.durl[0].url)) return console.log(biliHelper.lowResUrl);
 				    this.set('html5ld');
 				    var abp = biliHelper.switcher.html5('html5ld',comments);
@@ -868,12 +846,15 @@
 		    comments = comments ? comments : biliHelper.commentsUrl ? biliHelper.commentsUrl : 'http://comment.bilibili.com/' + biliHelper.cid + '.xml';
 		    fetch(comments).then(res => res.text()).then(res => {
 		        var response = parseXmlSafe(res);
+		        biliHelper.commentsUrl = 'data:application/xml;charset=utf-8,' + res;
+		        biliHelper.commentsXML = response;
 		        var assData;
 		        var assBtn = $('<a class="b-btn w">下载 ASS 格式弹幕</a>').attr('download', biliHelper.downloadFileName.replace('.xml', '.ass')).attr('href', null).click(function(e) {
 		            e.preventDefault();
 		            if (!assData) assData = '\ufeff' + generateASS(setPosition(parseXML('', response)), {
 		                'title': getNiceSectionFilename(biliHelper.avid, biliHelper.page, biliHelper.totalPage, 1, 1),
-		                'ori': location.href
+		                'ori': location.href,
+		                'opacity': biliHelper.playerConfig.opacity
 		            });
 		            var assBlob = new Blob([assData], {
 		                    type: 'application/octet-stream'
@@ -1052,7 +1033,8 @@
 						prob.id = "page-prob";
 						prob.innerHTML = "$('.player-wrapper .v-plist').attr('length', window.VideoPart.nodedata.length);$('#page-prob').remove();";
 						setTimeout(function() {
-							document.body.appendChild(prob);
+							var body = document.body || document.getElementsByTagName('body')[0] || document.lastElementChild || document;
+							body.appendChild(prob); 
 							biliHelper.genPage = false;
 							if (!videoInfo.bangumi) {
 								$('.bangumi-content .v_bgm_list').empty();
