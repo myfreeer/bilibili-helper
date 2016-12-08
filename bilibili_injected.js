@@ -694,6 +694,7 @@
 				        //flv.playUrl(location.href);
 				        biliHelper.switcher.flvPlayer.attachMediaElement(abp.video);
 				        biliHelper.switcher.flvPlayer.load();
+				        biliHelper.switcher.flvPlayer.on(flvjs.Events.ERROR, e => console.warn(e, 'Switch back to HTML5 HD.', biliHelper.switcher.html5hd()));
 				        //biliHelper.switcher.flvPlayer.play();
 				    }
 				}, 600);
@@ -717,6 +718,7 @@
 					comments = comments ? comments : biliHelper.commentsXML ? biliHelper.commentsXML : biliHelper.commentsUrl ? biliHelper.commentsUrl : 'http://comment.bilibili.com/' + biliHelper.cid + '.xml';
 					this.set('html5hd');
 					var abp = biliHelper.switcher.html5('html5hd',comments);
+					abp.video.querySelector('source').addEventListener('error', e=>console.warn(e, 'Switch back to HTML5 LD.', biliHelper.switcher.html5ld()));
 				},
 				html5ld: function(comments) {
 				    comments = comments ? comments : biliHelper.commentsXML ? biliHelper.commentsXML : biliHelper.commentsUrl ? biliHelper.commentsUrl : 'http://comment.bilibili.com/' + biliHelper.cid + '.xml';
