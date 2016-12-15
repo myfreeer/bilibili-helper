@@ -389,7 +389,13 @@ let getVideosByCid = function (cid) {
                 "filesize": sizes[i],
                 "url": urls[i]
             });
-            //if (mediaDataSource.segments.length ===1 && mediaDataSource.segments.url.match('\.mp4')) mediaDataSource.type = 'mp4';
+            /*
+            if (mediaDataSource.segments.length === 1 && mediaDataSource.segments[0].url.match('\.mp4') && !mediaDataSource.segments[0].url.match('\.flv')) {
+                mediaDataSource.type = 'mp4';
+                mediaDataSource.type = mediaDataSource.segments[0].url;
+                delete mediaDataSource.segments
+            }
+            */
             return mediaDataSource
         })
 };

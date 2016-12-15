@@ -506,7 +506,7 @@
 					biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + this.current + '"]').addClass('w');
 					biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + newMode + '"]').removeClass('w');
 					localStorage.removeItem('defaulth5');
-					if (this.current == 'html5' && this.flvPlayer) this.flvPlayer.unload();
+					if (this.current == 'html5' && this.flvPlayer) this.flvPlayer.destroy();
 					try{clearInterval(checkFinished);} catch(e){}
 					try{clearInterval(interval);} catch(e){}
 					if (newMode.match('html5')) {
@@ -638,16 +638,23 @@
 							config: e.detail
 						});
 					});
+				    var restart=video=>!video.paused&&!video.pause()&&!video.play();
 				    biliHelper.mainBlock.speedSection.input.addEventListener("change", function(e) {
 				        if (Number(biliHelper.mainBlock.speedSection.input.value)) {
 				            abp.video.playbackRate = Number(biliHelper.mainBlock.speedSection.input.value);
+				            restart(abp.video);
 				        } else {
 				            biliHelper.mainBlock.speedSection.input.value = 1.0;
+				            restart(abp.video);
 				        };
 				    });
 				   abp.video.addEventListener("loadedmetadata", function(e) {
-				        biliHelper.mainBlock.speedSection.res.innerText = abp.video.videoWidth + "x" + abp.video.videoHeight;
+				        biliHelper.mainBlock.speedSection.res.innerText = '分辨率: ' + abp.video.videoWidth + "x" + abp.video.videoHeight;
 				    });
+				    /*abp.video.addEventListener("timeupdate", function(e) {
+				    	if (abp.video.readyState > 2) 
+				    		biliHelper.mainBlock.speedSection.res.innerText = '分辨率: ' + abp.video.videoWidth + "x" + abp.video.videoHeight + '; FPS: ' + (abp.video.webkitDecodedFrameCount/abp.video.currentTime).toString().substr(0,5) + '; Bitrate: ' + ((abp.video.webkitVideoDecodedByteCount+abp.video.webkitAudioDecodedByteCount)/(abp.video.currentTime*1000)).toString().substr(0,7);
+				    	});*/
 				    biliHelper.mainBlock.speedSection.rotate.addEventListener("change", function(e) {
 				        if (Number(biliHelper.mainBlock.speedSection.rotate.value) % 360 ===0) biliHelper.mainBlock.speedSection.rotate.value = 0;
 				        if (biliHelper.mainBlock.speedSection.mirror.className==="b-btn") {
@@ -696,6 +703,7 @@
 				        biliHelper.switcher.flvPlayer.load();
 				        biliHelper.switcher.flvPlayer.on(flvjs.Events.ERROR, e => console.warn(e, 'Switch back to HTML5 HD.', biliHelper.switcher.html5hd()));
 				        //biliHelper.switcher.flvPlayer.play();
+				        biliHelper.switcher.flvPlayer.on(flvjs.Events.MEDIA_INFO, e=>console.log('分辨率: ' + e.width + "x" + e.height+', FPS: '+e.fps,'视频码率: '+Math.round(e.videoDataRate*100)/100,'音频码率: '+Math.round(e.audioDataRate*100)/100));
 				    }
 				}, 600);
 				var lastTime;
