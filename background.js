@@ -357,10 +357,58 @@ let fetchretry = (url, options) => {
     var retries = (options && options.retries) ? options.retries : 5;
     var retryDelay = (options && options.retryDelay) ? options.retryDelay : 500;
     return new Promise((resolve, reject) => {
-        let wrappedFetch = n => fetch(url, options).then(response => resolve(response)).catch(error => n > 0 ? setTimeout(() => wrappedFetch(--n), retryDelay) : reject(error));
+        let wrappedFetch = n => fetch(url, options).then(response => resolve(response)).catch(error => n > 0 ? setTimeout(() => wrappedFetch(--n), retryDelay) : resolve({'code': -1, 'message': error}));
         wrappedFetch(retries);
     });
 };
+function xml2obj(xml) {
+    try {
+        let text, obj = {};
+        if (xml.children.length > 0) {
+            Array.prototype.slice.call(xml.children).map(item => {
+                let nodeName = item.nodeName;
+                if (typeof (obj[nodeName]) == "undefined") obj[nodeName] = xml2obj(item); // 若是新的属性, 则往obj中添加
+                else {
+                    if (!obj[nodeName].push) obj[nodeName] = [obj[nodeName]]; // 若老的属性没有push方法, 则把属性改成Array
+                    obj[nodeName].push(xml2obj(item));
+                }
+            });
+        } else {
+            text = xml.textContent;
+            if (/^\d+(\.\d+)?$/.test(text)) obj = Number(text);
+            else if (text === 'true' || text === 'false') obj = Boolean(text);
+            else obj = text;
+        }
+        return obj;
+    } catch (e) {
+        console.warn(e.message);
+    }
+}
+
+function processXmlObj(obj) {
+    if (obj.video) obj = obj.video;
+    if (obj.durl && !obj.durl.push) obj.durl = [obj.durl];
+    if (obj.durl.length && obj.durl.length > 0 && obj.durl[0] && obj.durl[0].backup_url && !obj.durl[0].backup_url.push && obj.durl[0].backup_url.url) {
+        obj.durl[0].backup_url = obj.durl[0].backup_url.url;
+        if (!obj.durl[0].backup_url.push) obj.durl[0].backup_url = [obj.durl[0].backup_url];
+    }
+    if (obj.accept_quality && !obj.accept_quality.push) obj.accept_quality = obj.accept_quality.split(',').map(e => Number(e));
+    return obj;
+}
+
+function parseJsonforFlvjs(json) {
+    if (!json) return console.warn('parseJsonforFlvjs Failed: No JSON provided.');
+    var mediaDataSource = {};
+    mediaDataSource.type = 'flv';
+    if (parseInt(json.timelength)) mediaDataSource.duration = parseInt(json.timelength);
+    if (json.durl) mediaDataSource.segments = json.durl.map(obj => ({
+        "duration": obj.length,
+        "filesize": obj.size,
+        "url": obj.url
+    }));
+    if (!json.durl) return console.warn('parseJsonforFlvjs Failed: Nothing to play.');
+    return mediaDataSource;
+}
 
 let getVideosByCid = function (cid) {
     if (!cid) return;
@@ -368,49 +416,20 @@ let getVideosByCid = function (cid) {
     let calcSign = (cid, ts) => md5(`${interfaceUrl(cid,ts)}${SECRETKEY_MINILOADER}`);
     let ts = Math.ceil(Date.now() / 1000);
     return fetchretry(`http://interface.bilibili.com/playurl?${interfaceUrl(cid,ts)}&sign=${calcSign(cid,ts)}`, {
-            credentials: 'include',
-            retries: 5
-        })
-        .then(res => res.text()).then(res => {
-            let parser = new DOMParser();
-            let doc = parser.parseFromString(res, 'text/xml');
-            let array = x => Array.prototype.slice.call(x);
-            var mediaDataSource = {
-                "type": "flv",
-                "duration": Number(doc.querySelector('timelength').textContent),
-                "segments": [],
-                "withCredentials": true
-            };
-            let urls = array(doc.querySelectorAll('durl > url')).map(res => /*res.textContent.match("ws.acgvideo.com") ? res.textContent : */res.textContent/*.replace(/^http:\/\//,"https://")/*.replace("dynamic=1", "")*/);
-            let lengths = array(doc.querySelectorAll('durl > length')).map(res => Number(res.textContent));
-            let sizes = array(doc.querySelectorAll('durl > size')).map(res => Number(res.textContent));
-            for (let i in urls) mediaDataSource.segments.push({
-                "duration": lengths[i],
-                "filesize": sizes[i],
-                "url": urls[i]
-            });
-            /*
-            if (mediaDataSource.segments.length === 1 && mediaDataSource.segments[0].url.match('\.mp4') && !mediaDataSource.segments[0].url.match('\.flv')) {
-                mediaDataSource.type = 'mp4';
-                mediaDataSource.type = mediaDataSource.segments[0].url;
-                delete mediaDataSource.segments
-            }
-            */
-            return mediaDataSource
-        })
+        credentials: 'include',
+        retries: 5
+    }).then(res => res.text()).then(res => processXmlObj(xml2obj((new DOMParser()).parseFromString(res, 'text/xml'))));
 };
 
 function getDownloadLink(request) {
     var urls = [
         request.token ? 'http://api.bilibili.com/playurl?aid=' + request.avid + '&page=' + request.pg + '&platform=html5&vtype=mp4&token=' + request.token : 'http://api.bilibili.com/playurl?aid=' + request.avid + '&page=' + request.pg + '&platform=html5&vtype=mp4',
-        "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + appsec),
-        "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + appsec)
+        "http://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&quality=2&type=mp4" + appsec)
     ];
 
     if (request.cidHack && request.cidHack != locale) {
         cidHackType[request.cid] = request.cidHack;
     }
-    if (getOption("dlquality") == 'mp4') urls.pop();
     var fetchArray = urls.map(url => fetchretry(url, {credentials: 'include'}).then(response => response.json()));
     fetchArray.push(getVideosByCid(request.cid));
     return Promise.all(fetchArray);
@@ -599,7 +618,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                         download: avDownloadLink,
                         playback: avRealPlaybackLink,
                         lowres: avLowResLink,
-                        flv: array[array.length-1],
+                        flv: parseJsonforFlvjs(array[array.length-1]),
                         dlquality: getOption("dlquality"),
                         rel_search: getOption("rel_search")
                     });
