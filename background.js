@@ -823,7 +823,7 @@ chrome.webRequest.onBeforeRequest.addListener(function (details) {
         if (details.url.match('type=flv')) url += '&type=flv';
         if (details.url.match('type=hdmp4')) url += '&type=hdmp4';
         if (details.url.match(/qualty=([0-9]+)/) && details.url.match(/qualty=([0-9]+)/)[1]) url += '&qualty=' + details.url.match(/qualty=([0-9]+)/)[1];
-        else return {
+        return {
             redirectUrl: url
         };
 
