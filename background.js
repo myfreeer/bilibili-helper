@@ -356,11 +356,27 @@ let fetchretry = (url, options) => {
     });
 };
 
+function parseJsonforFlvjs(json) {
+    if (!json) return console.warn('parseJsonforFlvjs Failed: No JSON provided.');
+    var mediaDataSource = {};
+    mediaDataSource.type = 'flv';
+    if (parseInt(json.timelength)) mediaDataSource.duration = parseInt(json.timelength);
+    if (json.durl) mediaDataSource.segments = json.durl.map(function (obj) {
+        return {
+            "duration": obj.length,
+            "filesize": obj.size,
+            "url": obj.url
+        };
+    });
+    if (!json.durl) return console.warn('parseJsonforFlvjs Failed: Nothing to play.');
+    return mediaDataSource;
+}
+
 function getDownloadLink(request) {
     var urls = [
+        'https://www.biliplus.com/BPplayurl.php?cid=' + request.cid + '&otype=json&type=mp4',
         'https://api.prprpr.me/dplayer/video/bilibili?cid=' + request.cid,
-        'http://www.kanbilibili.com/api/video/' + request.avid + '/download?cid=' + request.cid,
-        getOption("dlquality") == 'flv' && use_SECRETKEY_MINILOADER ? "https://interface.bilibili.com/playurl?&cid=" + request.cid + "&from=miniplay&otype=json&player=1&sign=" + md5("cid=" + request.cid + "&from=miniplay&otype=json&player=1" + SECRETKEY_MINILOADER) : "https://interface.bilibili.com/playurl?platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + "&sign=" + md5("platform=bilihelper&otype=json&appkey=" + appkey + "&cid=" + request.cid + "&type=" + getOption("dlquality") + appsec)
+        'https://www.biliplus.com/BPplayurl.php?cid=' + request.cid + '&otype=json&type=flv'
     ];
     if (request.cidHack && request.cidHack != locale) {
         cidHackType[request.cid] = request.cidHack;
@@ -785,6 +801,40 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
     urls: ["http://static.hdslb.com/play.swf"]
 }, ["blocking"]);
 
+/*
+chrome.webRequest.onBeforeRequest.addListener(function(details) {
+    if (details.url.match(/episode_id=([0-9]+)/)&&details.url.match(/episode_id=([0-9]+)/)[1]) {
+        return {
+            redirectUrl: "https://static-s.bilibili.com/play.swf"
+        };
+    } else {
+        return {};
+    }
+}, {
+    urls: ["*://bangumi.bilibili.com/web_api/get_source*"]
+}, ["blocking"]);
+*/
+
+chrome.webRequest.onBeforeRequest.addListener(function (details) {
+    if (details.url.match(/cid=([0-9]+)/) && details.url.match(/cid=([0-9]+)/)[1]) {
+        var url = 'https://www.biliplus.com/BPplayurl.php?cid=' + details.url.match(/cid=([0-9]+)/)[1];
+        if (details.url.match('otype=json')) url += '&otype=json';
+        if (details.url.match('type=mp4')) url += '&type=mp4';
+        if (details.url.match('type=flv')) url += '&type=flv';
+        if (details.url.match('type=hdmp4')) url += '&type=hdmp4';
+        if (details.url.match(/qualty=([0-9]+)/) && details.url.match(/qualty=([0-9]+)/)[1]) url += '&qualty=' + details.url.match(/qualty=([0-9]+)/)[1];
+        else return {
+            redirectUrl: url
+        };
+
+    } else {
+        return {};
+    }
+}, {
+    urls: ["*://bangumi.bilibili.com/web_api/get_source*"]
+}, ["blocking"]);
+
+
 chrome.webRequest.onBeforeRequest.addListener(function(details) {
     return {
         cancel: true
@@ -842,6 +892,27 @@ chrome.webRequest.onHeadersReceived.addListener(function(details) {
     };
 }, {
     urls: ["http://www.bilibili.com/video/av*", "http://bangumi.bilibili.com/anime/v/*"]
+}, ["responseHeaders", "blocking"]);
+
+chrome.webRequest.onHeadersReceived.addListener(function (details) {
+    var headers = details.responseHeaders;
+    for (var i = 0; i < headers.length; i++) {
+        if (headers[i].name.toLowerCase() == "access-control-allow-origin") {
+            headers[i].value = "*";
+            return {
+                responseHeaders: headers
+            };
+        }
+    }
+    details.responseHeaders.push({
+        name: "Access-Control-Allow-Origin",
+        value: "*"
+    });
+    return {
+        responseHeaders: details.responseHeaders
+    };
+}, {
+    urls: ["*://www.biliplus.com/BPplayurl.php*", "*://www.biliplus.com/api/view*"]
 }, ["responseHeaders", "blocking"]);
 
 function getCookie(name) {
