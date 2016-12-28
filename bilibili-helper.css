@@ -283,3 +283,35 @@
         background-position-x: 180px
     }
 }
+
+#indexgg1,
+#indexgg2,
+#indexgg3,
+#indexgg4,
+#indexgg5,
+#indexgg6,
+#indexc2,
+.gg-ads,
+#topgg,
+.r-gg1,
+#listgg1,
+#listb1,
+#listb2,
+#listb3,
+#alistads,
+#googlegg,
+#arcgg3,
+#contgg1,
+.ad,
+iframe[src="http://www.bilibili.com/bdad.html"],
+clear.ad_top,
+#bdad,
+div[class^="ad-"],
+#taobaoid,
+.baidu-search-block {
+    display: none!important
+}
+
+.sponsor-tosponsor img {
+    z-index: 0!important
+}
