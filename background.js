@@ -71,13 +71,6 @@ URL.prototype.__defineGetter__('query', function() {
     return parsedObj;
 });
 
-var randomIP = function(fakeip) {
-    var ip_addr = '220.181.111.';
-    if (fakeip == 2) ip_addr = '59.152.193.';
-    ip_addr += Math.floor(Math.random() * 254 + 1);
-    return ip_addr;
-};
-
 function getFileData(url, callback, method) {
     var m = 'GET';
     var retry = 0;
@@ -861,6 +854,7 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
     urls: ["http://tajs.qq.com/stats*"]
 }, ["blocking"]);
 
+/*
 var randomIP = function(fakeip) {
     var ip_addr = '220.181.111.';
     if (fakeip == 2) ip_addr = '59.152.193.';
@@ -885,6 +879,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(function(details) {
 }, {
     urls: ["http://interface.bilibili.com/playurl?cid*", "http://interface.bilibili.com/playurl?accel=1&cid=*", "http://interface.bilibili.com/playurl?platform=bilihelper*", "http://www.bilibili.com/video/av*", "http://www.bilibili.com/bangumi/*", "http://app.bilibili.com/bangumi/*", "http://www.bilibili.com/search*", "http://*.acgvideo.com/*", "http://www.bilibili.com/api_proxy*", "http://bangumi.bilibili.com/*", "http://interface.bilibili.com/playurl?platform=android*"]
 }, ['requestHeaders', 'blocking']);
+*/
 
 function receivedHeaderModifier(details) {
     var hasCORS = false;
