@@ -397,8 +397,9 @@ function parseJsonforFlvjs(json) {
     if (json.durl) mediaDataSource.segments = json.durl.map(obj => ({
         "duration": obj.length,
         "filesize": obj.size,
-        "url": obj.url
+        "url": obj.url.replace(/^http:\/\//,"https://")
     }));
+    if (mediaDataSource.segments.length === 1 && json.durl[0].backup_url && json.durl[0].backup_url.length === 1 && !mediaDataSource.segments[0].url.match('flv') && json.durl[0].backup_url[0].match('flv'))mediaDataSource.segments[0].url=json.durl[0].backup_url[0].replace(/^http:\/\//,"https://");
     if (!json.durl) return console.warn('parseJsonforFlvjs Failed: Nothing to play.');
     return mediaDataSource;
 }
@@ -853,33 +854,6 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 }, {
     urls: ["http://tajs.qq.com/stats*"]
 }, ["blocking"]);
-
-/*
-var randomIP = function(fakeip) {
-    var ip_addr = '220.181.111.';
-    if (fakeip == 2) ip_addr = '59.152.193.';
-    ip_addr += Math.floor(Math.random() * 254 + 1);
-    return ip_addr;
-};
-chrome.webRequest.onBeforeSendHeaders.addListener(function(details) {
-    var query = new URL(details.url).query;
-    var ip = randomIP(cidHackType[query['cid']] == 2 ? 2 : 1);
-    if (locale != cidHackType[query['cid']]) {
-        details.requestHeaders.push({
-            name: 'X-Forwarded-For',
-            value: ip
-        }, {
-            name: 'Client-IP',
-            value: ip
-        });
-    }
-    return {
-        requestHeaders: details.requestHeaders
-    };
-}, {
-    urls: ["http://interface.bilibili.com/playurl?cid*", "http://interface.bilibili.com/playurl?accel=1&cid=*", "http://interface.bilibili.com/playurl?platform=bilihelper*", "http://www.bilibili.com/video/av*", "http://www.bilibili.com/bangumi/*", "http://app.bilibili.com/bangumi/*", "http://www.bilibili.com/search*", "http://*.acgvideo.com/*", "http://www.bilibili.com/api_proxy*", "http://bangumi.bilibili.com/*", "http://interface.bilibili.com/playurl?platform=android*"]
-}, ['requestHeaders', 'blocking']);
-*/
 
 function receivedHeaderModifier(details) {
     var hasCORS = false;
