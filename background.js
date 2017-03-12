@@ -605,6 +605,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             getDownloadLink(request).then(array => {
                 var avLowResLink = array[0],
                     avPlaybackLink = array[1];
+                const makeHttps = obj => (obj.url=obj.url.replace(/^http:\/\//,"https://")) && obj;
+                avLowResLink.durl = avLowResLink.durl.map(makeHttps);
+                avPlaybackLink.durl = avPlaybackLink.durl.map(makeHttps);
               //  if (array[3] && array[2].mode !== "error") array[3].durl = array[3].durl.map((data,index) => array[2].data.map(obj => obj.type == "split" && obj.parts[index].url && obj.parts[index].url.match(request.cid + "-" + (index+1) + ".flv\?") ? data.url = obj.parts[index].url.replace(/^http:\/\//,"https://") :null) ? data : data);
                 var avDownloadLink = (getOption("dlquality") == 'mp4') ? avPlaybackLink : array[2];
                 resolvePlaybackLink(avPlaybackLink, function(avRealPlaybackLink) {
