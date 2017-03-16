@@ -301,6 +301,7 @@
 			biliHelper.mediaDataSource = response.flv;
 			biliHelper.lowResUrl=videoLowResLink;
 			notifyCidHack();
+			const makeHttps=obj=>(obj.url=obj.url.replace(/^http:\/\//,"https://"))&&obj;
 			if (typeof videoPlaybackLink == "undefined" || typeof videoPlaybackLink.durl == "undefined" || Number(videoPlaybackLink.code) < 0) {
 				if (typeof videoDownloadLink.message == "string" || videoDownloadLink.result.indexOf("error") >= 0  || typeof videoDownloadLink.error_text == "string") {
 					if (typeof videoPlaybackLink.message == "string" || videoPlaybackLink.result.indexOf("error") >= 0  || typeof videoPlaybackLink.error_text == "string") {
@@ -332,12 +333,12 @@
 				setTimeout(biliHelper.fails, 500);
 			}
 			if (typeof videoDownloadLink.durl["url"] === "undefined") {
-				biliHelper.downloadUrls = videoDownloadLink.durl;
+				biliHelper.downloadUrls = videoDownloadLink.durl.map(makeHttps);
 			} else {
 				biliHelper.downloadUrls.push(videoDownloadLink.durl);
 			}
 			if (typeof videoPlaybackLink.durl === "undefined" || typeof videoPlaybackLink.durl["url"] === "undefined") {
-				biliHelper.playbackUrls = videoPlaybackLink.durl;
+				biliHelper.playbackUrls = videoPlaybackLink.durl.map(makeHttps);
 			} else {
 				biliHelper.playbackUrls.push(videoPlaybackLink.durl);
 			}
@@ -384,6 +385,9 @@
 			if (biliHelper.playbackUrls && biliHelper.playbackUrls.length == 1) {
 				biliHelper.mainBlock.switcherSection.find('a[type="html5"]').removeClass('hidden');
 				biliHelper.mainBlock.switcherSection.find('a[type="html5hd"]').removeClass('hidden');
+			}
+			if (biliHelper.lowResUrl.durl && biliHelper.lowResUrl.durl.url) {
+				biliHelper.lowResUrl.durl = biliHelper.lowResUrl.durl.map(makeHttps);
 				biliHelper.mainBlock.switcherSection.find('a[type="html5ld"]').removeClass('hidden');
 			}
 			$('#loading-notice').fadeOut(300);
