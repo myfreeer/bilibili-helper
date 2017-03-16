@@ -301,7 +301,7 @@
 			biliHelper.mediaDataSource = response.flv;
 			biliHelper.lowResUrl=videoLowResLink;
 			notifyCidHack();
-			const makeHttps=obj=>(obj.url=obj.url.replace(/^http:\/\//,"https://"))&&obj;
+			const makeHttps=obj=>obj.url.match('ws.acgvideo')?obj:(obj.url=obj.url.replace(/^http:\/\//,"https://"))&&obj;
 			if (typeof videoPlaybackLink == "undefined" || typeof videoPlaybackLink.durl == "undefined" || Number(videoPlaybackLink.code) < 0) {
 				if (typeof videoDownloadLink.message == "string" || videoDownloadLink.result.indexOf("error") >= 0  || typeof videoDownloadLink.error_text == "string") {
 					if (typeof videoPlaybackLink.message == "string" || videoPlaybackLink.result.indexOf("error") >= 0  || typeof videoPlaybackLink.error_text == "string") {
