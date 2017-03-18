@@ -98,6 +98,11 @@
     root.checkCRCHash = checkCRCHash;
 })(window);
 
+setTimeout(() => {
+    let _bangumiJump = location.href.match(/bangumi.bilibili.com\/anime\/[0-9]+\/play\#([0-9]+)$/);
+    if (_bangumiJump) location = 'http://bangumi.bilibili.com/anime/v/' + _bangumiJump[1];
+}, 500);
+
 (function() {
 	if ($("html").hasClass("bilibili-helper")) return false;
 	var adModeOn = false;
