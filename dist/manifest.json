@@ -1,0 +1,43 @@
+{
+   "background": {
+      "page": "background.html",
+      "persistent": true
+   },
+   "browser_action": {
+      "default_icon": {
+         "19": "imgs/icon-19.png",
+         "38": "imgs/icon-38.png"
+      },
+      "default_popup": "popup.html",
+      "default_title": "__MSG_extShortName__"
+   },
+   "content_scripts": [ {
+      "all_frames": true,
+      "css": ["ABPlayer.css", "bilibili-helper.css", "colpick.css"],
+      "js": [ "content_scripts.js", "MessageBox.min.js", "SelectModule.min.js", "cookies.js", "filename-sanitize.js", "jquery.min.js", "ColPick.js", "CommentCoreLibrary.js", "ABPlayer.js", "flv.min.js" ],
+      "matches": [ "*://*.bilibili.com/*" ],
+      "run_at": "document_end"
+   }, {
+      "all_frames": true,
+      "js": [ "ocrad.min.js", "store.min.js", "bilibili_live.js" ],
+      "matches": [ "*://live.bilibili.com/*"  ],
+      "run_at": "document_end"
+   } ],
+   "default_locale": "zh_CN",
+   "description": "__MSG_extDescription__",
+   "icons": {
+      "256": "imgs/icon-256.png",
+      "128": "imgs/icon-128.png",
+      "16": "imgs/icon-16.png",
+      "32": "imgs/icon-32.png"
+   },
+   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDd/wqh8sN1lnVWVGyKqhGM0Zz0ZuY3Dq5hNK3qNBw1/+B/XGe+zzwe7aSyr0qikd8pkN5HpoDvEDdkFHcdhPwXWoQGKiNAnKtohuz/2+g5YzLYzQg2bRqKdYJebEoCoiHtoSNS/HRtUeg483ypAH26LLyD6p+ykwQNo9DvtBo0kwIDAQAB",
+   "manifest_version": 2,
+   "name": "__MSG_extName__",
+   "short_name": "__MSG_extShortName__",
+   "options_page": "options.html",
+   "permissions": [ "downloads", "alarms", "cookies", "notifications", "storage", "tabs", "webRequest", "webRequestBlocking", "*://*.bilibili.com/*", "*://*.bilibili.cn/*", "*://*.bilibili.tv/*", "*://*.letv.cn/*", "*://*.hdslb.com/*", "*://*.acgvideo.com/*", "*://*.guguke.net/*", "*://*/*.acgvideo.com/*" ],
+   "version": "0.9.0.0",
+   "content_security_policy":"script-src 'self' 'unsafe-eval'; object-src 'self'",
+   "web_accessible_resources": [ "bilibili-helper.woff", "template.html", "imgs/icon-32.png", "imgs/loading.gif", "imgs/jinkela.png", "imgs/loading.gif", "imgs/helper-neko.png","imgs/icon.png", "options.html", "imgs/menu-icon.png", "live.css", "live-content-script.js" ]
+}
