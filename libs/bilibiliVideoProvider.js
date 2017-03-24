@@ -11,7 +11,7 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
     const getToken=async(retries)=>{
       let token;
       try{
-        let text = await fetch('http://www.bilibili.com/video/av7/').then(res => res.text())
+        let text = await fetch(location.protocol + '//www.bilibili.com/video/av7/').then(res => res.text())
         token = text.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/)[1];
         sessionStorage['bilibiliVideoProvider_Token'] = token;
         return token;
@@ -26,7 +26,7 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
     if (sessionStorage['bilibiliVideoProvider_Token']) token = sessionStorage['bilibiliVideoProvider_Token'];
     if (!token) token = await getToken();
     url.low = `${location.protocol}//api.bilibili.com/playurl?aid=${avid}&page=${page}&platform=html5&vtype=mp4&token=${token}`;
-    url._base = location.protocol + "//interface.bilibili.com/playurl?';
+    url._base = location.protocol + '//interface.bilibili.com/playurl?';
     url._query =(type,quality=3)=> `appkey=${APPKEY}&cid=${cid}&otype=json&quality=${quality}&type=${type}`;
     url.mp4 = url._base + url._query('mp4') +'&sign=' + md5(url._query('mp4') + APPSECRET);
     url.flv = url._base + url._query('flv') +'&sign=' + md5(url._query('flv') + APPSECRET);

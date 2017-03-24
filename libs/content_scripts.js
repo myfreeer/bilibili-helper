@@ -1,9 +1,9 @@
 // require external libs
 var {bilibiliVideoInfoProvider,bilibiliBangumiVideoInfoProvider} = require('./bilibiliVideoInfoProvider');
-var {sleep, parseSafe, parseTime, mySendMessage, parseXmlSafe} = require('./utils');
+var {sleep, parseSafe, parseTime, mySendMessage, parseXmlSafe, fetchretry, storageSet, storageGet, storageRemove, storageClear} = require('./utils');
 var commentSenderQuery = require('./commentSenderQuery');
 var bilibiliVideoProvider = require('./bilibiliVideoProvider');
-var xml2ass = require(./xml2ass');
+var xml2ass = require('./xml2ass');
 
 // shortcuts
 Element.prototype.find=Element.prototype.querySelectorAll;
@@ -54,6 +54,9 @@ var mainData={};
 		default:
 			return;
 	}
-	cid = videoInfo.list[page-1].cid;	
+	cid = videoInfo.list[page-1].cid;
 	if (!(avid && page && cid && videoInfo)) return console.warn('something went wrong, exiting.');
 	let _videoLink = bilibiliVideoProvider(cid, avid, page);
+	let comment = {};
+	let comment.url = `${location.protocol}//comment.bilibili.com/${cid}.xml`;
+	let comment._text = fetchretry(comment.url);
