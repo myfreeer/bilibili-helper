@@ -1,7 +1,7 @@
 var COMMONJS = typeof module == 'object' && module.exports;
 if (COMMONJS) {
   var md5 = require('./md5');
-  var sleep = require('./libs').sleep;
+  var sleep = require('./utils').sleep;
 }
 const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include', retries = 5, retryDelay = 500) => {
     const APPKEY = '84956560bc028eb7';
@@ -25,8 +25,8 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
     };
     if (sessionStorage['bilibiliVideoProvider_Token']) token = sessionStorage['bilibiliVideoProvider_Token'];
     if (!token) token = await getToken();
-    url.low = `http://api.bilibili.com/playurl?aid=${avid}&page=${page}&platform=html5&vtype=mp4&token=${token}`;
-    url._base = 'http://interface.bilibili.com/playurl?';
+    url.low = `${location.protocol}//api.bilibili.com/playurl?aid=${avid}&page=${page}&platform=html5&vtype=mp4&token=${token}`;
+    url._base = location.protocol + "//interface.bilibili.com/playurl?';
     url._query =(type,quality=3)=> `appkey=${APPKEY}&cid=${cid}&otype=json&quality=${quality}&type=${type}`;
     url.mp4 = url._base + url._query('mp4') +'&sign=' + md5(url._query('mp4') + APPSECRET);
     url.flv = url._base + url._query('flv') +'&sign=' + md5(url._query('flv') + APPSECRET);

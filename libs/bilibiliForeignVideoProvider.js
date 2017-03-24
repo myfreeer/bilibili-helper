@@ -1,7 +1,7 @@
 var COMMONJS = typeof module == 'object' && module.exports;
 if (COMMONJS) {
   var md5 = require('./md5');
-  var sleep = require('./libs').sleep;
+  var sleep = require('./utils').sleep;
 }
 const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include', retries = 5, retryDelay = 500) => {
     let url={};
