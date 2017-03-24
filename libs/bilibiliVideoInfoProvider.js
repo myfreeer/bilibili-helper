@@ -1,4 +1,4 @@
-const bilibiliVideoInfoProvider = async(avid, page = 1, credentials = 'include', retries = 5, retryDelay = 500, n = 0) => {
+export const bilibiliVideoInfoProvider = async(avid, page = 1, credentials = 'include', retries = 5, retryDelay = 500, n = 0) => {
     if (!avid) throw new Error('bilibiliVideoInfoProvider: avid is reuired');
     const url = [location.protocol + "//api.bilibili.com/view?type=json&appkey=8e9fc618fbd41e28&id=" + avid + "&page=" + page + "&batch=true", "https://www.biliplus.com/api/view?id=" + avid];
     if (sessionStorage[avid + '_' + page]) return JSON.parse(sessionStorage[avid + '_' + page]);
@@ -19,7 +19,7 @@ const bilibiliVideoInfoProvider = async(avid, page = 1, credentials = 'include',
     return json;
 };
 
-const bilibiliBangumiVideoInfoProvider = async(epid, credentials = 'include', retries = 5, retryDelay = 500, n = 0) => {
+export const bilibiliBangumiVideoInfoProvider = async(epid, credentials = 'include', retries = 5, retryDelay = 500, n = 0) => {
     if (!epid) throw new Error('bilibiliBangumiVideoInfoProvider: epid is required');
     var url = location.protocol + '//bangumi.bilibili.com/web_api/episode/' + epid + '.json';
     if (sessionStorage['ep_' + epid]) return JSON.parse(sessionStorage['ep_' + epid]);
@@ -37,4 +37,3 @@ const bilibiliBangumiVideoInfoProvider = async(epid, credentials = 'include', re
     sessionStorage['ep_' + epid] = JSON.stringify(videoInfo);
     return videoInfo;
 };
-module.exports = {bilibiliVideoInfoProvider, bilibiliBangumiVideoInfoProvider};

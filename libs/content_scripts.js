@@ -1,9 +1,9 @@
 // require external libs
-var {bilibiliVideoInfoProvider,bilibiliBangumiVideoInfoProvider} = require('./bilibiliVideoInfoProvider');
-var {sleep, parseSafe, parseTime, mySendMessage, parseXmlSafe, fetchretry, storageSet, storageGet, storageRemove, storageClear} = require('./utils');
-var commentSenderQuery = require('./commentSenderQuery');
-var bilibiliVideoProvider = require('./bilibiliVideoProvider');
-var xml2ass = require('./xml2ass');
+import {bilibiliVideoInfoProvider,bilibiliBangumiVideoInfoProvider} from './bilibiliVideoInfoProvider';
+import {sleep, parseSafe, parseTime, mySendMessage, parseXmlSafe, fetchretry, storageSet, storageGet, storageRemove, storageClear} from './utils';
+import commentSenderQuery from './commentSenderQuery';
+import bilibiliVideoProvider from './bilibiliVideoProvider';
+import xml2ass from './xml2ass';
 
 // shortcuts
 Element.prototype.find=Element.prototype.querySelectorAll;
@@ -28,10 +28,13 @@ NodeList.prototype.some = HTMLCollection.prototype.some = Array.prototype.some;
 var _$ = document.querySelector;
 var _$$ = document.querySelectorAll;
 
+//main func
 (async function() {
 var mainData={};
 	let url = location.href;
-	let avid, page, epid, cid, videoInfo, videoLink;
+	let avid, page, epid, cid, videoInfo, videoLink, options;
+	let _options = storageGet();
+	//get video info
 	switch(location.hostname){
 		case 'www.bilibili.com':
 			let _avid = url.match(/bilibili.com\/video\/av([0-9]+)/);
@@ -56,7 +59,11 @@ var mainData={};
 	}
 	cid = videoInfo.list[page-1].cid;
 	if (!(avid && page && cid && videoInfo)) return console.warn('something went wrong, exiting.');
+	// preload video links
 	let _videoLink = bilibiliVideoProvider(cid, avid, page);
 	let comment = {};
-	let comment.url = `${location.protocol}//comment.bilibili.com/${cid}.xml`;
-	let comment._text = fetchretry(comment.url);
+	// preload comments
+	comment.url = `${location.protocol}//comment.bilibili.com/${cid}.xml`;
+	comment._text = fetchretry(comment.url);
+	options = await _options;
+})();

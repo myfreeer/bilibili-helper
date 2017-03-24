@@ -553,4 +553,5 @@ var mina = function (cid0) {
 };
 
 initFont();
-if (typeof module === 'object' && module.exports) module.exports = (xmldoc, opts) =>  '\ufeff' + generateASS(setPosition(parseXML('', xmldoc)), opts);
+const xml2ass = (xmldoc, opts) =>  '\ufeff' + generateASS(setPosition(parseXML('', xmldoc)), opts);
+export default xml2ass;

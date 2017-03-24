@@ -1,8 +1,6 @@
-var COMMONJS = typeof module == 'object' && module.exports;
-if (COMMONJS) {
-  var md5 = require('./md5');
-  var sleep = require('./utils').sleep;
-}
+import md5 from './md5';
+import {sleep} from './utils';
+
 const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include', retries = 5, retryDelay = 500) => {
     const APPKEY = '84956560bc028eb7';
     const APPSECRET = '94aba54af9065f71de72f5508f1cd42e';
@@ -64,4 +62,4 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
     video.mediaDataSource = parseJsonforFlvjs(video.flv);
     return video;
 };
-if (COMMONJS) module.exports = bilibiliVideoProvider;
+export default bilibiliVideoProvider;

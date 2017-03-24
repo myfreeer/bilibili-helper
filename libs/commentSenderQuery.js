@@ -1,5 +1,4 @@
-var COMMONJS = typeof module == 'object' && module.exports;
-if (COMMONJS) var { CRC32,  checkCRCHash } = require('./crc32');
+import { CRC32,  checkCRCHash } from './crc32';
 const commentSenderQuery = async(hash, retries = 5) => {
     if (sessionStorage['commentSender_hash_' + hash]) return JSON.parse(sessionStorage['commentSender_hash_' + hash]);
     if (hash.indexOf('D') === 0) return {};
@@ -14,4 +13,4 @@ const commentSenderQuery = async(hash, retries = 5) => {
         else return mid;
     }
 };
-if (COMMONJS) module.exports = commentSenderQuery;
+export default commentSenderQuery;
