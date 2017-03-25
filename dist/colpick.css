@@ -13,7 +13,7 @@ colpick Color Picker / colpick.com
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
 	border-radius: 5px;
-	z-index: 15;
+	z-index: 150000 !important;
 	/*Prevents selecting text when dragging the selectors*/
 	-webkit-user-select: none;
 	-moz-user-select: none;

@@ -1182,36 +1182,6 @@ function BilibiliParser(xmlDoc, text, warn){
 	}
 	
 	var tlist = [];
-	/* Begin added filter code */
-	// Dictionary for cached results
-	// Do not process same comment more than once
-	// True for good, false for bad
-	var filtercache = {};
-	function filterComment(cmt) {
-		if (filters.length == 0) return false;
-		for (var i = 0; i < filters.color.length; i++) {
-			if (cmt.color == filters.color[i].content) {
-				return false;
-			}
-		}
-		for (var i = 0; i < filters.user.length; i++) {
-			if (cmt.hash == filters.user[i].content) {
-				return false;
-			}
-		}
-		for (var i = 0; i < filters.text.length; i++) {
-			if(cmt.text.indexOf(filters.text[i].content)!=-1) {
-				return false;
-			}
-		}
-		for (var i = 0; i < filters.regex.length; i++) {
-			if (filters.regex[i].content.exec(cmt.text)) {
-				return false;
-			}
-		}
-		return true;
-	}
-	/* end added filter code */
 	for(var i=0;i < elems.length;i++){
 		if(elems[i].getAttribute('p') != null){
 			var opt = elems[i].getAttribute('p').split(',');
@@ -1232,20 +1202,6 @@ function BilibiliParser(xmlDoc, text, warn){
 			obj.border = false;
 			if(obj.mode < 7){
 				obj.text = text.replace(/(\/n|\\n|\n|\r\n)/g, "\n");
-				/* begin added filter code */
-				// Test against saved results. If failed, reject
-				if (filtercache[obj.text]===false) {
-					continue;
-				}
-				if (filtercache[obj.text]===undefined) {
-					// Apply filters to comment
-					var result = filterComment(obj);
-					filtercache[obj.text] = result; // Save result for duplicates
-					if (!result) {
-						continue;
-					}
-				}
-				/* end added filter code */
 			}else{
 				if(obj.mode == 7){
 					try{

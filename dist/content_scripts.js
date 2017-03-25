@@ -1175,7 +1175,7 @@ const $h = html => {
 	//some ui code from original helper
 	if (!_$('.b-page-body')) genPage = decodeURIComponent(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6__cookies__["a" /* __GetCookie */])('redirectUrl'));
 	if (_$('.b-page-body .z-msg') > 0 && _$('.b-page-body .z-msg').text().indexOf('版权') > -1) genPage =1;
-	let biliHelper = $h(isBangumi && !genPage ? "<div class=\"v1-bangumi-info-btn helper\" id=\"bilibili_helper\"><span class=\"t\">哔哩哔哩助手</span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + options.version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>" : "<div class=\"block helper\" id=\"bilibili_helper\"><span class=\"t\"><div class=\"icon\"></div><div class=\"t-right\"><span class=\"t-right-top middle\">助手</span><span class=\"t-right-bottom\">扩展菜单</span></div></span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + options.version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>");
+	let biliHelper = $h(isBangumi && !genPage ? "<div class=\"v1-bangumi-info-btn helper\" id=\"bilibili_helper\"><span class=\"t\">哔哩哔哩助手</span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>" : "<div class=\"block helper\" id=\"bilibili_helper\"><span class=\"t\"><div class=\"icon\"></div><div class=\"t-right\"><span class=\"t-right-top middle\">助手</span><span class=\"t-right-bottom\">扩展菜单</span></div></span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>");
 	biliHelper.find('.t').onclick=()=>biliHelper.toggleClass('active');
 	biliHelper.blockInfo = biliHelper.find('.info');
 	biliHelper.mainBlock = biliHelper.find('.main');
@@ -1416,7 +1416,7 @@ const $h = html => {
 	            src: {
 	                playlist: [{
 	                    video: document.getElementById("bilibili_helper_html5_player_video"),
-	                    comments: comment.xml
+	                    comments: BilibiliParser(comment.xml)
 	                }]
 	            },
 	            width: "100%",
@@ -1445,14 +1445,14 @@ const $h = html => {
 	        if (type && type.match(/hd|ld/)) return abp;
 	        this.flvPlayer = flvjs.createPlayer(videoLink.mediaDataSource);
 	        biliHelper.switcher.interval = setInterval(function () {
-	            if (abp.commentObjArray && biliHelper.switcher.flvPlayer) {
+	            if (abp.commentObjArray && abp.commentObjArray.length > 0 && biliHelper.switcher.flvPlayer) {
 	                clearInterval(biliHelper.switcher.interval);
 	                biliHelper.switcher.flvPlayer.attachMediaElement(abp.video);
 	                biliHelper.switcher.flvPlayer.load();
 	                biliHelper.switcher.flvPlayer.on(flvjs.Events.ERROR, e => console.warn(e, 'Switch back to HTML5 HD.', biliHelper.switcher.html5hd()));
 	                biliHelper.switcher.flvPlayer.on(flvjs.Events.MEDIA_INFO, e => console.log('分辨率: ' + e.width + "x" + e.height + ', FPS: ' + e.fps, '视频码率: ' + Math.round(e.videoDataRate * 100) / 100, '音频码率: ' + Math.round(e.audioDataRate * 100) / 100));
 	            }
-	        }, 600);
+	        }, 1000);
 	        var lastTime;
 	        biliHelper.switcher.checkFinished = setInterval(function () {
 	            if (abp.video.currentTime !== lastTime) {

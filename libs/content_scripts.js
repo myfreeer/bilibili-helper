@@ -122,7 +122,6 @@ const $h = html => {
 	biliHelper.mainBlock.querySection = $h('<div class="section query"><h3>弹幕发送者查询</h3><p><span></span>正在加载全部弹幕, 请稍等…</p></div>');
 	biliHelper.mainBlock.append(biliHelper.mainBlock.querySection);
 	(isBangumi && !genPage ? _$('.v1-bangumi-info-operate .v1-app-btn') : _$('.player-wrapper .arc-toolbar')).append(biliHelper);
-	console.log(await _videoLink, videoInfo);
 
 	// process video links
 	videoLink = await _videoLink;
@@ -329,7 +328,7 @@ const $h = html => {
 	            src: {
 	                playlist: [{
 	                    video: document.getElementById("bilibili_helper_html5_player_video"),
-	                    comments: comment.xml
+	                    comments: BilibiliParser(comment.xml)
 	                }]
 	            },
 	            width: "100%",
@@ -365,7 +364,7 @@ const $h = html => {
 	                biliHelper.switcher.flvPlayer.on(flvjs.Events.ERROR, e => console.warn(e, 'Switch back to HTML5 HD.', biliHelper.switcher.html5hd()));
 	                biliHelper.switcher.flvPlayer.on(flvjs.Events.MEDIA_INFO, e => console.log('分辨率: ' + e.width + "x" + e.height + ', FPS: ' + e.fps, '视频码率: ' + Math.round(e.videoDataRate * 100) / 100, '音频码率: ' + Math.round(e.audioDataRate * 100) / 100));
 	            }
-	        }, 600);
+	        }, 1000);
 	        var lastTime;
 	        biliHelper.switcher.checkFinished = setInterval(function () {
 	            if (abp.video.currentTime !== lastTime) {

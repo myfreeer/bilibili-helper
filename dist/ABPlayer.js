@@ -22,7 +22,7 @@ function CommentLoader(url, xcm, callback) {
         callback = function() {
             return;
         };
-    if (typeof url == "object" && typeof url.getElementsByTagName == "function") return callback(cm.load(BilibiliParser(url)));
+    if (typeof url == "object") return callback(cm.load(url));
     if (url.indexOf('data:application/xml;charset=utf-8,') === 0) return callback(cm.load(BilibiliParser(parseXmlSafe(url.substring(35)))));
     var xmlhttp = null;
     var retry = 0;
@@ -829,6 +829,7 @@ return check; }
 					window.addEventListener("resize", function() {
 						ABPInst.cmManager.setBounds();
 					});
+					window.addEventListener("scroll", ()=>ABPInst.cmManager.setBounds());
 				}
 				video.addEventListener("timeupdate", function() {
 					if (ABPInst.cmManager.display === false) return;
