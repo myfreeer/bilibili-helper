@@ -4,16 +4,19 @@ import {sleep, parseSafe, parseTime, mySendMessage, parseXmlSafe, fetchretry, st
 import commentSenderQuery from './commentSenderQuery';
 import bilibiliVideoProvider from './bilibiliVideoProvider';
 import xml2ass from './xml2ass';
+import {getDownloadOptions, getNiceSectionFilename} from './filename-sanitize';
 
 // shortcuts
 Element.prototype.find=Element.prototype.querySelector;
+Element.prototype.findAll=Element.prototype.querySelectorAll;
 Element.prototype.attr=Element.prototype.getAttribute;
 Element.prototype.on=Element.prototype.addEventListener;
 Element.prototype.off=Element.prototype.removeEventListener;
 // arrow functions binds no this nor arguments
 Element.prototype.data=function(str){return this.dataset[str];};
-Element.prototype.text=function(){return this.innerText;};
-Element.prototype.html=function(str){return str ? (this.innerHTML = str) : this.innerHTML;};
+Element.prototype.text=function(str){str ? (this.innerText = str) : this.innerText;return this;};
+Element.prototype.empty=function(){this.innerHTML = ''; return this;};
+Element.prototype.html=function(str){str ? (this.innerHTML = str) : this.innerHTML;return this;};
 Element.prototype.hide=function(){this.style.display = 'none';};
 Element.prototype.show=function(){this.style.display = '';};
 Element.prototype.addClass=function(){return this.classList.add(...arguments);};
@@ -22,6 +25,7 @@ Element.prototype.toggleClass=function(){return this.classList.toggle(...argumen
 Element.prototype.hasClass=function(){return this.classList.contains(...arguments);};
 Element.prototype.replaceClass=function(){return this.classList.replace(...arguments);};
 NodeList.prototype.map = HTMLCollection.prototype.map = Array.prototype.map;
+NodeList.prototype.each = HTMLCollection.prototype.each = NodeList.prototype.forEach;
 NodeList.prototype.filter = HTMLCollection.prototype.filter = Array.prototype.filter;
 NodeList.prototype.reduce = HTMLCollection.prototype.reduce = Array.prototype.reduce;
 NodeList.prototype.reduceRight = HTMLCollection.prototype.reduceRight = Array.prototype.reduceRight;
@@ -72,8 +76,8 @@ const $h = html => {
 	let comment = {};
 	// preload comments
 	comment.url = `${location.protocol}//comment.bilibili.com/${cid}.xml`;
-	comment._text = fetchretry(comment.url).then(res=>res.text());
-	let videoPic = _$('img.cover_image').attr('src');
+	comment._text = fetchretry(comment.url).then(res=>res.text()).then(text=>parseXmlSafe(text));
+	const videoPic = _$('img.cover_image').attr('src');
 	options = await _options;
 	//some ui code from original helper
 	if (!_$('.b-page-body')) genPage = decodeURIComponent(__GetCookie('redirectUrl'));
@@ -115,5 +119,30 @@ const $h = html => {
 	console.log(await _videoLink, videoInfo);
 	// process video links
 	videoLink = await _videoLink;
+	const clickDownLinkElementHandler = async(event) => !event.preventDefault() && await mySendMessage({
+	    command: 'requestForDownload',
+	    url: event.target.attr('href'),
+	    filename: event.target.attr('download')
+	});
+	const createDownLinkElement = (segmentInfo, index) => {
+	    const downloadOptions = getDownloadOptions(segmentInfo.url, getNiceSectionFilename(avid, page, videoInfo.pages || 1, index, videoLink.mediaDataSource.segments.length));
+	    const length = parseTime(segmentInfo.duration);
+	    const size = (segmentInfo.filesize / 1048576 + 0.5) >>> 0;
+	    const title = isNaN(size) ? (`长度: ${length}`) : (`长度: ${length} 大小: ${size} MB`);
+	    let bhDownLink = $h(`<a class="b-btn w" rel="noreferrer" id="bili_helper_down_link_${index}" download="${downloadOptions.filename}" title="${title}" href="${segmentInfo.url}">${'分段 ' + (index + 1)}</a>`);
+	    bhDownLink.download = downloadOptions.filename;
+	    bhDownLink.onclick = clickDownLinkElementHandler;
+	    biliHelper.mainBlock.downloaderSection.find('p').append(bhDownLink);
+	};
+	biliHelper.mainBlock.downloaderSection.find('p').empty();
+	videoLink.mediaDataSource.segments.forEach(createDownLinkElement);
+	//const videoPic = videoInfo.pic || videoLink.low.img;
+	if (videoLink.mediaDataSource.segments.length > 1) {
+	    var bhDownAllLink = $h('<a class="b-btn"></a>').text('下载全部 ' + videoLink.mediaDataSource.segments.length + ' 个分段');
+	    biliHelper.mainBlock.downloaderSection.find('p').append(bhDownAllLink);
+	    bhDownAllLink.onclick=e=> biliHelper.mainBlock.downloaderSection.findAll('p .b-btn.w').each(e=>e.click());
+	}
+	biliHelper.mainBlock.downloaderSection.find('p').append($h('<a class="b-btn" target="_blank" title="实验性功能，由bilibilijj提供，访问慢且不稳定" href="http://www.bilibilijj.com/Files/DownLoad/' + cid + '.mp3/www.bilibilijj.com.mp3?mp3=true">音频</a>'));
+	biliHelper.mainBlock.downloaderSection.find('p').append($h('<a class="b-btn" target="_blank" href="' + videoPic + '">封面</a>'));
 
 })();

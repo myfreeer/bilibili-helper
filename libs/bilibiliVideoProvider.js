@@ -128,7 +128,7 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
     if (video.mediaDataSource.type === 'mp4') {
         const ts = Math.ceil(Date.now() / 1000);
         url.flv = url._base + `${interfaceUrl(cid,ts)}&sign=${calcSign(cid,ts)}`;
-        video.flv = await getVideoLink(url.flv, flv, retries, credentials, retryDelay);
+        video.flv = await getVideoLink(url.flv, 'flv', retries, credentials, retryDelay);
         processVideoUrlObj(video.flv);
         video.mediaDataSource = parseJsonforFlvjs(video.flv);
     }

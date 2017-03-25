@@ -99,7 +99,7 @@ var filenameSanitize = (function () {
     };
 })();
 
-function getNiceSectionFilename(avid, page, totalPage, idx, numParts) {
+export function getNiceSectionFilename(avid, page, totalPage, idx, numParts) {
     // TODO inspect the page to get better section name
     var idName = 'av' + avid,
         // page/part name is only shown when there are more than one pages/parts
@@ -121,7 +121,7 @@ function getNiceSectionFilename(avid, page, totalPage, idx, numParts) {
 
 // Helper function, return object {url, filename}, options object used by
 // "chrome.downloads.download"
-function getDownloadOptions(url, filename) {
+export function getDownloadOptions(url, filename) {
     // TODO Improve file extension determination process.
     //
     // Parsing the url should be ok in most cases, but the best way should
