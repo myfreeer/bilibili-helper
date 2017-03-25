@@ -503,55 +503,6 @@ var parseXML = function (content, data) {
   });
 };
 
-// 获取当前cid
-var getCid = function (callback) {
-  debug('get cid...');
-  var cid = null, src = null;
-  try {
-    src = document.querySelector('#bofqi iframe').src.replace(/^.*\?/, '');
-    cid = Number(src.match(/cid=(\d+)/)[1]);
-  } catch (e) { }
-  if (!cid) try {
-    src = document.querySelector('#bofqi embed').getAttribute('flashvars');
-    cid = Number(src.match(/cid=(\d+)/)[1]);
-  } catch (e) { }
-  if (!cid) try {
-    src = document.querySelector('#bofqi object param[name="flashvars"]').getAttribute('value');
-    cid = Number(src.match(/cid=(\d+)/)[1]);
-  } catch (e) { }
-  if (cid) setTimeout(callback, 0, cid);
-  else if (src) GM_xmlhttpRequest({
-    'method': 'GET',
-    'url': 'http://interface.bilibili.com/player?' + src,
-    'onload': function (resp) {
-      try { cid = Number(resp.responseText.match(/<chatid>(\d+)<\/chatid>/)[1]); }
-      catch (e) { }
-      setTimeout(callback, 0, cid || undefined);
-    },
-    'onerror': function () { setTimeout(callback, 0); }
-  }); else {
-    setTimeout(getCid, 100, callback);
-  }
-};
-
-// 下载的主程序
-var mina = function (cid0) {
-  getCid(function (cid) {
-    cid = cid || cid0;
-    fetchDanmaku(cid, function (danmaku) {
-      var name;
-      try { name = document.querySelector('.viewbox h1, .viewbox h2').textContent; }
-      catch (e) { name = '' + cid; }
-      debug('got xml with %d danmaku', danmaku.length);
-      var ass = generateASS(setPosition(danmaku), {
-        'title': document.title,
-        'ori': location.href,
-      });
-      startDownload('\ufeff' + ass, name + '.ass');
-    });
-  });
-};
-
 initFont();
 const xml2ass = (xmldoc, opts) =>  '\ufeff' + generateASS(setPosition(parseXML('', xmldoc)), opts);
 export default xml2ass;

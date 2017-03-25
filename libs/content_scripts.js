@@ -180,7 +180,7 @@ const $h = html => {
 	        assUrl = window.URL.createObjectURL(assBlob);
 	    event.target.href = assUrl;
 	    clickDownLinkElementHandler(event);
-	    document.on('unload',  () =>window.URL.revokeObjectURL(assUrl));
+	    document.addEventListener('unload',  () =>window.URL.revokeObjectURL(assUrl));
 	};
 	let assBtn = $h(`<a class="b-btn w" download="${biliHelper.downloadFileName.replace('.xml', '.ass')}" href>下载 ASS 格式弹幕</a>`);
 	assBtn.onclick = clickAssBtnHandler;
