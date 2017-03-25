@@ -17,7 +17,7 @@ Element.prototype.on=Element.prototype.addEventListener;
 Element.prototype.off=Element.prototype.removeEventListener;
 // arrow functions binds no this nor arguments
 Element.prototype.data=function(str){return this.dataset[str];};
-Element.prototype.text=function(str){str ? (this.innerText = str) : this.innerText;return this;};
+Element.prototype.text=function(str){return str ? (this.innerText = str) : this.innerText;};
 Element.prototype.empty=function(){this.innerHTML = ''; return this;};
 Element.prototype.html=function(str){str ? (this.innerHTML = str) : this.innerHTML;return this;};
 Element.prototype.hide=function(){this.style.display = 'none';};
@@ -165,7 +165,7 @@ const $h = html => {
 	biliHelper.downloadFileName = getDownloadOptions(comment.url, getNiceSectionFilename(avid, page, videoInfo.pages || 1, 1, 1)).filename;
 	biliHelper.mainBlock.infoSection.find('p').append($h('<span>cid: ' + cid + '</span>'));
 	biliHelper.mainBlock.commentSection = $h(`<div class="section comment"><h3>弹幕下载</h3><p><a class="b-btn w" href="${comment.url}" download="${biliHelper.downloadFileName}">下载 XML 格式弹幕</a></p></div>`);
-	commentDiv.find('a').onclick = clickDownLinkElementHandler;
+	biliHelper.mainBlock.commentSection.find('a').onclick = clickDownLinkElementHandler;
 	biliHelper.mainBlock.append(biliHelper.mainBlock.commentSection);
 	comment.xml = await comment._xml;
 	let assData;
@@ -182,8 +182,53 @@ const $h = html => {
 	    clickDownLinkElementHandler(event);
 	    document.on('unload',  () =>window.URL.revokeObjectURL(assUrl));
 	};
-	let assBtn = $(`<a class="b-btn w" download="${biliHelper.downloadFileName.replace('.xml', '.ass')}" href>下载 ASS 格式弹幕</a>`);
+	let assBtn = $h(`<a class="b-btn w" download="${biliHelper.downloadFileName.replace('.xml', '.ass')}" href>下载 ASS 格式弹幕</a>`);
 	assBtn.onclick = clickAssBtnHandler;
 	biliHelper.mainBlock.commentSection.find('p').append(assBtn);
 
+	// begin comment user query
+	biliHelper.comments = comment.xml.getElementsByTagName('d');
+	let control = $h('<div><input type="text" class="b-input" placeholder="根据关键词筛选弹幕"><div class="b-slt"><span class="txt">请选择需要查询的弹幕…</span><div class="b-slt-arrow"></div><ul class="list"><li disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</li></ul></div><span></span><span class="result">选择弹幕查看发送者…</span></div>');
+	control.find('.b-input').onkeyup = e => {
+		const keyword = control.find('input').value,
+			regex = new RegExp(parseSafe(keyword), 'gi');
+		control.find('ul.list').html('<li disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</li>');
+		if (control.find('.b-slt .txt').text() != '请选择需要查询的弹幕' && keyword.trim() != '') control.find('.b-slt .txt').html(parseSafe(control.find('.b-slt .txt').text()));
+		if (keyword.trim() != '') control.find('.b-slt .txt').text(control.find('.b-slt .txt').text());
+		for (let node of biliHelper.comments){
+			let text = node.childNodes[0];
+			if (text && node && regex.test(text.nodeValue)) {
+				text = text.nodeValue;
+				const commentData = node.getAttribute('p').split(','),
+		                        sender = commentData[6],
+		                        time = parseTime(parseInt(commentData[0]) * 1000);
+		        let li = $h(`<li sender=${sender}></li>`);
+		        li.sender = sender;
+		        li.html('[' + time + '] ' + (keyword.trim() == '' ? parseSafe(text) : parseSafe(text).replace(regex, kw =>'<span class="kw">' + kw + '</span>')));
+		        control.find('ul.list').append(li);
+		    }
+		}
+	};
+	debugger;
+	control.find('.b-input').onkeyup();
+	const displayUserInfo = (mid, data) => {
+	    control.find('.result').html('发送者: <a href="http://space.bilibili.com/' + mid + '" target="_blank" card="' + parseSafe(data.name) + '" data-usercard-mid="' + mid + '">' + parseSafe(data.name) + '</a><div target="_blank" class="user-info-level l' + parseSafe(data.level_info.current_level) + '"></div>');
+	    let s = document.createElement('script');
+	    s.appendChild(document.createTextNode('UserCard.bind($("#bilibili_helper .query .result"));'));
+	    document.body.appendChild(s);
+	    s.parentNode.removeChild(s);
+	};
+	SelectModule.bind(control.find('div.b-slt'), {
+	    onChange: item => {
+	        console.log(item);
+	        const sender = item[0].sender;
+	        control.find('.result').text('查询中…');
+	        if (sender.indexOf('D') == 0) {
+	            control.find('.result').text('游客弹幕');
+	            return;
+	        }
+	        commentSenderQuery(hash).then(data=>displayUserInfo(data.mid,data));
+	    }
+	});
+	biliHelper.mainBlock.querySection.find('p').empty().append(control);
 })();
