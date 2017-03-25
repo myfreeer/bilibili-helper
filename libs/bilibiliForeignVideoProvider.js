@@ -1,8 +1,6 @@
-var COMMONJS = typeof module == 'object' && module.exports;
-if (COMMONJS) {
-  var md5 = require('./md5');
-  var sleep = require('./utils').sleep;
-}
+import md5 from './md5';
+import {sleep} from './utils';
+
 const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include', retries = 5, retryDelay = 500) => {
     let url={};
     url.low = 'https://www.biliplus.com/BPplayurl.php?cid=' + cid + '&otype=json&quality=1&type=mp4';
@@ -42,4 +40,4 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
     video.mediaDataSource = parseJsonforFlvjs(video.flv);
     return video;
 };
-if (COMMONJS) module.exports = bilibiliForeignVideoProvider;
+export default bilibiliVideoProvider;
