@@ -10,18 +10,7 @@ var notification = false,
     updateNotified = false,
     videoPlaybackHosts = ["http://*.hdslb.com/*", "https://*.hdslb.com/*", "http://*.acgvideo.com/*", "http://*/*.acgvideo.com/*", "https://*.acgvideo.com/*", "https://*/*.acgvideo.com/*"],
     Live = {};
-bangumi = false;
 var bkg_page = chrome.extension.getBackgroundPage();
-
-URL.prototype.__defineGetter__('query', function() {
-    var parsed = this.search.substr(1).split('&');
-    var parsedObj = {};
-    parsed.forEach(function(elem, iter, arr) {
-        var vals = arr[iter].split('=');
-        parsedObj[vals[0]] = vals[1];
-    });
-    return parsedObj;
-});
 
 function getFileData(url, callback, method) {
     var m = 'GET';
@@ -68,24 +57,6 @@ function postFileData(url, data, callback) {
         }
     };
     xmlhttp.send(encodeData);
-}
-
-function getUrlVars(url) {
-    var vars = [],
-        hash;
-    var hashes = url.slice(url.indexOf('?') + 1).split('&');
-    for (var i = 0; i < hashes.length; i++) {
-        hash = hashes[i].split('=');
-        vars.push(hash[0]);
-        vars[hash[0]] = hash[1];
-    }
-    return vars;
-}
-
-function searchBilibili(info) {
-    chrome.tabs.create({
-        url: "http://www.bilibili.com/search?keyword=" + info.selectionText
-    });
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -176,42 +147,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     }
 });
 
-chrome.alarms.onAlarm.addListener(function(alarm) {
-    switch (alarm.name) {
-        case "checkDynamic":
-            checkDynamic();
-            return true;
-        default:
-            return false;
-    }
-});
-
-chrome.notifications.onButtonClicked.addListener(function(notificationId, index) {
-    if (Live.notisesIdList[notificationId] != undefined) {
-        if (index === 0) {
-            chrome.tabs.create({
-                url: Live.notisesIdList[notificationId].link
-            });
-        } else if (index === 1) {
-            chrome.tabs.create({
-                url: 'http://live.bilibili.com/i/following'
-            });
-        }
-    } else if (notificationId == 'getTV') {
-        chrome.tabs.create({
-            url: 'http://live.bilibili.com/i/awards'
-        });
-    } else if (index == 0 && notificationAvid[notificationId]) {
-        chrome.tabs.create({
-            url: "http://www.bilibili.com/video/av" + notificationAvid[notificationId]
-        });
-    } else if (index == 1) {
-        chrome.tabs.create({
-            url: "http://www.bilibili.com/account/dynamic"
-        });
-    }
-});
-
 chrome.webRequest.onBeforeRequest.addListener(function(details) {
     chrome.tabs.sendMessage(details.tabId, {
         command: "error"
@@ -259,9 +194,9 @@ function receivedHeaderModifier(details) {
     };
 }
 
-    chrome.webRequest.onHeadersReceived.addListener(receivedHeaderModifier, {
-        urls: videoPlaybackHosts
-    }, ["responseHeaders", "blocking"]);
+chrome.webRequest.onHeadersReceived.addListener(receivedHeaderModifier, {
+    urls: videoPlaybackHosts
+}, ["responseHeaders", "blocking"]);
 
 chrome.webRequest.onHeadersReceived.addListener(function(details) {
     var headers = details.responseHeaders;
@@ -281,29 +216,3 @@ chrome.webRequest.onHeadersReceived.addListener(function(details) {
 }, {
     urls: ["http://www.bilibili.com/video/av*", "http://bangumi.bilibili.com/anime/v/*"]
 }, ["responseHeaders", "blocking"]);
-
-function getCookie(name) {
-    var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
-    if (arr = document.cookie.match(reg))
-        return unescape(arr[2]);
-    else
-        return null;
-}
-
-function each(obj, fn) {
-    if (!fn) return;
-    if (obj instanceof Array) {
-        var i = 0,
-            len = obj.length;
-        for (; i < len; i++) {
-            if (fn.call(obj[i], i) == false)
-                break;
-        }
-    } else if (typeof obj === 'object') {
-        var j = null;
-        for (j in obj) {
-            if (fn.call(obj[j], j) == false)
-                break;
-        }
-    }
-}

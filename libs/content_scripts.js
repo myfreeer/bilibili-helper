@@ -48,6 +48,8 @@ const $h = html => {
 	let avid, page, epid, cid, videoInfo, videoLink, options, isBangumi, genPage;
 	//preload options
 	const _options = storageGet();
+	//prevent offical html5 autoload
+	localStorage.removeItem('defaulth5');
 
 	//get video info
 	switch(location.hostname){
@@ -86,6 +88,7 @@ const $h = html => {
 	options = await _options;
 
 	//some ui code from original helper
+	const videoPic = videoInfo.pic || (_$('img.cover_image') && _$('img.cover_image').attr('src'));
 	if (!_$('.b-page-body')) genPage = decodeURIComponent(__GetCookie('redirectUrl'));
 	if (_$('.b-page-body .z-msg') > 0 && _$('.b-page-body .z-msg').text().indexOf('版权') > -1) genPage =1;
 	let biliHelper = $h(isBangumi && !genPage ? "<div class=\"v1-bangumi-info-btn helper\" id=\"bilibili_helper\"><span class=\"t\">哔哩哔哩助手</span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>" : "<div class=\"block helper\" id=\"bilibili_helper\"><span class=\"t\"><div class=\"icon\"></div><div class=\"t-right\"><span class=\"t-right-top middle\">助手</span><span class=\"t-right-bottom\">扩展菜单</span></div></span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>");
@@ -99,7 +102,7 @@ const $h = html => {
 	    biliHelper.mainBlock.redirectSection = $h('<div class="section redirect"><h3>生成页选项</h3><p><a class="b-btn w" href="' + biliHelper.redirectUrl + '">前往原始跳转页</a></p></div>');
 	    biliHelper.mainBlock.append(biliHelper.mainBlock.redirectSection);
 	}
-	biliHelper.mainBlock.speedSection = $h('<div class="section speed hidden"><h3>视频播放控制</h3><p><span id="bilibili_helper_html5_video_res"></span><a class="b-btn w" id="bilibili_helper_html5_video_mirror">镜像视频</a><br>视频播放速度<input id="bilibili_helper_html5_video_speed" type="number" class="b-input" placeholder="1.0" value=1.0></br>旋转视频<input id="bilibili_helper_html5_video_rotate" type="number" class="b-input" placeholder="0" value=0></p></div>');
+	biliHelper.mainBlock.speedSection = $h('<div class="section speed hidden"><h3>视频播放控制</h3><p><span id="bilibili_helper_html5_video_res"></span><a class="b-btn w" id="bilibili_helper_html5_video_mirror">镜像视频</a><br>视频播放速度: <input id="bilibili_helper_html5_video_speed" type="number" class="b-input" placeholder="1.0" value=1.0 style="width: 40px;">    旋转视频: <input id="bilibili_helper_html5_video_rotate" type="number" class="b-input" placeholder="0" value=0 style="width: 40px;"></p></div>');
 	biliHelper.mainBlock.append(biliHelper.mainBlock.speedSection);
 	biliHelper.mainBlock.speedSection.input = biliHelper.mainBlock.speedSection.find('input#bilibili_helper_html5_video_speed.b-input');
 	biliHelper.mainBlock.speedSection.input.step = 0.1;
@@ -122,6 +125,15 @@ const $h = html => {
 	biliHelper.mainBlock.querySection = $h('<div class="section query"><h3>弹幕发送者查询</h3><p><span></span>正在加载全部弹幕, 请稍等…</p></div>');
 	biliHelper.mainBlock.append(biliHelper.mainBlock.querySection);
 	(isBangumi && !genPage ? _$('.v1-bangumi-info-operate .v1-app-btn') : _$('.player-wrapper .arc-toolbar')).append(biliHelper);
+	_$('#bofqi').html('<div id="player_placeholder" class="player"></div>');
+	_$('#bofqi').find('#player_placeholder').style.cssText =
+	    `background: url(${videoPic}) 50% 50% / cover no-repeat;
+	    -webkit-filter: blur(5px);
+	    overflow: hidden;
+	    visibility: visible;`;
+	let replaceNotice = $h('<div id="loading-notice">正在尝试替换播放器…<span id="cancel-replacing">取消</span></div>');
+	replaceNotice.find('#cancel-replacing').onclick= e =>!_$('#loading-notice').remove() && biliHelper.switcher.original();
+	_$('#bofqi').append(replaceNotice);
 
 	// process video links
 	videoLink = await _videoLink;
@@ -145,7 +157,6 @@ const $h = html => {
 	biliHelper.mainBlock.downloaderSection.find('p').empty();
 	videoLink.mediaDataSource.segments.forEach(createDownLinkElement);
 
-	const videoPic = videoInfo.pic || videoLink.low.img;
 	if (videoLink.mediaDataSource.segments.length > 1) {
 	    var bhDownAllLink = $h(`<a class="b-btn">下载全部${videoLink.mediaDataSource.segments.length}个分段</a>`);
 	    biliHelper.mainBlock.downloaderSection.find('p').append(bhDownAllLink);
@@ -281,7 +292,7 @@ const $h = html => {
 	    original: function () {
 	        this.set('original');
 	        _$('#bofqi').html(biliHelper.originalPlayer);
-	        if (_$('#bofqi embed').attr('width') == 950) $('#bofqi embed').attr('width', 980);
+	        if (_$('#bofqi embed').attr('width') == 950) _$('#bofqi embed').setAttribute('width', 980);
 	    },
 	    swf: function () {
 	        this.set('swf');
@@ -323,6 +334,7 @@ const $h = html => {
 	        default:
 	            this.set('html5');
 	            html5VideoUrl = videoLink.hd[0];
+	            if (videoLink.mediaDataSource.type === 'mp4') return console.warn('No Flv urls available, switch back to html5 hd',biliHelper.switcher.html5hd());
 	        }
 	        _$('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + videoPic + '" crossorigin="anonymous"><source src="' + html5VideoUrl + '" type="video/mp4"></video></div>');
 	        let abp = ABP.create(document.getElementById("bilibili_helper_html5_player"), {
@@ -336,8 +348,8 @@ const $h = html => {
 	            height: "100%",
 	            config: options
 	        });
-	        abp.playerUnit.addEventListener("wide", () => $("#bofqi").addClass("wide"));
-	        abp.playerUnit.addEventListener("normal", () => $("#bofqi").removeClass("wide"));
+	        abp.playerUnit.addEventListener("wide", () => _$("#bofqi").addClass("wide"));
+	        abp.playerUnit.addEventListener("normal", () => _$("#bofqi").removeClass("wide"));
 	        abp.playerUnit.addEventListener("sendcomment", function (e) {
 	            const commentId = e.detail.id,
 	                commentData = e.detail;
@@ -405,23 +417,19 @@ const $h = html => {
 	        });
 	    },
 	    bilimac: function () {
-	        // this need jQuery
 	        this.set('bilimac');
-	        $('#bofqi').html('<div id="player_placeholder" class="player"></div><div id="loading-notice">正在加载 Bilibili Mac 客户端…</div>');
-	        $('#bofqi').find('#player_placeholder').css({
-	            background: 'url(' + videoPic + ') 50% 50% / cover no-repeat',
-	            '-webkit-filter': 'blur(20px)',
-	            overflow: 'hidden',
-	            visibility: 'visible'
-	        });
-	        $.post("http://localhost:23330/rpc", {
-	            action: 'playVideoByCID',
-	            data: cid + '|' + window.location.href + '|' + document.title + '|' + 1
-	        }, function () {
-	            $('#bofqi').find('#loading-notice').text('已在 Bilibili Mac 客户端中加载');
-	        }).fail(function () {
-	            $('#bofqi').find('#loading-notice').text('调用 Bilibili Mac 客户端失败 :(');
-	        });
+	        _$('#bofqi').html('<div id="player_placeholder" class="player"></div><div id="loading-notice">正在加载 Bilibili Mac 客户端…</div>');
+	        _$('#bofqi').find('#player_placeholder').style.cssText =
+	            `background: url(${videoPic}) 50% 50% / cover no-repeat;
+	            -webkit-filter: blur(20px);
+	            overflow: hidden;
+	            visibility: visible;`;
+	        fetch("http://localhost:23330/rpc", {
+	                method: "POST",
+	                headers: {"Content-Type": "application/x-www-form-urlencoded"},
+	                body: `action=playVideoByCID&data=${cid}|${window.location.href}|${document.title}|1`
+	            }).then(res => res.ok && _$('#bofqi').find('#loading-notice').text('已在 Bilibili Mac 客户端中加载'))
+	            .catch(e => _$('#bofqi').find('#loading-notice').text('调用 Bilibili Mac 客户端失败 :('));
 	    }
 	};
 	biliHelper.switcher.html5();
