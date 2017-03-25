@@ -112,6 +112,6 @@ var mainData={};
 	biliHelper.mainBlock.querySection = $h('<div class="section query"><h3>弹幕发送者查询</h3><p><span></span>正在加载全部弹幕, 请稍等…</p></div>');
 	biliHelper.mainBlock.append(biliHelper.mainBlock.querySection);
 	(isBangumi && !genPage ? _$('.v1-bangumi-info-operate .v1-app-btn') : _$('.player-wrapper .arc-toolbar')).append(biliHelper);
-	
+	console.log(await _videoLink, videoInfo);
 
 })();
