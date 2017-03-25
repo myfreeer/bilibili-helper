@@ -37,7 +37,7 @@ const $h = html => {
 
 //main func
 (async function() {
-var mainData={};
+//var mainData={};
 	const url = location.href;
 	let avid, page, epid, cid, videoInfo, videoLink, options, isBangumi, genPage;
 	const _options = storageGet();
@@ -72,7 +72,7 @@ var mainData={};
 	let comment = {};
 	// preload comments
 	comment.url = `${location.protocol}//comment.bilibili.com/${cid}.xml`;
-	comment._text = fetchretry(comment.url);
+	comment._text = fetchretry(comment.url).then(res=>res.text());
 	let videoPic = _$('img.cover_image').attr('src');
 	options = await _options;
 	//some ui code from original helper
@@ -113,5 +113,7 @@ var mainData={};
 	biliHelper.mainBlock.append(biliHelper.mainBlock.querySection);
 	(isBangumi && !genPage ? _$('.v1-bangumi-info-operate .v1-app-btn') : _$('.player-wrapper .arc-toolbar')).append(biliHelper);
 	console.log(await _videoLink, videoInfo);
+	// process video links
+	videoLink = await _videoLink;
 
 })();

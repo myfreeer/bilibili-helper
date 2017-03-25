@@ -102,8 +102,25 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
     const ts = Math.ceil(Date.now() / 1000);
     url.flv = url._base + `${interfaceUrl(cid,ts)}&sign=${calcSign(cid,ts)}`;
     let video = {};
-    for (let i of ['low', 'mp4', 'flv']) video[i] = await getVideoLink(url[i], i, retries, credentials, retryDelay);
+    const types = ['low', 'mp4', 'flv'];
+    for (let i of types) video[i] = await getVideoLink(url[i], i, retries, credentials, retryDelay);
     video.mediaDataSource = parseJsonforFlvjs(video.flv);
+    video.hd = [];
+    video.ld = [];
+    const processVideoUrl = url => {
+        if (!url) return;
+        if (!url.match('ws.acgvideo.com')) url = url.replace(/^http:\/\//, "https://");
+        if (url.match('hd.mp4')) video.hd.push(url);
+        else if (url.match('.mp4')) video.ld.push(url);
+    };
+    const processVideoUrlObj = obj => {
+        if (!(obj.durl && obj.durl[0] && obj.durl[0].url)) return;
+        obj.durl.forEach(durl => processVideoUrl(durl.url));
+        if (obj.durl[0].backup_url && obj.durl[0].backup_url[0]) obj.durl[0].backup_url.forEach(url => processVideoUrl(url));
+    };
+    for (let i of types) processVideoUrlObj(video[i]);
+    video.hd = video.hd.sort().reverse();
+    video.ld = video.ld.sort().reverse();
     return video;
 };
 export default bilibiliVideoProvider;
