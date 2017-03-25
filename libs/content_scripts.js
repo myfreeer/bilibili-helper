@@ -209,7 +209,6 @@ const $h = html => {
 		    }
 		}
 	};
-	debugger;
 	control.find('.b-input').onkeyup();
 	const displayUserInfo = (mid, data) => {
 	    control.find('.result').html('发送者: <a href="http://space.bilibili.com/' + mid + '" target="_blank" card="' + parseSafe(data.name) + '" data-usercard-mid="' + mid + '">' + parseSafe(data.name) + '</a><div target="_blank" class="user-info-level l' + parseSafe(data.level_info.current_level) + '"></div>');
@@ -218,16 +217,13 @@ const $h = html => {
 	    document.body.appendChild(s);
 	    s.parentNode.removeChild(s);
 	};
-	SelectModule.bind(control.find('div.b-slt'), {
+	//jQuery is required here.
+	SelectModule.bind($(control.find('div.b-slt')), {
 	    onChange: item => {
-	        console.log(item);
 	        const sender = item[0].sender;
 	        control.find('.result').text('查询中…');
-	        if (sender.indexOf('D') == 0) {
-	            control.find('.result').text('游客弹幕');
-	            return;
-	        }
-	        commentSenderQuery(hash).then(data=>displayUserInfo(data.mid,data));
+	        if (sender.indexOf('D') == 0) return control.find('.result').text('游客弹幕');
+	        commentSenderQuery(sender).then(data=>displayUserInfo(data.mid,data));
 	    }
 	});
 	biliHelper.mainBlock.querySection.find('p').empty().append(control);
