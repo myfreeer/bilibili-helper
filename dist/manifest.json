@@ -1,6 +1,6 @@
 {
    "background": {
-      "page": "background.html",
+      "scripts": ["background.js"],
       "persistent": true
    },
    "browser_action": {
@@ -14,13 +14,8 @@
    "content_scripts": [ {
       "all_frames": true,
       "css": ["ABPlayer.css", "bilibili-helper.css", "colpick.css"],
-      "js": [ "content_scripts.js", "MessageBox.min.js", "SelectModule.min.js", "cookies.js", "filename-sanitize.js", "jquery.min.js", "ColPick.js", "CommentCoreLibrary.js", "ABPlayer.js", "flv.min.js" ],
+      "js": [ "content_scripts.js", "jquery.min.js", "ColPick.js", "CommentCoreLibrary.js", "ABPlayer.js", "flv.min.js" ],
       "matches": [ "*://*.bilibili.com/*" ],
-      "run_at": "document_end"
-   }, {
-      "all_frames": true,
-      "js": [ "ocrad.min.js", "store.min.js", "bilibili_live.js" ],
-      "matches": [ "*://live.bilibili.com/*"  ],
       "run_at": "document_end"
    } ],
    "default_locale": "zh_CN",
@@ -35,9 +30,9 @@
    "manifest_version": 2,
    "name": "__MSG_extName__",
    "short_name": "__MSG_extShortName__",
-   "options_page": "options.html",
+   //"options_page": "options.html",
    "permissions": [ "downloads", "alarms", "cookies", "notifications", "storage", "tabs", "webRequest", "webRequestBlocking", "*://*.bilibili.com/*", "*://*.bilibili.cn/*", "*://*.bilibili.tv/*", "*://*.letv.cn/*", "*://*.hdslb.com/*", "*://*.acgvideo.com/*", "*://*.guguke.net/*", "*://*/*.acgvideo.com/*" ],
    "version": "0.9.0.0",
    "content_security_policy":"script-src 'self' 'unsafe-eval'; object-src 'self'",
-   "web_accessible_resources": [ "bilibili-helper.woff", "template.html", "imgs/icon-32.png", "imgs/loading.gif", "imgs/jinkela.png", "imgs/loading.gif", "imgs/helper-neko.png","imgs/icon.png", "options.html", "imgs/menu-icon.png", "live.css", "live-content-script.js" ]
+   "web_accessible_resources": [ "imgs/*"]
 }

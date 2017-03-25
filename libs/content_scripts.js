@@ -83,13 +83,12 @@ const $h = html => {
 	// preload comments
 	comment.url = `${location.protocol}//comment.bilibili.com/${cid}.xml`;
 	comment._xml = fetchretry(comment.url).then(res=>res.text()).then(text=>parseXmlSafe(text));
-	const videoPic = _$('img.cover_image').attr('src');
 	options = await _options;
 
 	//some ui code from original helper
 	if (!_$('.b-page-body')) genPage = decodeURIComponent(__GetCookie('redirectUrl'));
 	if (_$('.b-page-body .z-msg') > 0 && _$('.b-page-body .z-msg').text().indexOf('版权') > -1) genPage =1;
-	let biliHelper = $h(isBangumi && !genPage ? "<div class=\"v1-bangumi-info-btn helper\" id=\"bilibili_helper\"><span class=\"t\">哔哩哔哩助手</span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + options.version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>" : "<div class=\"block helper\" id=\"bilibili_helper\"><span class=\"t\"><div class=\"icon\"></div><div class=\"t-right\"><span class=\"t-right-top middle\">助手</span><span class=\"t-right-bottom\">扩展菜单</span></div></span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + options.version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>");
+	let biliHelper = $h(isBangumi && !genPage ? "<div class=\"v1-bangumi-info-btn helper\" id=\"bilibili_helper\"><span class=\"t\">哔哩哔哩助手</span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>" : "<div class=\"block helper\" id=\"bilibili_helper\"><span class=\"t\"><div class=\"icon\"></div><div class=\"t-right\"><span class=\"t-right-top middle\">助手</span><span class=\"t-right-bottom\">扩展菜单</span></div></span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>");
 	biliHelper.find('.t').onclick=()=>biliHelper.toggleClass('active');
 	biliHelper.blockInfo = biliHelper.find('.info');
 	biliHelper.mainBlock = biliHelper.find('.main');
@@ -110,7 +109,7 @@ const $h = html => {
 	biliHelper.mainBlock.speedSection.rotate.step = 90;
 	biliHelper.mainBlock.switcherSection = $h('<div class="section switcher"><h3>播放器切换</h3></div>');
 	biliHelper.mainBlock.switcherSection.button = $h('<p><a class="b-btn w" type="original">原始播放器</a><a class="b-btn w" type="bilih5">原始HTML5</a><a class="b-btn w hidden" type="bilimac">Mac 客户端</a><a class="b-btn w hidden" type="swf">SWF 播放器</a><a class="b-btn w hidden" type="iframe">Iframe 播放器</a><a class="b-btn w hidden" type="html5">HTML5超清</a><a class="b-btn w hidden" type="html5hd">HTML5高清</a><a class="b-btn w hidden" type="html5ld">HTML5低清</a></p>');
-	biliHelper.mainBlock.switcherSection.button.onclick = e =>playerSwitcher[e.target.attr('type')]();
+	biliHelper.mainBlock.switcherSection.button.onclick = e =>biliHelper.switcher[e.target.attr('type')]();
 	biliHelper.mainBlock.switcherSection.append(biliHelper.mainBlock.switcherSection.button);
 	if (biliHelper.redirectUrl) {
 	    biliHelper.mainBlock.switcherSection.find('a[type="original"]').addClass('hidden');
@@ -147,9 +146,9 @@ const $h = html => {
 	biliHelper.mainBlock.downloaderSection.find('p').empty();
 	videoLink.mediaDataSource.segments.forEach(createDownLinkElement);
 
-	//const videoPic = videoInfo.pic || videoLink.low.img;
+	const videoPic = videoInfo.pic || videoLink.low.img;
 	if (videoLink.mediaDataSource.segments.length > 1) {
-	    var bhDownAllLink = $h('<a class="b-btn"></a>').text('下载全部 ' + videoLink.mediaDataSource.segments.length + ' 个分段');
+	    var bhDownAllLink = $h(`<a class="b-btn">下载全部${videoLink.mediaDataSource.segments.length}个分段</a>`);
 	    biliHelper.mainBlock.downloaderSection.find('p').append(bhDownAllLink);
 	    bhDownAllLink.onclick=e=> biliHelper.mainBlock.downloaderSection.findAll('p .b-btn.w').each(e=>e.click());
 	}
@@ -227,4 +226,190 @@ const $h = html => {
 	    }
 	});
 	biliHelper.mainBlock.querySection.find('p').empty().append(control);
+
+	// video player switcher begin
+	const restartVideo = video => !video.paused && !video.pause() && !video.play();
+	const mirrorAndRotateHandler = e => {
+	    if (biliHelper.mainBlock.speedSection.mirror.className === "b-btn w") {
+	        biliHelper.switcher.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg) matrix(-1, 0, 0, 1, 0, 0)';
+	        biliHelper.mainBlock.speedSection.mirror.className = "b-btn";
+	    } else {
+	        biliHelper.switcher.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg)';
+	        biliHelper.mainBlock.speedSection.mirror.className = "b-btn w";
+	    }
+	};
+	biliHelper.switcher = {
+	    current: "original",
+	    inited: false,
+	    _init: function (video) {
+	        this.video = video;
+	        biliHelper.mainBlock.speedSection.input.on("change", e => {
+	            if (Number(e.target.value)) {
+	                biliHelper.switcher.video.playbackRate = Number(e.target.value);
+	                restartVideo(biliHelper.switcher.video);
+	            } else {
+	                e.target.value = 1.0;
+	            }
+	        });
+	        biliHelper.mainBlock.speedSection.rotate.on("change", mirrorAndRotateHandler);
+	        biliHelper.mainBlock.speedSection.mirror.on("click", mirrorAndRotateHandler);
+	        this.inited = 1;
+	    },
+	    bind: function (video) {
+	        this.video = video;
+	        video.on("loadedmetadata", e => biliHelper.mainBlock.speedSection.res.innerText = '分辨率: ' + e.target.videoWidth + "x" + e.target.videoHeight);
+	        if (!this.inited) this._init(video);
+	        biliHelper.mainBlock.speedSection.removeClass('hidden');
+	    },
+	    unbind: function () {
+	        this.video = null;
+	        biliHelper.mainBlock.speedSection.addClass('hidden');
+	    },
+	    set: function (newMode) {
+	        biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + this.current + '"]').addClass('w');
+	        biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + newMode + '"]').removeClass('w');
+	        localStorage.removeItem('defaulth5');
+	        if (this.current == 'html5' && this.flvPlayer) this.flvPlayer.destroy();
+	        if (this.checkFinished) clearInterval(this.checkFinished);
+	        if (this.interval) clearInterval(this.interval);
+	        if (!newMode.match('html5')) this.unbind();
+	        biliHelper.mainBlock.speedSection.res.innerText = "";
+	        biliHelper.mainBlock.speedSection.input.onchange = null;
+	        biliHelper.mainBlock.speedSection.input.value = 1.0;
+	        this.current = newMode;
+	    },
+	    original: function () {
+	        this.set('original');
+	        _$('#bofqi').html(biliHelper.originalPlayer);
+	        if (_$('#bofqi embed').attr('width') == 950) $('#bofqi embed').attr('width', 980);
+	    },
+	    swf: function () {
+	        this.set('swf');
+	        _$('#bofqi').html('<object type="application/x-shockwave-flash" class="player" data="https://static-s.bilibili.com/play.swf" id="player_placeholder" style="visibility: visible;"><param name="allowfullscreeninteractive" value="true"><param name="allowfullscreen" value="true"><param name="quality" value="high"><param name="allowscriptaccess" value="always"><param name="wmode" value="opaque"><param name="flashvars" value="cid=' + cid + '&aid=' + avid + '"></object>');
+	    },
+	    iframe: function () {
+	        this.set('iframe');
+	        _$('#bofqi').html('<iframe height="536" width="980" class="player" src="https://secure.bilibili.com/secure,cid=' + cid + '&aid=' + avid + '" scrolling="no" border="0" frameborder="no" framespacing="0" onload="window.securePlayerFrameLoaded=true"></iframe>');
+	    },
+	    bilih5: function () {
+	        this.set('bilih5');
+	        _$('#bofqi').html('<div class="player"><div id="bilibiliPlayer"></div></div>');
+	        fetchretry("https://static.hdslb.com/player/js/bilibiliPlayer.min.js").then(res => res.text()).then(text => {
+	            var script = document.createElement('script');
+	            script.appendChild(document.createTextNode(text + ";var player = new bilibiliPlayer({aid: " + avid + ",cid: " + cid + ",autoplay: false,as_wide: false,player_type: 0,pre_ad: 0,lastplaytime: null,enable_ssl: 1,extra_params: null,p: " + page + "})"));
+	            document.getElementsByTagName('head')[0].appendChild(script);
+	        });
+	        biliHelper.switcher.interval = setInterval(function () {
+	            try {
+	                var bilibilivideo = document.getElementsByClassName('bilibili-player-video')[0].firstChild;
+	                if (bilibilivideo.tagName == "VIDEO") {
+	                    this.bind(bilibilivideo);
+	                    clearInterval(biliHelper.switcher.interval);
+	                }
+	            } catch (e) {}
+	        }, 500);
+	    },
+	    html5: function (type) {
+	        var html5VideoUrl;
+	        switch (type) {
+	        case 'html5ld':
+	            this.set('html5ld');
+	            html5VideoUrl = videoLink.ld[0];
+	            break;
+	        case 'html5hd':
+	            this.set('html5hd');
+	            html5VideoUrl = videoLink.hd[0];
+	            break;
+	        default:
+	            this.set('html5');
+	            html5VideoUrl = videoLink.hd[0];
+	        }
+	        _$('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + videoPic + '" crossorigin="anonymous"><source src="' + html5VideoUrl + '" type="video/mp4"></video></div>');
+	        let abp = ABP.create(document.getElementById("bilibili_helper_html5_player"), {
+	            src: {
+	                playlist: [{
+	                    video: document.getElementById("bilibili_helper_html5_player_video"),
+	                    comments: comment.xml
+	                }]
+	            },
+	            width: "100%",
+	            height: "100%",
+	            config: options
+	        });
+	        abp.playerUnit.addEventListener("wide", () => $("#bofqi").addClass("wide"));
+	        abp.playerUnit.addEventListener("normal", () => $("#bofqi").removeClass("wide"));
+	        abp.playerUnit.addEventListener("sendcomment", function (e) {
+	            const commentId = e.detail.id,
+	                commentData = e.detail;
+	            delete e.detail.id;
+	            chrome.runtime.sendMessage({
+	                command: "sendComment",
+	                avid: avid,
+	                cid: cid,
+	                page: page,
+	                comment: commentData
+	            }, function (response) {
+	                response.tmp_id = commentId;
+	                abp.commentCallback(response);
+	            });
+	        });
+	        abp.playerUnit.addEventListener("saveconfig",  e =>e.detail && Object.assign(options, e.detail) && storageSet(options));
+	        this.bind(abp.video);
+	        if (type && type.match(/hd|ld/)) return abp;
+	        this.flvPlayer = flvjs.createPlayer(videoLink.mediaDataSource);
+	        biliHelper.switcher.interval = setInterval(function () {
+	            if (abp.commentObjArray && biliHelper.switcher.flvPlayer) {
+	                clearInterval(biliHelper.switcher.interval);
+	                biliHelper.switcher.flvPlayer.attachMediaElement(abp.video);
+	                biliHelper.switcher.flvPlayer.load();
+	                biliHelper.switcher.flvPlayer.on(flvjs.Events.ERROR, e => console.warn(e, 'Switch back to HTML5 HD.', biliHelper.switcher.html5hd()));
+	                biliHelper.switcher.flvPlayer.on(flvjs.Events.MEDIA_INFO, e => console.log('分辨率: ' + e.width + "x" + e.height + ', FPS: ' + e.fps, '视频码率: ' + Math.round(e.videoDataRate * 100) / 100, '音频码率: ' + Math.round(e.audioDataRate * 100) / 100));
+	            }
+	        }, 600);
+	        var lastTime;
+	        biliHelper.switcher.checkFinished = setInterval(function () {
+	            if (abp.video.currentTime !== lastTime) {
+	                lastTime = abp.video.currentTime;
+	            } else {
+	                if ((abp.video.duration - abp.video.currentTime) / abp.video.currentTime < 0.001 && !abp.video.paused) {
+	                    abp.video.currentTime = 0;
+	                    if (!abp.video.loop) {
+	                        abp.video.pause();
+	                        setTimeout(abp.video.pause, 200);
+	                        document.querySelector('.button.ABP-Play.ABP-Pause.icon-pause').className = "button ABP-Play icon-play";
+	                    }
+	                }
+	            }
+	        }, 600);
+	    },
+	    html5hd: function () {
+	        this.set('html5hd');
+	        var abp = biliHelper.switcher.html5('html5hd');
+	        abp.video.querySelector('source').on('error', e => console.warn(e, 'Switch back to HTML5 LD.', biliHelper.switcher.html5ld()));
+	    },
+	    html5ld: function () {
+	        this.set('html5ld');
+	        var abp = biliHelper.switcher.html5('html5ld');
+	    },
+	    bilimac: function () {
+	        // this need jQuery
+	        this.set('bilimac');
+	        $('#bofqi').html('<div id="player_placeholder" class="player"></div><div id="loading-notice">正在加载 Bilibili Mac 客户端…</div>');
+	        $('#bofqi').find('#player_placeholder').css({
+	            background: 'url(' + videoPic + ') 50% 50% / cover no-repeat',
+	            '-webkit-filter': 'blur(20px)',
+	            overflow: 'hidden',
+	            visibility: 'visible'
+	        });
+	        $.post("http://localhost:23330/rpc", {
+	            action: 'playVideoByCID',
+	            data: cid + '|' + window.location.href + '|' + document.title + '|' + 1
+	        }, function () {
+	            $('#bofqi').find('#loading-notice').text('已在 Bilibili Mac 客户端中加载');
+	        }).fail(function () {
+	            $('#bofqi').find('#loading-notice').text('调用 Bilibili Mac 客户端失败 :(');
+	        });
+	    }
+	};
+	biliHelper.switcher.html5();
 })();
