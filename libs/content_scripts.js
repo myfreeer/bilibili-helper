@@ -6,6 +6,8 @@ import bilibiliVideoProvider from './bilibiliVideoProvider';
 import xml2ass from './xml2ass';
 import {getDownloadOptions, getNiceSectionFilename} from './filename-sanitize';
 import {__GetCookie, __SetCookie} from './cookies';
+import MessageBox from './MessageBox.min';
+import SelectModule from './SelectModule.min';
 
 // shortcuts
 Element.prototype.find=Element.prototype.querySelector;
