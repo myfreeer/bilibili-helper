@@ -1,3 +1,5 @@
+import {sleep} from './utils';
+
 export const bilibiliVideoInfoProvider = async(avid, page = 1, credentials = 'include', retries = 5, retryDelay = 500, n = 0) => {
     if (!avid) throw new Error('bilibiliVideoInfoProvider: avid is reuired');
     const url = [location.protocol + "//api.bilibili.com/view?type=json&appkey=8e9fc618fbd41e28&id=" + avid + "&page=" + page + "&batch=true", "https://www.biliplus.com/api/view?id=" + avid];

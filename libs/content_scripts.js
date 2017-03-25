@@ -30,7 +30,7 @@ const _$ = e =>document.querySelector(e);
 const _$$ = e => document.querySelectorAll(e);
 const $h = html => {
 	let elem = document.createElement('div');
-	elem.outerHTML = html;
+	elem.innerHTML = html;
 	return elem;
 };
 
@@ -74,10 +74,11 @@ var mainData={};
 	comment._text = fetchretry(comment.url);
 	let videoPic = _$('img.cover_image').attr('src');
 	options = await _options;
+	//some ui code from original helper
 	if (!_$('.b-page-body')) genPage = decodeURIComponent(__GetCookie('redirectUrl'));
 	if (_$('.b-page-body .z-msg') > 0 && _$('.b-page-body .z-msg').text().indexOf('版权') > -1) genPage =1;
 	let biliHelper = $h(isBangumi && !genPage ? "<div class=\"v1-bangumi-info-btn helper\" id=\"bilibili_helper\"><span class=\"t\">哔哩哔哩助手</span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + options.version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>" : "<div class=\"block helper\" id=\"bilibili_helper\"><span class=\"t\"><div class=\"icon\"></div><div class=\"t-right\"><span class=\"t-right-top middle\">助手</span><span class=\"t-right-bottom\">扩展菜单</span></div></span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + options.version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>");
-	biliHelper.helperBlock.find('.t').onclick=()=>biliHelper.helperBlock.toggleClass('active');
+	biliHelper.find('.t').onclick=()=>biliHelper.helperBlock.toggleClass('active');
 	biliHelper.blockInfo = biliHelper.find('.info');
 	biliHelper.mainBlock = biliHelper.find('.main');
 	biliHelper.mainBlock.infoSection = $h('<div class="section video hidden"><h3>视频信息</h3><p><span></span><span>aid: ' + avid + '</span><span>pg: ' + page + '</span></p></div>');
@@ -103,15 +104,13 @@ var mainData={};
 	    biliHelper.mainBlock.switcherSection.find('a[type="original"]').addClass('hidden');
 	    biliHelper.mainBlock.switcherSection.find('a[type="swf"],a[type="iframe"]').removeClass('hidden');
 	}
-	if (localStorage.getItem('bilimac_player_type')) {
-	    biliHelper.mainBlock.switcherSection.find('a[type="bilimac"]').removeClass('hidden');
-	}
+	if (localStorage.getItem('bilimac_player_type')) biliHelper.mainBlock.switcherSection.find('a[type="bilimac"]').removeClass('hidden');
 	biliHelper.mainBlock.append(biliHelper.mainBlock.switcherSection);
 	biliHelper.mainBlock.downloaderSection = $h('<div class="section downloder"><h3>视频下载</h3><p><span></span>视频地址获取中，请稍等…</p></div>');
 	biliHelper.mainBlock.append(biliHelper.mainBlock.downloaderSection);
 	biliHelper.mainBlock.querySection = $h('<div class="section query"><h3>弹幕发送者查询</h3><p><span></span>正在加载全部弹幕, 请稍等…</p></div>');
 	biliHelper.mainBlock.append(biliHelper.mainBlock.querySection);
-	(isBangumi && !genPage ? $('.v1-bangumi-info-operate .v1-app-btn') : $('.player-wrapper .arc-toolbar')).append(biliHelper.helperBlock);
+	(isBangumi && !genPage ? _$('.v1-bangumi-info-operate .v1-app-btn') : _$('.player-wrapper .arc-toolbar')).append(biliHelper.helperBlock);
 	
 
 })();
