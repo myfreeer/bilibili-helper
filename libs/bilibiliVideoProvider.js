@@ -58,6 +58,7 @@ const parseJsonforFlvjs = (json) => {
     if (!json.durl) return console.warn('parseJsonforFlvjs Failed: Nothing to play.');
     if (mediaDataSource.segments.length === 1 && json.durl[0].backup_url && json.durl[0].backup_url.length === 1 && !mediaDataSource.segments[0].url.match('flv') && json.durl[0].backup_url[0].match('flv')) mediaDataSource.segments[0].url = json.durl[0].backup_url[0].replace(/^http:\/\//,"https://");
     if (!mediaDataSource.segments[0].url.match('flv')) mediaDataSource.type = 'mp4';
+    if (mediaDataSource.type === 'mp4' && mediaDataSource.segments.length === 1) Object.assign(mediaDataSource, mediaDataSource.segments[0]);
     return mediaDataSource;
 };
 

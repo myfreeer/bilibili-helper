@@ -102,6 +102,7 @@
   background:#000;
   outline: none;
   cursor: pointer;
+  z-index: 0;
 }
 
 .ABP-Unit .ABP-Video.ABP-HideCursor {
@@ -120,7 +121,7 @@
 .ABP-Unit .ABP-Video video{
   width:100%;
   height:100%;
-  z-index: -2;
+  z-index: 0;
 }
 
 .ABP-Unit .ABP-Video .ABP-Container{
@@ -140,7 +141,7 @@
   right: 0;
   touch-callout: none;
   -webkit-user-select: none;
-  z-index: 0;
+  z-index: 1;
 }
 
 .ABP-Unit .ABP-Video .ABP-Container .cmt{
@@ -159,6 +160,7 @@
   word-break: keep-all;
   white-space: pre;
   text-shadow: rgb(0, 0, 0) -0.6px -0.6px 0px, rgb(0, 0, 0) 0.6px 0.6px 0px, rgb(0, 0, 0) 0.6px -0.6px 0px, rgb(0, 0, 0) -0.6px 0.6px 0px;
+  z-index: 10;
 }
 .ABP-Unit .ABP-Video .ABP-Container .cmt::after {
   content:attr(content);
@@ -168,14 +170,16 @@
   vertical-align:middle;
   color: black;
   -webkit-text-stroke: 2px black;
-  z-index: -1;
+  z-index: 10;
 }
 .ABP-Unit .ABP-Video .ABP-Container .cmt.noshadow::after {
   content: "";
   display: none;
+  z-index: 10;
 }
 .ABP-Unit .ABP-Video .ABP-Container .cmt.rshadow::after {
   -webkit-text-stroke: 1px white;
+  z-index: 10;
 }
 
 .ABP-Unit .ABP-Bottom {
@@ -186,12 +190,10 @@
 
 .ABP-Unit.ABP-FullScreen .ABP-Bottom {
   opacity: 0;
-  z-index: 99;
 }
 
 .ABP-Unit.ABP-FullScreen .ABP-Bottom:hover {
   opacity: 1;
-  z-index: 99;
 }
 
 #ABP-Tooltip {
@@ -233,6 +235,7 @@
   line-height: 20px;
   top:0;
   bottom:0;
+  z-index: 100;
   cursor: pointer;
   -webkit-transition: opacity 0.1s linear, color 0.1s linear;
           transition: opacity 0.1s linear, color 0.1s linear;
@@ -247,6 +250,7 @@
   background: #fff;
   opacity: 0;
   margin-bottom: 1px;
+  z-index: 100;
   pointer-events: none;
 }
 
@@ -494,6 +498,7 @@
   height: 20px;
   -webkit-user-select: none;
   font-size: 14px;
+  z-index: 100;
 }
 
 .ABP-Unit.ABP-Mini .ABP-Control {
@@ -634,6 +639,7 @@
 
 .ABP-Unit .ABP-Control .ABP-WideScreen {
   top:0;right:25px;bottom:0;
+  z-index: 100;
 }
 
 .ABP-Unit.ABP-FullScreen .ABP-Control .ABP-WideScreen, .ABP-Unit.ABP-Mini .ABP-Control .ABP-WideScreen {

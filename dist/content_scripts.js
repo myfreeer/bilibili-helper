@@ -248,6 +248,7 @@ const parseJsonforFlvjs = (json) => {
     if (!json.durl) return console.warn('parseJsonforFlvjs Failed: Nothing to play.');
     if (mediaDataSource.segments.length === 1 && json.durl[0].backup_url && json.durl[0].backup_url.length === 1 && !mediaDataSource.segments[0].url.match('flv') && json.durl[0].backup_url[0].match('flv')) mediaDataSource.segments[0].url = json.durl[0].backup_url[0].replace(/^http:\/\//,"https://");
     if (!mediaDataSource.segments[0].url.match('flv')) mediaDataSource.type = 'mp4';
+    if (mediaDataSource.type === 'mp4' && mediaDataSource.segments.length === 1) Object.assign(mediaDataSource, mediaDataSource.segments[0]);
     return mediaDataSource;
 };
 
@@ -1209,7 +1210,6 @@ const $h = html => {
 	biliHelper.mainBlock.querySection = $h('<div class="section query"><h3>弹幕发送者查询</h3><p><span></span>正在加载全部弹幕, 请稍等…</p></div>');
 	biliHelper.mainBlock.append(biliHelper.mainBlock.querySection);
 	(isBangumi && !genPage ? _$('.v1-bangumi-info-operate .v1-app-btn') : _$('.player-wrapper .arc-toolbar')).append(biliHelper);
-	console.log(await _videoLink, videoInfo);
 
 	// process video links
 	videoLink = await _videoLink;
@@ -1241,6 +1241,7 @@ const $h = html => {
 	}
 	biliHelper.mainBlock.downloaderSection.find('p').append($h('<a class="b-btn" target="_blank" title="实验性功能，由bilibilijj提供，访问慢且不稳定" href="http://www.bilibilijj.com/Files/DownLoad/' + cid + '.mp3/www.bilibilijj.com.mp3?mp3=true">音频</a>'));
 	biliHelper.mainBlock.downloaderSection.find('p').append($h('<a class="b-btn" target="_blank" href="' + videoPic + '">封面</a>'));
+	if (videoLink.mediaDataSource.type === 'mp4') delete videoLink.mediaDataSource.segments;
 
 	// switcherSection begin
 	if (videoLink.mediaDataSource.type === 'flv') biliHelper.mainBlock.switcherSection.find('a[type="html5"]').removeClass('hidden');
@@ -1445,7 +1446,7 @@ const $h = html => {
 	        if (type && type.match(/hd|ld/)) return abp;
 	        this.flvPlayer = flvjs.createPlayer(videoLink.mediaDataSource);
 	        biliHelper.switcher.interval = setInterval(function () {
-	            if (abp.commentObjArray && abp.commentObjArray.length > 0 && biliHelper.switcher.flvPlayer) {
+	            if (abp.commentObjArray && biliHelper.switcher.flvPlayer) {
 	                clearInterval(biliHelper.switcher.interval);
 	                biliHelper.switcher.flvPlayer.attachMediaElement(abp.video);
 	                biliHelper.switcher.flvPlayer.load();
