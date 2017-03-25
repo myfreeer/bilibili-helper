@@ -86,7 +86,7 @@ const getVideoLink = async(url, type, retries = 5, credentials = 'include', retr
     } catch (error) {
         if (--retries > 0) {
             await sleep(retryDelay);
-            return await getVideoLink(type, retries);
+            return await getVideoLink(url, type, retries);
         } else json = {
             'code': -1,
             'message': error
