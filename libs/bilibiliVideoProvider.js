@@ -1,8 +1,13 @@
 import md5 from './md5';
 import {sleep} from './utils';
 
+// from project youtube-dl (Public Domain)
+// https://github.com/rg3/youtube-dl/blob/bd8f48c78b952ebe3bf335185c819e265f63cb50/youtube_dl/extractor/bilibili.py#L59-L60
 const APPKEY = '84956560bc028eb7';
 const APPSECRET = '94aba54af9065f71de72f5508f1cd42e';
+
+// from project you-get (license MIT)
+// https://github.com/soimort/you-get/blob/0f0da0ccd72e93a3c93d51b5b90c81513ef77d15/src/you_get/extractors/bilibili.py#L15
 const SECRETKEY_MINILOADER = '1c15888dc316e05a15fdd0a02ed6584f';
 
 const processXmlObj = obj => {
