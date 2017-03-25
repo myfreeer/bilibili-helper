@@ -26,10 +26,5 @@ var utils = {
         }
     }
 };
-if (typeof module === 'object' && module.exports) {
-	module.exports.__GetCookie = utils.bindFn(utils.cookie.get, utils);
-	module.exports.__SetCookie = utils.bindFn(utils.cookie.set, utils);
-} else {
-	window.__GetCookie = utils.bindFn(utils.cookie.get, utils);
-	window.__SetCookie = utils.bindFn(utils.cookie.set, utils);
-}
+export const __GetCookie = utils.bindFn(utils.cookie.get, utils);
+export const __SetCookie = utils.bindFn(utils.cookie.set, utils);

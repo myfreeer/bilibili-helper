@@ -5,6 +5,7 @@ import commentSenderQuery from './commentSenderQuery';
 import bilibiliVideoProvider from './bilibiliVideoProvider';
 import xml2ass from './xml2ass';
 import {getDownloadOptions, getNiceSectionFilename} from './filename-sanitize';
+import {__GetCookie, __SetCookie} from './cookies';
 
 // shortcuts
 Element.prototype.find=Element.prototype.querySelector;
@@ -41,10 +42,11 @@ const $h = html => {
 
 //main func
 (async function() {
-//var mainData={};
 	const url = location.href;
 	let avid, page, epid, cid, videoInfo, videoLink, options, isBangumi, genPage;
+	//preload options
 	const _options = storageGet();
+
 	//get video info
 	switch(location.hostname){
 		case 'www.bilibili.com':
@@ -63,7 +65,7 @@ const $h = html => {
 			if (!epid) return console.log('cannot match epid');
 			videoInfo = await bilibiliBangumiVideoInfoProvider(epid);
 			avid = videoInfo.avid;
-			page = Number(videoInfo.page);
+			page = Number(videoInfo.currentPage);
 			isBangumi = true;
 			break;
 		default:
@@ -71,14 +73,17 @@ const $h = html => {
 	}
 	cid = videoInfo.list[page-1].cid;
 	if (!(avid && page && cid && videoInfo)) return console.warn('something went wrong, exiting.');
+
 	// preload video links
 	const _videoLink = bilibiliVideoProvider(cid, avid, page);
 	let comment = {};
+
 	// preload comments
 	comment.url = `${location.protocol}//comment.bilibili.com/${cid}.xml`;
-	comment._text = fetchretry(comment.url).then(res=>res.text()).then(text=>parseXmlSafe(text));
+	comment._xml = fetchretry(comment.url).then(res=>res.text()).then(text=>parseXmlSafe(text));
 	const videoPic = _$('img.cover_image').attr('src');
 	options = await _options;
+
 	//some ui code from original helper
 	if (!_$('.b-page-body')) genPage = decodeURIComponent(__GetCookie('redirectUrl'));
 	if (_$('.b-page-body .z-msg') > 0 && _$('.b-page-body .z-msg').text().indexOf('版权') > -1) genPage =1;
@@ -102,7 +107,6 @@ const $h = html => {
 	biliHelper.mainBlock.speedSection.rotate = biliHelper.mainBlock.speedSection.find('#bilibili_helper_html5_video_rotate');
 	biliHelper.mainBlock.speedSection.rotate.step = 90;
 	biliHelper.mainBlock.switcherSection = $h('<div class="section switcher"><h3>播放器切换</h3></div>');
-	debugger;
 	biliHelper.mainBlock.switcherSection.button = $h('<p><a class="b-btn w" type="original">原始播放器</a><a class="b-btn w" type="bilih5">原始HTML5</a><a class="b-btn w hidden" type="bilimac">Mac 客户端</a><a class="b-btn w hidden" type="swf">SWF 播放器</a><a class="b-btn w hidden" type="iframe">Iframe 播放器</a><a class="b-btn w hidden" type="html5">HTML5超清</a><a class="b-btn w hidden" type="html5hd">HTML5高清</a><a class="b-btn w hidden" type="html5ld">HTML5低清</a></p>');
 	biliHelper.mainBlock.switcherSection.button.onclick = e =>playerSwitcher[e.target.attr('type')]();
 	biliHelper.mainBlock.switcherSection.append(biliHelper.mainBlock.switcherSection.button);
@@ -118,8 +122,11 @@ const $h = html => {
 	biliHelper.mainBlock.append(biliHelper.mainBlock.querySection);
 	(isBangumi && !genPage ? _$('.v1-bangumi-info-operate .v1-app-btn') : _$('.player-wrapper .arc-toolbar')).append(biliHelper);
 	console.log(await _videoLink, videoInfo);
+
 	// process video links
 	videoLink = await _videoLink;
+
+	//downloaderSection code
 	const clickDownLinkElementHandler = async(event) => !event.preventDefault() && await mySendMessage({
 	    command: 'requestForDownload',
 	    url: event.target.attr('href'),
@@ -137,6 +144,7 @@ const $h = html => {
 	};
 	biliHelper.mainBlock.downloaderSection.find('p').empty();
 	videoLink.mediaDataSource.segments.forEach(createDownLinkElement);
+
 	//const videoPic = videoInfo.pic || videoLink.low.img;
 	if (videoLink.mediaDataSource.segments.length > 1) {
 	    var bhDownAllLink = $h('<a class="b-btn"></a>').text('下载全部 ' + videoLink.mediaDataSource.segments.length + ' 个分段');
@@ -145,8 +153,35 @@ const $h = html => {
 	}
 	biliHelper.mainBlock.downloaderSection.find('p').append($h('<a class="b-btn" target="_blank" title="实验性功能，由bilibilijj提供，访问慢且不稳定" href="http://www.bilibilijj.com/Files/DownLoad/' + cid + '.mp3/www.bilibilijj.com.mp3?mp3=true">音频</a>'));
 	biliHelper.mainBlock.downloaderSection.find('p').append($h('<a class="b-btn" target="_blank" href="' + videoPic + '">封面</a>'));
+
+	// switcherSection begin
 	if (videoLink.mediaDataSource.type === 'flv') biliHelper.mainBlock.switcherSection.find('a[type="html5"]').removeClass('hidden');
 	if (videoLink.hd.length > 0) biliHelper.mainBlock.switcherSection.find('a[type="html5hd"]').removeClass('hidden');
 	if (videoLink.ld.length > 0) biliHelper.mainBlock.switcherSection.find('a[type="html5ld"]').removeClass('hidden');
+
+	// comment begin
+	biliHelper.downloadFileName = getDownloadOptions(comment.url, getNiceSectionFilename(avid, page, videoInfo.pages || 1, 1, 1)).filename;
+	biliHelper.mainBlock.infoSection.find('p').append($h('<span>cid: ' + cid + '</span>'));
+	biliHelper.mainBlock.commentSection = $h(`<div class="section comment"><h3>弹幕下载</h3><p><a class="b-btn w" href="${comment.url}" download="${biliHelper.downloadFileName}">下载 XML 格式弹幕</a></p></div>`);
+	commentDiv.find('a').onclick = clickDownLinkElementHandler;
+	biliHelper.mainBlock.append(biliHelper.mainBlock.commentSection);
+	comment.xml = await comment._xml;
+	let assData;
+	const clickAssBtnHandler = event => {
+	    event.preventDefault();
+	    if (!assData) assData = xml2ass(comment.xml, {
+	        'title': getNiceSectionFilename(biliHelper.avid, biliHelper.page, biliHelper.totalPage, 1, 1),
+	        'ori': location.href,
+	        'opacity': options.opacity || 0.75
+	    });
+	    const assBlob = new Blob([assData], {type: 'application/octet-stream'}),
+	        assUrl = window.URL.createObjectURL(assBlob);
+	    event.target.href = assUrl;
+	    clickDownLinkElementHandler(event);
+	    document.on('unload',  () =>window.URL.revokeObjectURL(assUrl));
+	};
+	let assBtn = $(`<a class="b-btn w" download="${biliHelper.downloadFileName.replace('.xml', '.ass')}" href>下载 ASS 格式弹幕</a>`);
+	assBtn.onclick = clickAssBtnHandler;
+	biliHelper.mainBlock.commentSection.find('p').append(assBtn);
 
 })();
