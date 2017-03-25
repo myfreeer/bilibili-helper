@@ -353,7 +353,7 @@ const $h = html => {
 	                abp.commentCallback(response);
 	            });
 	        });
-	        abp.playerUnit.addEventListener("saveconfig",  e =>e.detail && Object.assign(options, e.detail) && storageSet(options));
+	        abp.playerUnit.addEventListener("saveconfig",  e =>e.detail && Object.assign(options, e.detail) && chrome.storage.local.set(options));
 	        this.bind(abp.video);
 	        if (type && type.match(/hd|ld/)) return abp;
 	        this.flvPlayer = flvjs.createPlayer(videoLink.mediaDataSource);
@@ -385,11 +385,24 @@ const $h = html => {
 	    html5hd: function () {
 	        this.set('html5hd');
 	        var abp = biliHelper.switcher.html5('html5hd');
-	        abp.video.querySelector('source').on('error', e => console.warn(e, 'Switch back to HTML5 LD.', biliHelper.switcher.html5ld()));
+	        abp.video.querySelector('source').on('error', e => {
+	                if (videoLink.hd.length > 1) {
+	                    console.warn(e, 'HTML5 HD Error, try another link...');
+	                    videoLink.hd.splice(0, 1);
+	                    biliHelper.switcher.html5('html5hd');
+	                } else console.warn(e, 'HTML5 HD Error, switch back to HTML5 LD.', biliHelper.switcher.html5ld());
+	        });
 	    },
 	    html5ld: function () {
 	        this.set('html5ld');
 	        var abp = biliHelper.switcher.html5('html5ld');
+	        abp.video.querySelector('source').on('error', e => {
+	            if (videoLink.ld.length > 1) {
+	                console.warn(e, 'HTML5 LD Error, try another link...');
+	                videoLink.ld.splice(0, 1);
+	                biliHelper.switcher.html5('html5ld');
+	            }
+	        });
 	    },
 	    bilimac: function () {
 	        // this need jQuery

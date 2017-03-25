@@ -72,7 +72,7 @@
 
 "use strict";
 const sleep = (time = 0) => new Promise(r => setTimeout(r, time));
-/* harmony export (immutable) */ __webpack_exports__["h"] = sleep;
+/* harmony export (immutable) */ __webpack_exports__["g"] = sleep;
 
 const formatInt = (Source, Length) => (Source + '').padStart(Length, '0');
 /* unused harmony export formatInt */
@@ -90,7 +90,7 @@ const parseXmlSafe = text => (new window.DOMParser()).parseFromString(text.repla
 /* harmony export (immutable) */ __webpack_exports__["c"] = parseXmlSafe;
 
 const storageSet = data => new Promise((resolve, reject) => chrome.storage.local.set(data, resolve));
-/* harmony export (immutable) */ __webpack_exports__["g"] = storageSet;
+/* unused harmony export storageSet */
 
 const storageGet = keys => new Promise((resolve, reject) => chrome.storage.local.get(keys, resolve));
 /* harmony export (immutable) */ __webpack_exports__["a"] = storageGet;
@@ -146,7 +146,7 @@ const bilibiliVideoInfoProvider = async(avid, page = 1, credentials = 'include',
         if (!json || !(json && json.list && json.list.length) || json && json.code === -503) throw new Error('Can not get valid JSON.');
     } catch (e) {
         if (++n < retries) {
-            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* sleep */])(retryDelay);
+            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* sleep */])(retryDelay);
             json = await bilibiliVideoInfoProvider(avid, page, credentials, retries, retryDelay, n);
         } else throw e;
     }
@@ -170,7 +170,7 @@ const bilibiliBangumiVideoInfoProvider = async(epid, credentials = 'include', re
         videoInfo = await bilibiliVideoInfoProvider(json.result.currentEpisode.avId, json.result.currentEpisode.page || 1);
     } catch (e) {
         if (++n < retries) {
-            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* sleep */])(retryDelay);
+            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* sleep */])(retryDelay);
             videoInfo = await bilibiliBangumiVideoInfoProvider(epid, credentials, retries, retryDelay, n);
         } else throw e;
     }
@@ -261,7 +261,7 @@ const getToken = async(retries = 5, retryDelay = 500) => {
         return token;
     } catch (e) {
         if (--retries > 0) {
-            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* sleep */])(retryDelay);
+            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* sleep */])(retryDelay);
             return await getToken(retries);
         } else throw (e);
     }
@@ -276,7 +276,7 @@ const getVideoLink = async(url, type, retries = 5, credentials = 'include', retr
         } else json = await fetch(url, {credentials}).then(response => response.json());
     } catch (error) {
         if (--retries > 0) {
-            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* sleep */])(retryDelay);
+            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* sleep */])(retryDelay);
             return await getVideoLink(url, type, retries);
         } else json = {
             'code': -1,
@@ -1441,7 +1441,7 @@ const $h = html => {
 	                abp.commentCallback(response);
 	            });
 	        });
-	        abp.playerUnit.addEventListener("saveconfig",  e =>e.detail && Object.assign(options, e.detail) && __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* storageSet */])(options));
+	        abp.playerUnit.addEventListener("saveconfig",  e =>e.detail && Object.assign(options, e.detail) && chrome.storage.local.set(options));
 	        this.bind(abp.video);
 	        if (type && type.match(/hd|ld/)) return abp;
 	        this.flvPlayer = flvjs.createPlayer(videoLink.mediaDataSource);
@@ -1473,11 +1473,24 @@ const $h = html => {
 	    html5hd: function () {
 	        this.set('html5hd');
 	        var abp = biliHelper.switcher.html5('html5hd');
-	        abp.video.querySelector('source').on('error', e => console.warn(e, 'Switch back to HTML5 LD.', biliHelper.switcher.html5ld()));
+	        abp.video.querySelector('source').on('error', e => {
+	                if (videoLink.hd.length > 1) {
+	                    console.warn(e, 'HTML5 HD Error, try another link...');
+	                    videoLink.hd.splice(0, 1);
+	                    biliHelper.switcher.html5('html5hd');
+	                } else console.warn(e, 'HTML5 HD Error, switch back to HTML5 LD.', biliHelper.switcher.html5ld());
+	        });
 	    },
 	    html5ld: function () {
 	        this.set('html5ld');
 	        var abp = biliHelper.switcher.html5('html5ld');
+	        abp.video.querySelector('source').on('error', e => {
+	            if (videoLink.ld.length > 1) {
+	                console.warn(e, 'HTML5 LD Error, try another link...');
+	                videoLink.ld.splice(0, 1);
+	                biliHelper.switcher.html5('html5ld');
+	            }
+	        });
 	    },
 	    bilimac: function () {
 	        // this need jQuery
