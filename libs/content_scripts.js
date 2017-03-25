@@ -101,11 +101,11 @@ const $h = html => {
 	biliHelper.mainBlock.speedSection.mirror = biliHelper.mainBlock.speedSection.find('#bilibili_helper_html5_video_mirror');
 	biliHelper.mainBlock.speedSection.rotate = biliHelper.mainBlock.speedSection.find('#bilibili_helper_html5_video_rotate');
 	biliHelper.mainBlock.speedSection.rotate.step = 90;
-	biliHelper.mainBlock.switcherSection = $h('<div class="section switcher"><h3>播放器切换</h3><p></p></div>');
+	biliHelper.mainBlock.switcherSection = $h('<div class="section switcher"><h3>播放器切换</h3></div>');
 	debugger;
-	biliHelper.mainBlock.switcherSection.button = $h('<a class="b-btn w" type="original">原始播放器</a><a class="b-btn w" type="bilih5">原始HTML5</a><a class="b-btn w hidden" type="bilimac">Mac 客户端</a><a class="b-btn w hidden" type="swf">SWF 播放器</a><a class="b-btn w hidden" type="iframe">Iframe 播放器</a><a class="b-btn w hidden" type="html5">HTML5超清</a><a class="b-btn w hidden" type="html5hd">HTML5高清/a><a class="b-btn w hidden" type="html5ld">HTML5低清</a>');
+	biliHelper.mainBlock.switcherSection.button = $h('<p><a class="b-btn w" type="original">原始播放器</a><a class="b-btn w" type="bilih5">原始HTML5</a><a class="b-btn w hidden" type="bilimac">Mac 客户端</a><a class="b-btn w hidden" type="swf">SWF 播放器</a><a class="b-btn w hidden" type="iframe">Iframe 播放器</a><a class="b-btn w hidden" type="html5">HTML5超清</a><a class="b-btn w hidden" type="html5hd">HTML5高清</a><a class="b-btn w hidden" type="html5ld">HTML5低清</a></p>');
 	biliHelper.mainBlock.switcherSection.button.onclick = e =>playerSwitcher[e.target.attr('type')]();
-	biliHelper.mainBlock.switcherSection.find('p').append(biliHelper.mainBlock.switcherSection.button);
+	biliHelper.mainBlock.switcherSection.append(biliHelper.mainBlock.switcherSection.button);
 	if (biliHelper.redirectUrl) {
 	    biliHelper.mainBlock.switcherSection.find('a[type="original"]').addClass('hidden');
 	    biliHelper.mainBlock.switcherSection.find('a[type="swf"],a[type="iframe"]').removeClass('hidden');
