@@ -51,6 +51,8 @@ const parseJsonforFlvjs = (json) => {
         "url": obj.url.match("ws.acgvideo.com") ? obj.url : obj.url.replace(/^http:\/\//, "https://")
     }));
     if (!json.durl) return console.warn('parseJsonforFlvjs Failed: Nothing to play.');
+    if (mediaDataSource.segments.length === 1 && json.durl[0].backup_url && json.durl[0].backup_url.length === 1 && !mediaDataSource.segments[0].url.match('flv') && json.durl[0].backup_url[0].match('flv')) mediaDataSource.segments[0].url = json.durl[0].backup_url[0].replace(/^http:\/\//,"https://");
+    if (!mediaDataSource.segments[0].url.match('flv')) mediaDataSource.type = 'mp4';
     return mediaDataSource;
 };
 
@@ -97,13 +99,12 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
     url._base = location.protocol + '//interface.bilibili.com/playurl?';
     url._query = (type, quality = 3) => `appkey=${APPKEY}&cid=${cid}&otype=json&quality=${quality}&type=${type}`;
     url.mp4 = url._base + url._query('mp4') + '&sign=' + md5(url._query('mp4') + APPSECRET);
+    url.flv = url._base + url._query('flv') +'&sign=' + md5(url._query('flv') + APPSECRET);
     const interfaceUrl = (cid, ts) => `cid=${cid}&player=1&ts=${ts}`;
     const calcSign = (cid, ts) => md5(`${interfaceUrl(cid,ts)}${SECRETKEY_MINILOADER}`);
-    const ts = Math.ceil(Date.now() / 1000);
-    url.flv = url._base + `${interfaceUrl(cid,ts)}&sign=${calcSign(cid,ts)}`;
     let video = {};
     const types = ['low', 'mp4', 'flv'];
-    for (let i of types) video[i] = await getVideoLink(url[i], i, retries, credentials, retryDelay);
+    for (let i of types) video[i] = await getVideoLink(url[i], null, retries, credentials, retryDelay);
     video.mediaDataSource = parseJsonforFlvjs(video.flv);
     video.hd = [];
     video.ld = [];
@@ -119,6 +120,13 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
         if (obj.durl[0].backup_url && obj.durl[0].backup_url[0]) obj.durl[0].backup_url.forEach(url => processVideoUrl(url));
     };
     for (let i of types) processVideoUrlObj(video[i]);
+    if (video.mediaDataSource.type === 'mp4') {
+        const ts = Math.ceil(Date.now() / 1000);
+        url.flv = url._base + `${interfaceUrl(cid,ts)}&sign=${calcSign(cid,ts)}`;
+        video.flv = await getVideoLink(url.flv, flv, retries, credentials, retryDelay);
+        processVideoUrlObj(video.flv);
+        video.mediaDataSource = parseJsonforFlvjs(video.flv);
+    }
     video.hd = video.hd.sort().reverse();
     video.ld = video.ld.sort().reverse();
     return video;
