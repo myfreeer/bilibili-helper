@@ -1,12 +1,10 @@
-var secureAvailable = false,
-    videoPlaybackHosts = ["http://*.hdslb.com/*", "https://*.hdslb.com/*", "http://*.acgvideo.com/*", "http://*/*.acgvideo.com/*", "https://*.acgvideo.com/*", "https://*/*.acgvideo.com/*"];
-
-var bkg_page = chrome.extension.getBackgroundPage();
+//options
 const storageGet = () => new Promise((resolve, reject) => chrome.storage.local.get(resolve));
 let options = {
     "player": "html5", //original swf iframe bilih5 html5 html5hd html5ld
     "rel_search": "with", //off without with
     "trackingBlock": true,
+    "api": 'offical',
     "opacity": 1,
     "prop": false,
     "scale": 1,
@@ -16,9 +14,11 @@ let options = {
 const refreshOptions = () => storageGet().then(obj=>Object.assign(options, obj)).then(()=>chrome.storage.local.set(options));
 refreshOptions();
 
+//static data
 const trackingUrls = [
     "*://data.bilibilijj.com/free/*.txt*",
     "*://tajs.qq.com/stats*",
+    "*://*.cnzz.com/stat.php*",
     "*://*.hdslb.com/images/base/loading.gif",
     "*://*.hdslb.com/message/img/infocenterIcon-*.png",
     "*://*.hdslb.com/images/v3images/img_loading.png",
@@ -44,7 +44,7 @@ const trackingUrls = [
     "*://*.hdslb.com/vip/dist/js/vipPlugin.js*",
     "*://*.hdslb.com/ad-images/wx.gif*",
     "*://*.hdslb.com/bfs/static/anime/js/bangumi.play.js*",
-    "*://s1.hdslb.com/bfs/static/anime/js/sponsor.js*",
+    "*://*.hdslb.com/bfs/static/anime/js/sponsor.js*",
     "*://data.bilibili.com/a/bangumi.js*",
     "*://*.up.lxdns.com/report.php*",
     "*://*.hdslb.com/js/video.min.js",
@@ -55,54 +55,9 @@ const trackingUrls = [
     "*://data.bilibili.com/rec.js*",
     "*://data.bilibili.com/v/flashplay/h5_player_op*"
 ];
+const videoPlaybackHosts = ["*://*.hdslb.com/*", "*://*.acgvideo.com/*", "*://*/*.acgvideo.com/*", "*://*.biliplus.com/BPplayurl.php*"];
 
-function getFileData(url, callback, method) {
-    var m = 'GET';
-    var retry = 0;
-    if (method && (method == 'POST'.toLowerCase() || method == 'GET'.toLowerCase())) m = method;
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.open(m, url, true);
-    xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            if (typeof callback == "function") callback(xmlhttp.responseText);
-        } else if (xmlhttp.readyState == 4 && xmlhttp.status > 400) {
-            if (typeof callback == "function") callback("{}");
-        }
-    };
-    xmlhttp.onerror = function() {
-        xmlhttp.abort();
-        xmlhttp.open(m, url, true);
-        if (retry < 3) xmlhttp.send();
-        retry += 1;
-    };
-    xmlhttp.ontimeout = xmlhttp.onerror;
-    xmlhttp.timeout = 3000;
-    xmlhttp.send();
-}
-
-function postFileData(url, data, callback) {
-    var encodeData = "",
-        append = false;
-    Object.keys(data).forEach(function(key) {
-        if (!append) {
-            append = true;
-        } else {
-            encodeData += "&";
-        }
-        encodeData += encodeURIComponent(key).replace(/%20/g, "+") + "=" +
-            encodeURIComponent(data[key]).replace(/%20/g, "+");
-    });
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.open("POST", url, true);
-    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-            if (typeof callback == "function") callback(xmlhttp.responseText);
-        }
-    };
-    xmlhttp.send(encodeData);
-}
-
+//message listener
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     switch (request.command) {
         case "injectCSS":
@@ -111,43 +66,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             chrome.tabs.insertCSS(sender.tab.id, {file: "ABPlayer.css"}, sendResponse);
             return true;
         case "refreshOptions":
-            refreshOptions().then(sendResponse);
-            return true;
-        case "checkComment":
-            getFileData("http://www.bilibili.com/feedback/arc-" + request.avid + "-1.html", function(commentData) {
-                var test = commentData.indexOf('<div class="no_more">');
-                if (test >= 0) {
-                    sendResponse({
-                        banned: true
-                    });
-                } else {
-                    sendResponse({
-                        banned: false
-                    });
-                }
-            });
-            return true;
-        case "sendComment":
-            var errorCode = ["正常", "选择的弹幕模式错误", "用户被禁止", "系统禁止",
-                "投稿不存在", "UP主禁止", "权限有误", "视频未审核/未发布", "禁止游客弹幕"
-            ];
-            request.comment.cid = request.cid;
-            postFileData("http://interface.bilibili.com/dmpost?cid=" + request.cid +
-                "&aid=" + request.avid + "&pid=" + request.page, request.comment,
-                function(result) {
-                    result = parseInt(result);
-                    if (result < 0) {
-                        sendResponse({
-                            result: false,
-                            error: errorCode[-result]
-                        });
-                    } else {
-                        sendResponse({
-                            result: true,
-                            id: result
-                        });
-                    }
-                });
+            refreshOptions();
             return true;
         case "requestForDownload":
             chrome.downloads.download({
@@ -157,7 +76,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                 conflictAction: "prompt"
             });
             return true;
-
         default:
             sendResponse({
                 result: "unknown"
@@ -166,6 +84,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     }
 });
 
+//webRequest listener
 chrome.webRequest.onBeforeRequest.addListener(function(details) {
     chrome.tabs.sendMessage(details.tabId, {
         command: "error"
@@ -173,18 +92,6 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 }, {
     urls: ["http://comment.bilibili.com/1272.xml"]
 });
-
-chrome.webRequest.onBeforeRequest.addListener(function(details) {
-    if (secureAvailable) {
-        return {
-            redirectUrl: "https://static-s.bilibili.com/play.swf"
-        };
-    } else {
-        return {};
-    };
-}, {
-    urls: ["http://static.hdslb.com/play.swf"]
-}, ["blocking"]);
 
 chrome.webRequest.onBeforeRequest.addListener(function(details) {
     if (options.trackingBlock) return {
@@ -235,3 +142,39 @@ chrome.webRequest.onHeadersReceived.addListener(function(details) {
 }, {
     urls: ["http://www.bilibili.com/video/av*", "http://bangumi.bilibili.com/anime/v/*"]
 }, ["responseHeaders", "blocking"]);
+
+// video api replacing
+// https://gist.github.com/myfreeer/d805427aba19f5b34480edafeb94e20d
+class urlParams {
+  constructor(str) {
+    if (str) this.parse(str);
+  }
+  toString(filterArray) {
+    filterArray = filterArray && filterArray.map ? filterArray.filter(e => this.has(e)) : this.keys()
+    return filterArray.map(e => this[e] === false || this[e] === 0 || this[e] ? e + '=' + encodeURIComponent(this[e]) : e).join('&');
+  }
+  parse(str) {
+    if (!str) return false;
+    if (str.charAt(0) === '?') str = str.substr(1);
+    let array = str.split('&').map(e => e.split('=')).map(e => this[e[0]] = e[1] && decodeURIComponent(e[1]));
+    return this;
+  }
+  keys() {
+    return Object.keys(this);
+  }
+  has(name) {
+    return this.hasOwnProperty(name);
+  }
+}
+chrome.webRequest.onBeforeRequest.addListener(function (details) {
+    if (options.api.match('http')) {
+        const search = (new URL(details.url)).search;
+        let urlparams = new urlParams(search);
+        if (details.url.match('bangumi')) urlparams.cid += '|bangumi';
+        return {
+            redirectUrl: `${options.api}/BPplayurl.php?${urlparams.toString(['cid', 'otype', 'type', 'quality'])}`
+        }
+    } else return {};
+}, {
+    urls: ['*://bangumi.bilibili.com/player/web_api/playurl*', '*://interface.bilibili.com/playurl*']
+}, ["blocking"]);

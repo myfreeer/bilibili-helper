@@ -7,7 +7,7 @@ Element.prototype.text=function(str){return str ? (this.innerText = str) : this.
 Element.prototype.addClass=function(){return this.classList.add(...arguments);};
 (async() => {
     let options = await storageGet();
-    console.log(options);
+    //console.log(options);
     $("#menu_title").text(chrome.i18n.getMessage('extShortName'));
     $("#version").text(chrome.runtime.getManifest().version);
     const resetOptions = () => {
@@ -16,6 +16,7 @@ Element.prototype.addClass=function(){return this.classList.add(...arguments);};
         $(`div[option="${options.trackingBlock}"].trackingBlock`).addClass("on");
         $(`div[option="${options.replace}"].replace`).addClass("on");
         $(`div[option="${options.player}"].player`).addClass("on");
+        $(`div[option="${options.api}"].api`).addClass("on");
     };
     resetOptions();
     const paseBool = str => {
@@ -31,7 +32,6 @@ Element.prototype.addClass=function(){return this.classList.add(...arguments);};
     document.getElementById('options_form').onclick = e => {
         if (!e.target.attr('option')) return;
         options[e.target.classList[1]] = paseBool(e.target.attr('option'));
-        storageSet(options);
-        resetOptions();
+        storageSet(options).then(() => resetOptions()).then(chrome.runtime.sendMessage({command: 'refreshOptions'}));
     };
 })();

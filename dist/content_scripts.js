@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 11);
+/******/ 	return __webpack_require__(__webpack_require__.s = 12);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -210,7 +210,7 @@ const bilibiliBangumiVideoInfoProvider = async(epid, credentials = 'include', re
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__md5__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__md5__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__md5___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__md5__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(0);
 
@@ -359,7 +359,7 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__crc32__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__crc32__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__crc32___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__crc32__);
 
 const commentSenderQuery = async(hash, retries = 5) => {
@@ -618,6 +618,41 @@ const genPageFunc = async(cid, videoInfo, redirectUrl) => {
 
 /***/ }),
 /* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+const errorCode = ["正常", "选择的弹幕模式错误", "用户被禁止", "系统禁止", "投稿不存在", "UP主禁止", "权限有误", "视频未审核/未发布", "禁止游客弹幕"];
+const sendComment = async(avid, cid, page, commentData) => {
+    commentData.cid = cid;
+    const comment = Object.keys(commentData).map(key => encodeURIComponent(key).replace(/%20/g, "+") + "=" + encodeURIComponent(commentData[key]).replace(/%20/g, "+")).join('&');
+    try {
+        let result = await fetch(`${location.protocol}//interface.bilibili.com/dmpost?cid=${cid}&aid=${avid}&pid=${page}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            credentials: 'include',
+            body: comment
+        }).then(res => res.text());
+        result = parseInt(result);
+        return result < 0 ? {
+            result: false,
+            error: errorCode[-result]
+        } : {
+            result: true,
+            id: result
+        };
+    } catch (e) {
+        return {
+            result: false,
+            error: e.toString()
+        };
+    }
+};
+/* harmony default export */ __webpack_exports__["a"] = (sendComment);
+
+/***/ }),
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1131,7 +1166,7 @@ const xml2ass = (xmldoc, opts) =>  '\ufeff' + generateASS(setPosition(parseXML('
 /* harmony default export */ __webpack_exports__["a"] = (xml2ass);
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1140,14 +1175,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__commentSenderQuery__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__bilibiliVideoProvider__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__xml2ass__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__xml2ass__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__filename_sanitize__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__cookies__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__MessageBox_min__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__SelectModule_min__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__genPageFunc__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__addTitleLink__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__sendComment__ = __webpack_require__(10);
 // require external libs
+
 
 
 
@@ -1339,7 +1376,7 @@ const $h = html => {
 	const clickAssBtnHandler = event => {
 	    event.preventDefault();
 	    if (!assData) assData = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__xml2ass__["a" /* default */])(comment.xml, {
-	        'title': __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__filename_sanitize__["b" /* getNiceSectionFilename */])(biliHelper.avid, biliHelper.page, biliHelper.totalPage, 1, 1),
+	        'title': __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__filename_sanitize__["b" /* getNiceSectionFilename */])(avid, page, videoInfo.pages || 1, 1, 1),
 	        'ori': location.href,
 	        'opacity': options.opacity || 0.75
 	    });
@@ -1511,13 +1548,7 @@ const $h = html => {
 	            const commentId = e.detail.id,
 	                commentData = e.detail;
 	            delete e.detail.id;
-	            chrome.runtime.sendMessage({
-	                command: "sendComment",
-	                avid: avid,
-	                cid: cid,
-	                page: page,
-	                comment: commentData
-	            }, function (response) {
+	            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_11__sendComment__["a" /* default */])(avid, cid, page, commentData).then(function (response) {
 	                response.tmp_id = commentId;
 	                abp.commentCallback(response);
 	            });
@@ -1593,7 +1624,7 @@ const $h = html => {
 })();
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 (function (root) {
@@ -1698,7 +1729,7 @@ const $h = html => {
 })(this);
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;/*

@@ -10,6 +10,7 @@ import MessageBox from './MessageBox.min';
 import SelectModule from './SelectModule.min';
 import genPageFunc from './genPageFunc';
 import addTitleLink from './addTitleLink';
+import sendComment from './sendComment';
 
 // shortcuts
 Element.prototype.find=Element.prototype.querySelector;
@@ -190,7 +191,7 @@ const $h = html => {
 	const clickAssBtnHandler = event => {
 	    event.preventDefault();
 	    if (!assData) assData = xml2ass(comment.xml, {
-	        'title': getNiceSectionFilename(biliHelper.avid, biliHelper.page, biliHelper.totalPage, 1, 1),
+	        'title': getNiceSectionFilename(avid, page, videoInfo.pages || 1, 1, 1),
 	        'ori': location.href,
 	        'opacity': options.opacity || 0.75
 	    });
@@ -362,13 +363,7 @@ const $h = html => {
 	            const commentId = e.detail.id,
 	                commentData = e.detail;
 	            delete e.detail.id;
-	            chrome.runtime.sendMessage({
-	                command: "sendComment",
-	                avid: avid,
-	                cid: cid,
-	                page: page,
-	                comment: commentData
-	            }, function (response) {
+	            sendComment(avid, cid, page, commentData).then(function (response) {
 	                response.tmp_id = commentId;
 	                abp.commentCallback(response);
 	            });

@@ -58,9 +58,9 @@ li {
 
 #main_form .icon{
     position: absolute;
-    left: 0;
-    top: 0;
-    height: 48px
+    left: 4px;
+    top: 6px;
+    height: 36px
 }
 
 .options_form {
@@ -91,7 +91,7 @@ li {
     font-size: 12px;
     height: 20px;
     line-height: 20px;
-    margin: 3px 3px;
+    margin: 0px 3px;
     padding: 3px;
     font-weight: 400;
     background-color: #fff;
@@ -127,7 +127,7 @@ li {
 <body>
     <div id="main_form" class="card">
         <div class="header">
-        <img src="./imgs/icon-256.png" class="icon"><span id="menu_title"></span> <span id="version"></span>
+        <img src="./imgs/icon-256.png" class="icon">  <span id="menu_title"></span> <span id="version"></span>
         </div>
         <ul id="options_form" class="options_form">
             <li class="category">
@@ -145,6 +145,12 @@ li {
                 <div class="button player" option="html5">html5</div>
                 <div class="button player" option="bilih5">官方html5</div>
                 <div class="button player" option="original">flash</div>
+            </li>
+            <li class="category">
+                <p>视频api替换</p>
+                <div class="button api" option="offical">不替换</div>
+                <div class="button api" option="https://www.biliplus.com">biliplus</div>
+                <div class="button api" option="http://biliplus.ipcjsdev.tk" title="不支持https">ipcjs</div>
             </li>
             <li class="category">
                 <p>视频关联搜索设置</p>
