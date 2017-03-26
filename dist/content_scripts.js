@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 10);
+/******/ 	return __webpack_require__(__webpack_require__.s = 11);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -117,8 +117,8 @@ const fetchretry = (url, options) => {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var lastMessageBoxLayer=20000;function MessageBox(b){this.params={evType:"over",center:!0,Overlap:!1,focusShowPos:"up",zIndex:null,animation:"fade",position:null,event:null,bound:!0,margin:5,backdrop:!1,bindInput:!1};"string"==typeof b&&(b={evType:b});if("object"==typeof b){for(var d in this.params){b.hasOwnProperty(d)&&(this.params[d]=b[d])}}}MessageBox.prototype={timer:null,msgbox:null,bindobj:null,backobj:null,incomingTimer:null,position:{},reverseMap:{up:"down",down:"up",left:"right",right:"left"},show:function(i,o,h,n,l){i=$(i);if(!1!=this.params.Overlap||"yes"!=i.attr("hasMessageBox")){i.attr("hasMessageBox","yes");"undefined"==typeof h&&(h=1000);"undefined"==typeof n&&(n="msg");"button"==h&&(l=n,n=h,h=1000);var k=h;0==h&&(k=50);var j=this;j.leftTimer=function(){"button"!=n&&(clearTimeout(j.timer),j.timer=setTimeout(function(){clearTimeout(j.timer);j.close(j)},k))};j.incomingTimer=function(){clearTimeout(j.timer)};this.bindobj=i;this.msgbox=$('<div class="m-layer m_layer"><div class="bg"><div class="content"><div class="mini"><div class="msg-text"><i class="b-icon"></i>'+o+"</div>"+("button"==n?'<div class="btnbox"><a class="b-btn ok">\u786e\u8ba4</a><a class="b-btn-cancel cancel">\u53d6\u6d88</a></div>':"")+"</div></div></div></div>").prependTo("body");this.msgbox.addClass("m-"+n);j.params.backdrop&&(j.backobj=$('<div class="m-backdrop"></div>').css({position:"fixed",top:0,left:0,right:0,bottom:0,opacity:0.6,backgroundColor:"#000",zIndex:(j.params.zIndex||lastMessageBoxLayer)-1}).appendTo("body"));"over"==this.params.evType?(i.bind("mouseleave",j.leftTimer),i.bind("mouseenter",j.incomingTimer),this.msgbox.bind("mouseenter",function(){clearTimeout(j.timer)}),this.msgbox.bind("mouseleave",j.leftTimer)):i.bind("blur",j.leftTimer);this.setPos();this.msgbox.css("z-index",j.params.zIndex||lastMessageBoxLayer++);if(this.params.bindInput&&"error"==n){if(i.is(":text")||i.is("textarea")){i.addClass("error").on("focus.m-error",this.closeErrHandler())}else{if(0<i.find(":text,textarea").length){i.addClass("error").find(":text,textarea").on("focus.m-error",this.closeErrHandler())}}}"button"==n&&(this.msgbox.find(".ok").click(function(){"undefined"!=typeof l&&!1==l(j)||j.close()}),this.msgbox.find(".cancel").click(function(){j.close()}));0!=h&&j.leftTimer();"fade"!=this.params.animation?this.msgbox.addClass(this.params.animation):this.moveIn(this.params.focusShowPos);this.bindobj.data("b-msgbox",this);return this.msgbox}},close:function(){var b=this,d=function(){b.msgbox.remove();b.params.backdrop&&b.backobj.remove();"over"==b.params.evType&&b.bindobj.off("mouseenter",b.incomingTimer);b.bindobj.off("over"==b.params.evType?"mouseleave":"blur",b.leftTimer)};this.bindobj.attr("hasMessageBox","");"fade"!=this.params.animation?this.msgbox.removeClass(this.params.animation).fadeOut(200,d):this.msgbox.fadeOut(200,d)},closeErrHandler:function(){var b=this;return function(){var a=b.bindobj.removeClass("error");b.close();a.is(":text")||a.is("textarea")?a.off("focus.m-error"):0<a.find(":text,textarea").length&&a.find(":text,textarea").off("focus.m-error")}},moveIn:function(f){var h={opacity:1},e=5,g=5;switch(f){case"up":h.top="-=5";g=0;break;case"down":h.top="+=5";e=-e;g=0;break;case"left":h.left="-=5";e=0;break;case"right":h.left="+=5";g=-g;e=0;break;default:h.top="-=5",g=0}this.msgbox.show().css({top:this.position.top+e,left:this.position.left+g,opacity:0});this.msgbox.animate(h,200)},setPos:function(){this.params.position?(this.position=this.params.position,this.resetBound()):this._pos(this.params.focusShowPos);this.msgbox.css("left",this.position.left);this.msgbox.css("top",this.position.top)},_pos:function(e,f){var d=this.bindobj;this.params.focusShowPos=e;switch(e){case"up":this.position.top=d.offset().top-this.msgbox.outerHeight()-this.params.margin;this.position.left=d.offset().left;this.params.center&&(this.position.left=this.position.left-this.msgbox.outerWidth()/2+d.outerWidth()/2);break;case"down":this.position.top=d.offset().top+d.outerHeight()+this.params.margin;this.position.left=d.offset().left;this.params.center&&(this.position.left=this.position.left-this.msgbox.outerWidth()/2+d.outerWidth()/2);break;case"left":this.position.top=d.offset().top;this.position.left=d.offset().left-this.msgbox.outerWidth()-this.params.margin;break;case"right":this.position.top=d.offset().top,this.position.left=d.offset().left+d.outerWidth()+this.params.margin}if(!this.checkBound(e)){if(!0!==f){return this._pos(this.reverseMap[e],!0)}this.setBound("down");this.setBound("left");this.position.top-=10;this.position.left+=10}this.resetBound();return this.position},resetBound:function(e){if(this.params.bound||!0===e){e=["up","down","left","right"];for(var f=0;f<e.length;f++){var d=e[f];this.checkBound(d)||this.setBound(d)}}},checkBound:function(b){switch(b){case"up":return this.position.top>=$(window).scrollTop();case"down":return this.position.top+this.msgbox.outerHeight()<=$(window).height()+$(window).scrollTop();case"left":return this.position.left>=$(window).scrollLeft();case"right":return this.position.left+this.msgbox.outerWidth()<=$(window).width()+$(window).scrollLeft();default:return !0}},setBound:function(b){switch(b){case"up":this.position.top=$(window).scrollTop();break;case"down":this.position.top=$(window).height()+$(window).scrollTop()-this.msgbox.outerHeight();break;case"left":this.position.left=$(window).scrollLeft();break;case"right":this.position.left=$(window).width()+$(window).scrollLeft()-this.msgbox.outerWidth()}}};
-/* unused harmony default export */ var _unused_webpack_default_export = (MessageBox);
+var lastMessageBoxLayer=20000;function MessageBox(b){this.params={evType:"over",center:!0,Overlap:!1,focusShowPos:"up",zIndex:null,animation:!1,position:null,event:null,bound:!0,margin:5,backdrop:!1,bindInput:!1};"string"==typeof b&&(b={evType:b});if("object"==typeof b){for(var d in this.params){b.hasOwnProperty(d)&&(this.params[d]=b[d])}}}MessageBox.prototype={timer:null,msgbox:null,bindobj:null,backobj:null,incomingTimer:null,position:{},reverseMap:{up:"down",down:"up",left:"right",right:"left"},show:function(i,o,h,n,l){i=$(i);if(!1!=this.params.Overlap||"yes"!=i.attr("hasMessageBox")){i.attr("hasMessageBox","yes");"undefined"==typeof h&&(h=1000);"undefined"==typeof n&&(n="msg");"button"==h&&(l=n,n=h,h=1000);var k=h;0==h&&(k=50);var j=this;j.leftTimer=function(){"button"!=n&&(clearTimeout(j.timer),j.timer=setTimeout(function(){clearTimeout(j.timer);j.close(j)},k))};j.incomingTimer=function(){clearTimeout(j.timer)};this.bindobj=i;this.msgbox=$('<div class="m-layer m_layer"><div class="bg"><div class="content"><div class="mini"><div class="msg-text"><i class="b-icon"></i>'+o+"</div>"+("button"==n?'<div class="btnbox"><a class="b-btn ok">\u786e\u8ba4</a><a class="b-btn-cancel cancel">\u53d6\u6d88</a></div>':"")+"</div></div></div></div>").prependTo("body");this.msgbox.addClass("m-"+n);j.params.backdrop&&(j.backobj=$('<div class="m-backdrop"></div>').css({position:"fixed",top:0,left:0,right:0,bottom:0,opacity:0.6,backgroundColor:"#000",zIndex:(j.params.zIndex||lastMessageBoxLayer)-1}).appendTo("body"));"over"==this.params.evType?(i.bind("mouseleave",j.leftTimer),i.bind("mouseenter",j.incomingTimer),this.msgbox.bind("mouseenter",function(){clearTimeout(j.timer)}),this.msgbox.bind("mouseleave",j.leftTimer)):i.bind("blur",j.leftTimer);this.setPos();this.msgbox.css("z-index",j.params.zIndex||lastMessageBoxLayer++);if(this.params.bindInput&&"error"==n){if(i.is(":text")||i.is("textarea")){i.addClass("error").on("focus.m-error",this.closeErrHandler())}else{if(0<i.find(":text,textarea").length){i.addClass("error").find(":text,textarea").on("focus.m-error",this.closeErrHandler())}}}"button"==n&&(this.msgbox.find(".ok").click(function(){"undefined"!=typeof l&&!1==l(j)||j.close()}),this.msgbox.find(".cancel").click(function(){j.close()}));0!=h&&j.leftTimer();"fade"!=this.params.animation?this.msgbox.addClass(this.params.animation):this.moveIn(this.params.focusShowPos);this.bindobj.data("b-msgbox",this);return this.msgbox}},close:function(){var b=this,d=function(){b.msgbox.remove();b.params.backdrop&&b.backobj.remove();"over"==b.params.evType&&b.bindobj.off("mouseenter",b.incomingTimer);b.bindobj.off("over"==b.params.evType?"mouseleave":"blur",b.leftTimer)};this.bindobj.attr("hasMessageBox","");"fade"!=this.params.animation?this.msgbox.removeClass(this.params.animation).fadeOut(200,d):this.msgbox.fadeOut(200,d)},closeErrHandler:function(){var b=this;return function(){var a=b.bindobj.removeClass("error");b.close();a.is(":text")||a.is("textarea")?a.off("focus.m-error"):0<a.find(":text,textarea").length&&a.find(":text,textarea").off("focus.m-error")}},moveIn:function(f){var h={opacity:1},e=5,g=5;switch(f){case"up":h.top="-=5";g=0;break;case"down":h.top="+=5";e=-e;g=0;break;case"left":h.left="-=5";e=0;break;case"right":h.left="+=5";g=-g;e=0;break;default:h.top="-=5",g=0}this.msgbox.show().css({top:this.position.top+e,left:this.position.left+g,opacity:0});this.msgbox.css(h)},setPos:function(){this.params.position?(this.position=this.params.position,this.resetBound()):this._pos(this.params.focusShowPos);this.msgbox.css("left",this.position.left);this.msgbox.css("top",this.position.top)},_pos:function(e,f){var d=this.bindobj;this.params.focusShowPos=e;switch(e){case"up":this.position.top=d.offset().top-this.msgbox.outerHeight()-this.params.margin;this.position.left=d.offset().left;this.params.center&&(this.position.left=this.position.left-this.msgbox.outerWidth()/2+d.outerWidth()/2);break;case"down":this.position.top=d.offset().top+d.outerHeight()+this.params.margin;this.position.left=d.offset().left;this.params.center&&(this.position.left=this.position.left-this.msgbox.outerWidth()/2+d.outerWidth()/2);break;case"left":this.position.top=d.offset().top;this.position.left=d.offset().left-this.msgbox.outerWidth()-this.params.margin;break;case"right":this.position.top=d.offset().top,this.position.left=d.offset().left+d.outerWidth()+this.params.margin}if(!this.checkBound(e)){if(!0!==f){return this._pos(this.reverseMap[e],!0)}this.setBound("down");this.setBound("left");this.position.top-=10;this.position.left+=10}this.resetBound();return this.position},resetBound:function(e){if(this.params.bound||!0===e){e=["up","down","left","right"];for(var f=0;f<e.length;f++){var d=e[f];this.checkBound(d)||this.setBound(d)}}},checkBound:function(b){switch(b){case"up":return this.position.top>=$(window).scrollTop();case"down":return this.position.top+this.msgbox.outerHeight()<=$(window).height()+$(window).scrollTop();case"left":return this.position.left>=$(window).scrollLeft();case"right":return this.position.left+this.msgbox.outerWidth()<=$(window).width()+$(window).scrollLeft();default:return !0}},setBound:function(b){switch(b){case"up":this.position.top=$(window).scrollTop();break;case"down":this.position.top=$(window).height()+$(window).scrollTop()-this.msgbox.outerHeight();break;case"left":this.position.left=$(window).scrollLeft();break;case"right":this.position.left=$(window).width()+$(window).scrollLeft()-this.msgbox.outerWidth()}}};
+/* harmony default export */ __webpack_exports__["a"] = (MessageBox);
 
 /***/ }),
 /* 2 */
@@ -130,6 +130,31 @@ var SelectModule=function(){function b(c,e){this.params={};this._isMobile=!1;if(
 
 /***/ }),
 /* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+function addTitleLink(text, mode) {
+    if (mode == "off") return text;
+    return text.replace(/(\d+)/g, function (mathchedText, $1, offset, str) {
+        for (var i = offset; i >= 0; i--) {
+            if (str[i] == "】") break;
+            else if (str[i] == "【") return mathchedText;
+        }
+        var previous = str.substring(0, offset) + ((parseInt(mathchedText) - 1 >= 10 || (parseInt(mathchedText) - 1 < 0) ? ((parseInt(mathchedText) - 1).toString()) : ('0' + (parseInt(mathchedText) - 1).toString())) + str.substring(offset + mathchedText.length, str.length)),
+            next = str.substring(0, offset) + ((parseInt(mathchedText) + 1 >= 10 || (parseInt(mathchedText) - 1 < 0) ? ((parseInt(mathchedText) + 1).toString()) : ('0' + (parseInt(mathchedText) + 1).toString())) + str.substring(offset + mathchedText.length, str.length));
+        previous = previous.replace(/(#)/g, " ");
+        next = next.replace(/(#)/g, " ");
+        if (mode == "without") {
+            previous = previous.replace(/(\【.*?\】)/g, "");
+            next = next.replace(/(\【.*?\】)/g, "");
+        }
+        return "<span class=\"titleNumber\" previous = \"" + previous + "\" next = \"" + next + "\">" + mathchedText + "</span>";
+    });
+}
+/* harmony default export */ __webpack_exports__["a"] = (addTitleLink);
+
+/***/ }),
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -181,11 +206,11 @@ const bilibiliBangumiVideoInfoProvider = async(epid, credentials = 'include', re
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__md5__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__md5__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__md5___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__md5__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(0);
 
@@ -330,11 +355,11 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
 /* harmony default export */ __webpack_exports__["a"] = (bilibiliVideoProvider);
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__crc32__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__crc32__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__crc32___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__crc32__);
 
 const commentSenderQuery = async(hash, retries = 5) => {
@@ -354,7 +379,7 @@ const commentSenderQuery = async(hash, retries = 5) => {
 /* harmony default export */ __webpack_exports__["a"] = (commentSenderQuery);
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -394,7 +419,7 @@ const __SetCookie = utils.bindFn(utils.cookie.set, utils);
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -558,7 +583,7 @@ function getDownloadOptions(url, filename) {
 }
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -592,7 +617,7 @@ const genPageFunc = async(cid, videoInfo, redirectUrl) => {
 /* harmony default export */ __webpack_exports__["a"] = (genPageFunc);
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1106,22 +1131,24 @@ const xml2ass = (xmldoc, opts) =>  '\ufeff' + generateASS(setPosition(parseXML('
 /* harmony default export */ __webpack_exports__["a"] = (xml2ass);
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__bilibiliVideoInfoProvider__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__bilibiliVideoInfoProvider__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__commentSenderQuery__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__bilibiliVideoProvider__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__xml2ass__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__filename_sanitize__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__cookies__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__commentSenderQuery__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__bilibiliVideoProvider__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__xml2ass__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__filename_sanitize__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__cookies__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__MessageBox_min__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__SelectModule_min__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__genPageFunc__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__genPageFunc__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__addTitleLink__ = __webpack_require__(3);
 // require external libs
+
 
 
 
@@ -1211,11 +1238,16 @@ const $h = html => {
 	comment._xml = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* fetchretry */])(comment.url).then(res=>res.text()).then(text=>__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* parseXmlSafe */])(text));
 	options = await _options;
 
-	//some ui code from original helper
 	const videoPic = videoInfo.pic || (_$('img.cover_image') && _$('img.cover_image').attr('src'));
+	//genPage func
 	if (!_$('.b-page-body')) genPage = decodeURIComponent(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6__cookies__["a" /* __GetCookie */])('redirectUrl'));
 	if (_$('.b-page-body .z-msg') > 0 && _$('.b-page-body .z-msg').text().indexOf('版权') > -1) genPage =1;
 	if (genPage) await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_9__genPageFunc__["a" /* default */])(cid, videoInfo, genPage);
+	//addTitleLink func
+	_$('.viewbox .info .v-title h1').html(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_10__addTitleLink__["a" /* default */])(_$('.viewbox .info .v-title h1').attr('title'), options.rel_search));
+	if (_$(".titleNumber")) _$(".titleNumber").onclick = e =>(new __WEBPACK_IMPORTED_MODULE_7__MessageBox_min__["a" /* default */]).show(e.target, '\u70b9\u51fb\u641c\u7d22\u76f8\u5173\u89c6\u9891\uff1a<br /><a target="_blank" href="http://www.bilibili.com/search?orderby=default&keyword=' + encodeURIComponent(e.target.attr("previous")) + '">' + e.target.attr("previous") + '</a><br /><a target="_blank" href="http://www.bilibili.com/search?orderby=ranklevel&keyword=' + encodeURIComponent(e.target.attr("next")) + '">' + e.target.attr("next") + '</a>', 1e3);
+
+	//some ui code from original helper
 	let biliHelper = $h(isBangumi && !genPage ? "<div class=\"v1-bangumi-info-btn helper\" id=\"bilibili_helper\"><span class=\"t\">哔哩哔哩助手</span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>" : "<div class=\"block helper\" id=\"bilibili_helper\"><span class=\"t\"><div class=\"icon\"></div><div class=\"t-right\"><span class=\"t-right-top middle\">助手</span><span class=\"t-right-bottom\">扩展菜单</span></div></span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>");
 	biliHelper.find('.t').onclick=()=>biliHelper.toggleClass('active');
 	biliHelper.blockInfo = biliHelper.find('.info');
@@ -1557,11 +1589,11 @@ const $h = html => {
 	            .catch(e => _$('#bofqi').find('#loading-notice').text('调用 Bilibili Mac 客户端失败 :('));
 	    }
 	};
-	biliHelper.switcher.html5();
+	biliHelper.switcher[options.player]();
 })();
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 (function (root) {
@@ -1666,7 +1698,7 @@ const $h = html => {
 })(this);
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;/*

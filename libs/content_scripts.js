@@ -9,6 +9,7 @@ import {__GetCookie, __SetCookie} from './cookies';
 import MessageBox from './MessageBox.min';
 import SelectModule from './SelectModule.min';
 import genPageFunc from './genPageFunc';
+import addTitleLink from './addTitleLink';
 
 // shortcuts
 Element.prototype.find=Element.prototype.querySelector;
@@ -88,11 +89,16 @@ const $h = html => {
 	comment._xml = fetchretry(comment.url).then(res=>res.text()).then(text=>parseXmlSafe(text));
 	options = await _options;
 
-	//some ui code from original helper
 	const videoPic = videoInfo.pic || (_$('img.cover_image') && _$('img.cover_image').attr('src'));
+	//genPage func
 	if (!_$('.b-page-body')) genPage = decodeURIComponent(__GetCookie('redirectUrl'));
 	if (_$('.b-page-body .z-msg') > 0 && _$('.b-page-body .z-msg').text().indexOf('版权') > -1) genPage =1;
 	if (genPage) await genPageFunc(cid, videoInfo, genPage);
+	//addTitleLink func
+	_$('.viewbox .info .v-title h1').html(addTitleLink(_$('.viewbox .info .v-title h1').attr('title'), options.rel_search));
+	if (_$(".titleNumber")) _$(".titleNumber").onclick = e =>(new MessageBox).show(e.target, '\u70b9\u51fb\u641c\u7d22\u76f8\u5173\u89c6\u9891\uff1a<br /><a target="_blank" href="http://www.bilibili.com/search?orderby=default&keyword=' + encodeURIComponent(e.target.attr("previous")) + '">' + e.target.attr("previous") + '</a><br /><a target="_blank" href="http://www.bilibili.com/search?orderby=ranklevel&keyword=' + encodeURIComponent(e.target.attr("next")) + '">' + e.target.attr("next") + '</a>', 1e3);
+
+	//some ui code from original helper
 	let biliHelper = $h(isBangumi && !genPage ? "<div class=\"v1-bangumi-info-btn helper\" id=\"bilibili_helper\"><span class=\"t\">哔哩哔哩助手</span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>" : "<div class=\"block helper\" id=\"bilibili_helper\"><span class=\"t\"><div class=\"icon\"></div><div class=\"t-right\"><span class=\"t-right-top middle\">助手</span><span class=\"t-right-bottom\">扩展菜单</span></div></span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>");
 	biliHelper.find('.t').onclick=()=>biliHelper.toggleClass('active');
 	biliHelper.blockInfo = biliHelper.find('.info');
@@ -434,5 +440,5 @@ const $h = html => {
 	            .catch(e => _$('#bofqi').find('#loading-notice').text('调用 Bilibili Mac 客户端失败 :('));
 	    }
 	};
-	biliHelper.switcher.html5();
+	biliHelper.switcher[options.player]();
 })();

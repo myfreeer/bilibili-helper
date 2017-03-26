@@ -4,13 +4,16 @@ var secureAvailable = false,
 var bkg_page = chrome.extension.getBackgroundPage();
 const storageGet = () => new Promise((resolve, reject) => chrome.storage.local.get(resolve));
 let options = {
+    "player": "html5", //original swf iframe bilih5 html5 html5hd html5ld
+    "rel_search": "with", //off without with
     "opacity": 1,
     "prop": false,
     "scale": 1,
     "volume": 0.5,
     "replace": true
 };
-storageGet().then(obj=>Object.assign(options, obj)).then(()=>chrome.storage.local.set(options));
+const refreshOptions = () => storageGet().then(obj=>Object.assign(options, obj)).then(()=>chrome.storage.local.set(options));
+refreshOptions();
 
 function getFileData(url, callback, method) {
     var m = 'GET';
@@ -66,33 +69,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             chrome.tabs.insertCSS(sender.tab.id, {file: "colpick.css"});
             chrome.tabs.insertCSS(sender.tab.id, {file: "ABPlayer.css"}, sendResponse);
             return true;
-        case "getMyInfo":
-            getFileData("http://api.bilibili.com/myinfo", function(myinfo) {
-                myinfo = JSON.parse(myinfo);
-                if (typeof myinfo.code == undefined) myinfo.code = 200;
-                sendResponse({
-                    code: myinfo.code || 200,
-                    myinfo: myinfo
-                });
-            });
-            return true;
-        case "searchVideo":
-            var keyword = request.keyword;
-            getFileData("http://api.bilibili.com/search?type=json&appkey=8e9fc618fbd41e28&keyword=" + encodeURIComponent(keyword) + "&page=1&order=ranklevel", function(searchResult) {
-                searchResult = JSON.parse(searchResult);
-                if (searchResult.code == 0) {
-                    sendResponse({
-                        status: "ok",
-                        result: searchResult.result[0]
-                    });
-                } else {
-                    sendResponse({
-                        status: "error",
-                        code: searchResult.code,
-                        error: searchResult.error
-                    });
-                }
-            });
+        case "refreshOptions":
+            refreshOptions().then(sendResponse);
             return true;
         case "checkComment":
             getFileData("http://www.bilibili.com/feedback/arc-" + request.avid + "-1.html", function(commentData) {
@@ -106,11 +84,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                         banned: false
                     });
                 }
-            });
-            return true;
-        case "savePlayerConfig":
-            sendResponse({
-               // result: setOption("playerConfig", JSON.stringify(request.config))
             });
             return true;
         case "sendComment":
