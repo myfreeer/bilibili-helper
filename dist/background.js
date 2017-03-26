@@ -150,7 +150,7 @@ class urlParams {
     if (str) this.parse(str);
   }
   toString(filterArray) {
-    filterArray = filterArray && filterArray.map ? filterArray.filter(e => this.has(e)) : this.keys()
+    filterArray = filterArray && filterArray.map ? filterArray.filter(e => this.hasOwnProperty(e)) : Object.keys(this);
     return filterArray.map(e => this[e] === false || this[e] === 0 || this[e] ? e + '=' + encodeURIComponent(this[e]) : e).join('&');
   }
   parse(str) {
@@ -158,12 +158,6 @@ class urlParams {
     if (str.charAt(0) === '?') str = str.substr(1);
     let array = str.split('&').map(e => e.split('=')).map(e => this[e[0]] = e[1] && decodeURIComponent(e[1]));
     return this;
-  }
-  keys() {
-    return Object.keys(this);
-  }
-  has(name) {
-    return this.hasOwnProperty(name);
   }
 }
 chrome.webRequest.onBeforeRequest.addListener(function (details) {
