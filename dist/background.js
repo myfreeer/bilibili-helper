@@ -1,16 +1,16 @@
-var notification = false,
-    notificationAvid = {},
-    playerTabs = {},
-    cidHackType = {},
-    viCache = {},
-    locale = 0,
-    localeAcquired = false,
-    localeTimeout = null,
-    secureAvailable = false,
-    updateNotified = false,
-    videoPlaybackHosts = ["http://*.hdslb.com/*", "https://*.hdslb.com/*", "http://*.acgvideo.com/*", "http://*/*.acgvideo.com/*", "https://*.acgvideo.com/*", "https://*/*.acgvideo.com/*"],
-    Live = {};
+var secureAvailable = false,
+    videoPlaybackHosts = ["http://*.hdslb.com/*", "https://*.hdslb.com/*", "http://*.acgvideo.com/*", "http://*/*.acgvideo.com/*", "https://*.acgvideo.com/*", "https://*/*.acgvideo.com/*"];
+
 var bkg_page = chrome.extension.getBackgroundPage();
+const storageGet = () => new Promise((resolve, reject) => chrome.storage.local.get(resolve));
+let options = {
+    "opacity": 1,
+    "prop": false,
+    "scale": 1,
+    "volume": 0.5,
+    "replace": true
+};
+storageGet().then(obj=>Object.assign(options, obj)).then(()=>chrome.storage.local.set(options));
 
 function getFileData(url, callback, method) {
     var m = 'GET';
@@ -61,6 +61,11 @@ function postFileData(url, data, callback) {
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     switch (request.command) {
+        case "injectCSS":
+            chrome.tabs.insertCSS(sender.tab.id, {file: "bilibili-helper.css"});
+            chrome.tabs.insertCSS(sender.tab.id, {file: "colpick.css"});
+            chrome.tabs.insertCSS(sender.tab.id, {file: "ABPlayer.css"}, sendResponse);
+            return true;
         case "getMyInfo":
             getFileData("http://api.bilibili.com/myinfo", function(myinfo) {
                 myinfo = JSON.parse(myinfo);
@@ -200,7 +205,7 @@ chrome.webRequest.onHeadersReceived.addListener(receivedHeaderModifier, {
 
 chrome.webRequest.onHeadersReceived.addListener(function(details) {
     var headers = details.responseHeaders;
-    if (details.statusLine.indexOf("HTTP/1.1 302") == 0 && getOption("replace") == "on") {
+    if (details.statusLine.indexOf("HTTP/1.1 302") == 0 && options.replace) {
         for (var i = 0; i < headers.length; i++) {
             if (headers[i].name.toLowerCase() == "location") {
                 headers.splice(i, 1, {
