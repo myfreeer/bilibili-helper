@@ -6,6 +6,7 @@ const storageGet = () => new Promise((resolve, reject) => chrome.storage.local.g
 let options = {
     "player": "html5", //original swf iframe bilih5 html5 html5hd html5ld
     "rel_search": "with", //off without with
+    "trackingBlock": true,
     "opacity": 1,
     "prop": false,
     "scale": 1,
@@ -14,6 +15,46 @@ let options = {
 };
 const refreshOptions = () => storageGet().then(obj=>Object.assign(options, obj)).then(()=>chrome.storage.local.set(options));
 refreshOptions();
+
+const trackingUrls = [
+    "*://data.bilibilijj.com/free/*.txt*",
+    "*://tajs.qq.com/stats*",
+    "*://*.hdslb.com/images/base/loading.gif",
+    "*://*.hdslb.com/message/img/infocenterIcon-*.png",
+    "*://*.hdslb.com/images/v3images/img_loading.png",
+    "*://*.hdslb.com/images/v2images/topicons.png",
+    "*://api.bilibili.com/crossdomain.xml*",
+    "*://*.hdslb.com/crossdomain.xml*",
+    "*://interface.bilibili.com/serverdate.js*",
+    "*://*.hdslb.com/images/base/app-box.png",
+    "*://api.bilibili.com/x/elec/show*",
+    "*://static.hdslb.com/images/elecrank-empty.png",
+    "*://live-feed.bilibili.com/ajax/feed/count*",
+    "*://comment.bilibili.com/playtag,*",
+    "*://interface.bilibili.com/msg.xml*",
+    "*://data.bilibili.com/crossdomain.xml*",
+    "*://*.bilibili.com/index/index-icon.json*",
+    "*://*.bilibili.com/widget/getSearchDefaultWords*",
+    "*://*.bilibili.com/v/web/*",
+    "*://*.hdslb.com/images/v2images/footpic.png",
+    "*://*.hdslb.com/ad-images/wx.jpg",
+    "*://*.hdslb.com/player/images/player_error.png",
+    "*://data.bilibili.com/a/access.js*",
+    "*://api.bilibili.com/plaza/banner*",
+    "*://*.hdslb.com/vip/dist/js/vipPlugin.js*",
+    "*://*.hdslb.com/ad-images/wx.gif*",
+    "*://*.hdslb.com/bfs/static/anime/js/bangumi.play.js*",
+    "*://s1.hdslb.com/bfs/static/anime/js/sponsor.js*",
+    "*://data.bilibili.com/a/bangumi.js*",
+    "*://*.up.lxdns.com/report.php*",
+    "*://*.hdslb.com/js/video.min.js",
+    "*://*.hdslb.com/js/bfd.js",
+    "*://*.bilibili.com/rec.js",
+    "*://*.hdslb.com/js/video.min.js*",
+    "*://*.hdslb.com/js/bfd.js*",
+    "*://data.bilibili.com/rec.js*",
+    "*://data.bilibili.com/v/flashplay/h5_player_op*"
+];
 
 function getFileData(url, callback, method) {
     var m = 'GET';
@@ -146,11 +187,11 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 }, ["blocking"]);
 
 chrome.webRequest.onBeforeRequest.addListener(function(details) {
-    return {
+    if (options.trackingBlock) return {
         cancel: true
     };
 }, {
-    urls: ["http://tajs.qq.com/stats*"]
+    urls: trackingUrls
 }, ["blocking"]);
 
 function receivedHeaderModifier(details) {
