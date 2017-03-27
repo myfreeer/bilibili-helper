@@ -1,7 +1,7 @@
 import md5 from './md5';
 import {sleep} from './utils';
 
-// from project youtube-dl (Public Domain)
+// from project youtube-dl (Unlicense)
 // https://github.com/rg3/youtube-dl/blob/bd8f48c78b952ebe3bf335185c819e265f63cb50/youtube_dl/extractor/bilibili.py#L59-L60
 const APPKEY = '84956560bc028eb7';
 const APPSECRET = '94aba54af9065f71de72f5508f1cd42e';
@@ -27,7 +27,7 @@ const xml2obj = xml => {
         if (xml.children.length > 0) {
             [...xml.children].map(item => {
                 let nodeName = item.nodeName;
-                if (typeof (obj[nodeName]) == "undefined") obj[nodeName] = xml2obj(item);
+                if (typeof (obj[nodeName]) === "undefined") obj[nodeName] = xml2obj(item);
                 else {
                     if (!obj[nodeName].push) obj[nodeName] = [obj[nodeName]];
                     obj[nodeName].push(xml2obj(item));
@@ -105,7 +105,7 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
     url._base = location.protocol + '//interface.bilibili.com/playurl?';
     url._query = (type, quality = 3) => `appkey=${APPKEY}&cid=${cid}&otype=json&quality=${quality}&type=${type}`;
     url.mp4 = url._base + url._query('mp4') + '&sign=' + md5(url._query('mp4') + APPSECRET);
-    url.flv = url._base + url._query('flv') +'&sign=' + md5(url._query('flv') + APPSECRET);
+    url.flv = url._base + url._query('flv') + '&sign=' + md5(url._query('flv') + APPSECRET);
     const interfaceUrl = (cid, ts) => `cid=${cid}&player=1&ts=${ts}`;
     const calcSign = (cid, ts) => md5(`${interfaceUrl(cid,ts)}${SECRETKEY_MINILOADER}`);
     let video = {};

@@ -193,7 +193,7 @@
             pickerElement.style.backgroundColor = pickerColor.hex;
             ctx.callback && ctx.callback(c.hex, { h: ctx.h - hueOffset, s: ctx.s, v: ctx.v }, { r: c.r, g: c.g, b: c.b }, undefined, mouse);
         }
-    };
+    }
 
     /**
      * Return click event handler for the picker.
@@ -211,7 +211,7 @@
             var c = hsv2rgb(ctx);
             ctx.callback && ctx.callback(c.hex, { h: ctx.h - hueOffset, s: ctx.s, v: ctx.v }, { r: c.r, g: c.g, b: c.b }, mouse);
         }
-    };
+    }
 
     var uniqID = 0;
     
@@ -296,7 +296,7 @@
 
         enableDragging(this, this.slideElement, slideListener(this, this.slideElement, this.pickerElement));
         enableDragging(this, this.pickerElement, pickerListener(this, this.pickerElement));
-    };
+    }
 
     function addEventListener(element, event, listener) {
 
@@ -387,7 +387,7 @@
          ctx.callback && ctx.callback(hex || c.hex, { h: ctx.h, s: ctx.s, v: ctx.v }, rgb || { r: c.r, g: c.g, b: c.b }, mousePicker, mouseSlide);
          
          return ctx;
-    };
+    }
 
     /**
      * Sets color of the picker in hsv format.
@@ -423,11 +423,11 @@
     ColorPicker.positionIndicators = function(slideIndicator, pickerIndicator, mouseSlide, mousePicker) {
         
         if (mouseSlide) {
-            slideIndicator.style.top = (mouseSlide.y - slideIndicator.offsetHeight/2) + 'px';
+            slideIndicator.style.top = (mouseSlide.y - slideIndicator.offsetHeight / 2) + 'px';
         }
         if (mousePicker) {
-            pickerIndicator.style.top = (mousePicker.y - pickerIndicator.offsetHeight/2) + 'px';
-            pickerIndicator.style.left = (mousePicker.x - pickerIndicator.offsetWidth/2) + 'px';
+            pickerIndicator.style.top = (mousePicker.y - pickerIndicator.offsetHeight / 2) + 'px';
+            pickerIndicator.style.left = (mousePicker.x - pickerIndicator.offsetWidth / 2) + 'px';
         } 
     };
 

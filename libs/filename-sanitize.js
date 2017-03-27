@@ -1,7 +1,7 @@
 // adapted from https://github.com/parshap/node-sanitize-filename/blob/master/index.js
 // remove node "Buffer" to work in browser.
 'use strict';
-
+import {_$} from './utils';
 /**
  * Replaces characters in strings that are illegal/unsafe for filenames.
  * Unsafe characters are either removed or replaced by a substitute set
@@ -109,14 +109,14 @@ export function getNiceSectionFilename(avid, page, totalPage, idx, numParts) {
 
     // try to find a good page name
     if (pageIdName) {
-        pageName = $('.player-wrapper #plist > span').text();
+        pageName = _$('.player-wrapper #plist > span').text();
         pageName = pageName.substr(pageName.indexOf('、') + 1);
-        if (!partIdName) document.title = pageName + '_' + $('div.v-title').text() + '_' + idName + '_' + pageIdName;
-        return partIdName ? pageName + '_' + $('div.v-title').text() + '_' + idName + '_' + pageIdName + '_' + partIdName : pageName + '_' + $('div.v-title').text() + '_' + idName + '_' + pageIdName;
+        if (!partIdName) document.title = pageName + '_' + _$('div.v-title').text() + '_' + idName + '_' + pageIdName;
+        return partIdName ? pageName + '_' + _$('div.v-title').text() + '_' + idName + '_' + pageIdName + '_' + partIdName : pageName + '_' + _$('div.v-title').text() + '_' + idName + '_' + pageIdName;
     }
-    if (!partIdName) document.title = $('div.v-title').text() + '_' + idName;
+    if (!partIdName) document.title = _$('div.v-title').text() + '_' + idName;
     // document.title contains other info feeling too much
-    return partIdName ? $('div.v-title').text() + '_' + idName + '_' + partIdName : $('div.v-title').text() + '_' + idName;
+    return partIdName ? _$('div.v-title').text() + '_' + idName + '_' + partIdName : _$('div.v-title').text() + '_' + idName;
 }
 
 // Helper function, return object {url, filename}, options object used by
@@ -141,7 +141,7 @@ export function getDownloadOptions(url, filename) {
         fileExt = "flv";
         break;
     default:
-        ; // remain the same, nothing
+         // remain the same, nothing
     }
 
     resFn = filenameSanitize(filename, {

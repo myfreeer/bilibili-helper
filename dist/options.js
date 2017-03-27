@@ -1,10 +1,10 @@
-const storageSet = data => new Promise((resolve, reject) => chrome.storage.local.set(data, resolve));
-const storageGet = keys => new Promise((resolve, reject) => chrome.storage.local.get(keys, resolve));
+const storageSet = data => new Promise(resolve => chrome.storage.local.set(data, () => resolve()));
+const storageGet = keys => new Promise(resolve => chrome.storage.local.get(keys, resolve));
 const $ = e => document.querySelector(e);
 const $$ = e => document.querySelectorAll(e);
-Element.prototype.attr=Element.prototype.getAttribute;
-Element.prototype.text=function(str){return str ? (this.innerText = str) : this.innerText;};
-Element.prototype.addClass=function(){return this.classList.add(...arguments);};
+Element.prototype.attr = Element.prototype.getAttribute;
+Element.prototype.text = function(str){ return str ? (this.innerText = str) : this.innerText; };
+Element.prototype.addClass = function(){ return this.classList.add(...arguments); };
 (async() => {
     let options = await storageGet();
     //console.log(options);

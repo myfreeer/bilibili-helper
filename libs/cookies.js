@@ -9,10 +9,10 @@ var utils = {
         get: function (f) {
             var h = "" + document.cookie,
                 e = h.indexOf(f + "=");
-            if (-1 == e || "" == f) {
+            if (-1 === e || "" === f) {
                 return ""
             }
-            var g = h.indexOf(";", e); - 1 == g && (g = h.length);
+            var g = h.indexOf(";", e); - 1 === g && (g = h.length);
             return unescape(h.substring(e + f.length + 1, g))
         },
         set: function (f, h, e) {

@@ -3,7 +3,7 @@
     var crctable = function () {
         var c = 0,
             table = typeof Int32Array !== 'undefined' ? new Int32Array(256) : new Array(256);
-        for (var n = 0; n != 256; ++n) {
+        for (var n = 0; n !== 256; ++n) {
             c = n;
             for (var x = 0; x < 8; x++) {
                 c = c & 1 ? -306674912 ^ c >>> 1 : c >>> 1;
@@ -16,7 +16,7 @@
     for (var f in crctable) crcIndex[f] = crctable[f] >>> 24;
 
     function crc32(input) {
-        if (typeof input != 'string') input = "" + input;
+        if (typeof input !== 'string') input = "" + input;
         var crcstart = 0xFFFFFFFF,
             len = input.length,
             index;
@@ -28,7 +28,7 @@
     }
 
     function crc32lastindex(input) {
-        if (typeof input != 'string') input = "" + input;
+        if (typeof input !== 'string') input = "" + input;
         var crcstart = 0xFFFFFFFF,
             len = input.length,
             index;
@@ -41,7 +41,7 @@
 
     function getcrcindex(t) {
         for (var _i3 = 0; _i3 < 256; _i3++)
-            if (crcIndex[_i3] == t) return _i3;
+            if (crcIndex[_i3] === t) return _i3;
 
         return -1;
     }
@@ -85,16 +85,16 @@
         }
         for (i = 0; i < 100000; i++) {
             lastindex = crc32lastindex(i);
-            if (lastindex == index[3]) {
+            if (lastindex === index[3]) {
                 deepCheckData = deepCheck(i, index);
                 if (deepCheckData[0]) break;
             }
         }
-        if (i == 100000) return -1;
+        if (i === 100000) return -1;
         return i + '' + deepCheckData[1];
     };
 
     root.CRC32 = CRC32;
     root.checkCRCHash = checkCRCHash;
-    if (typeof module == 'object' && module.exports) module.exports = {CRC32, checkCRCHash};
+    if (typeof module === 'object' && module.exports) module.exports = {CRC32, checkCRCHash};
 })(this);
