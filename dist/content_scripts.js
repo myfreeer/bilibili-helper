@@ -71,6 +71,30 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+Element.prototype.find=Element.prototype.querySelector;
+Element.prototype.findAll=Element.prototype.querySelectorAll;
+Element.prototype.attr=Element.prototype.getAttribute;
+Element.prototype.on=Element.prototype.addEventListener;
+Element.prototype.off=Element.prototype.removeEventListener;
+// arrow functions binds no this nor arguments
+Element.prototype.data=function(str){return this.dataset[str];};
+Element.prototype.text=function(str){return str ? (this.innerText = str) : this.innerText;};
+Element.prototype.empty=function(){this.innerHTML = ''; return this;};
+Element.prototype.html=function(str){str ? (this.innerHTML = str) : this.innerHTML;return this;};
+Element.prototype.hide=function(){this.style.display = 'none';};
+Element.prototype.show=function(){this.style.display = '';};
+Element.prototype.addClass=function(){return this.classList.add(...arguments);};
+Element.prototype.removeClass=function(){return this.classList.remove(...arguments);};
+Element.prototype.toggleClass=function(){return this.classList.toggle(...arguments);};
+Element.prototype.hasClass=function(){return this.classList.contains(...arguments);};
+Element.prototype.replaceClass=function(){return this.classList.replace(...arguments);};
+NodeList.prototype.map = HTMLCollection.prototype.map = Array.prototype.map;
+NodeList.prototype.each = HTMLCollection.prototype.each = NodeList.prototype.forEach;
+NodeList.prototype.filter = HTMLCollection.prototype.filter = Array.prototype.filter;
+NodeList.prototype.reduce = HTMLCollection.prototype.reduce = Array.prototype.reduce;
+NodeList.prototype.reduceRight = HTMLCollection.prototype.reduceRight = Array.prototype.reduceRight;
+NodeList.prototype.every = HTMLCollection.prototype.every = Array.prototype.every;
+NodeList.prototype.some = HTMLCollection.prototype.some = Array.prototype.some;
 const sleep = (time = 0) => new Promise(r => setTimeout(r, time));
 /* harmony export (immutable) */ __webpack_exports__["g"] = sleep;
 
@@ -89,7 +113,7 @@ const mySendMessage = obj => new Promise((resolve, reject) => chrome.runtime.sen
 const parseXmlSafe = text => (new window.DOMParser()).parseFromString(text.replace(/[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}]/ug, ""), "text/xml");
 /* harmony export (immutable) */ __webpack_exports__["c"] = parseXmlSafe;
 
-const storageSet = data => new Promise((resolve, reject) => chrome.storage.local.set(data, resolve));
+const storageSet = data => new Promise((resolve, reject) => chrome.storage.local.set(data, ()=>resolve()));
 /* unused harmony export storageSet */
 
 const storageGet = keys => new Promise((resolve, reject) => chrome.storage.local.get(keys, resolve));
@@ -1412,30 +1436,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 // shortcuts
-Element.prototype.find=Element.prototype.querySelector;
-Element.prototype.findAll=Element.prototype.querySelectorAll;
-Element.prototype.attr=Element.prototype.getAttribute;
-Element.prototype.on=Element.prototype.addEventListener;
-Element.prototype.off=Element.prototype.removeEventListener;
-// arrow functions binds no this nor arguments
-Element.prototype.data=function(str){return this.dataset[str];};
-Element.prototype.text=function(str){return str ? (this.innerText = str) : this.innerText;};
-Element.prototype.empty=function(){this.innerHTML = ''; return this;};
-Element.prototype.html=function(str){str ? (this.innerHTML = str) : this.innerHTML;return this;};
-Element.prototype.hide=function(){this.style.display = 'none';};
-Element.prototype.show=function(){this.style.display = '';};
-Element.prototype.addClass=function(){return this.classList.add(...arguments);};
-Element.prototype.removeClass=function(){return this.classList.remove(...arguments);};
-Element.prototype.toggleClass=function(){return this.classList.toggle(...arguments);};
-Element.prototype.hasClass=function(){return this.classList.contains(...arguments);};
-Element.prototype.replaceClass=function(){return this.classList.replace(...arguments);};
-NodeList.prototype.map = HTMLCollection.prototype.map = Array.prototype.map;
-NodeList.prototype.each = HTMLCollection.prototype.each = NodeList.prototype.forEach;
-NodeList.prototype.filter = HTMLCollection.prototype.filter = Array.prototype.filter;
-NodeList.prototype.reduce = HTMLCollection.prototype.reduce = Array.prototype.reduce;
-NodeList.prototype.reduceRight = HTMLCollection.prototype.reduceRight = Array.prototype.reduceRight;
-NodeList.prototype.every = HTMLCollection.prototype.every = Array.prototype.every;
-NodeList.prototype.some = HTMLCollection.prototype.some = Array.prototype.some;
 const _$ = e =>document.querySelector(e);
 const _$$ = e => document.querySelectorAll(e);
 const $h = html => {
@@ -1648,13 +1648,13 @@ const $h = html => {
 	// video player switcher begin
 	const restartVideo = video => !video.paused && !video.pause() && !video.play();
 	const mirrorAndRotateHandler = e => {
-	    if (biliHelper.mainBlock.speedSection.mirror.className === "b-btn w") {
-	        biliHelper.switcher.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg) matrix(-1, 0, 0, 1, 0, 0)';
-	        biliHelper.mainBlock.speedSection.mirror.className = "b-btn";
-	    } else {
-	        biliHelper.switcher.video.style.transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg)';
-	        biliHelper.mainBlock.speedSection.mirror.className = "b-btn w";
-	    }
+	    biliHelper.mainBlock.speedSection.rotate.value %= 360;
+	    let transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg)';
+	    if (e.target == biliHelper.mainBlock.speedSection.mirror) {
+	    	if (e.target.hasClass('w')) transform += 'matrix(-1, 0, 0, 1, 0, 0)';
+	    	e.target.toggleClass('w');
+	    } else if (!biliHelper.mainBlock.speedSection.mirror.hasClass('w')) transform += 'matrix(-1, 0, 0, 1, 0, 0)';
+	    biliHelper.switcher.video.style.transform = transform;
 	};
 	biliHelper.switcher = {
 	    current: "original",
