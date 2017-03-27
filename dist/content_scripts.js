@@ -220,7 +220,7 @@ MessageBox.prototype = {
                 b.bindobj.off("over" == b.params.evType ? "mouseleave" : "blur", b.leftTimer)
             };
         this.bindobj.attr("hasMessageBox", "");
-        d()
+        this.msgbox.fadeOut(200, d)
     },
     closeErrHandler: function () {
         var b = this;
@@ -1606,7 +1606,7 @@ const $h = html => {
 
 	// begin comment user query
 	biliHelper.comments = comment.xml.getElementsByTagName('d');
-	let control = $h('<div><input type="text" class="b-input" placeholder="根据关键词筛选弹幕"><select class="list" style="max-width: 272px;border-radius: 4px;"><option disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</option></select><span class="result">选择弹幕查看发送者…</span></div>');
+	let control = $h('<div><input type="text" class="b-input" placeholder="根据关键词筛选弹幕"><select class="list"><option disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</option></select><span class="result">选择弹幕查看发送者…</span></div>');
 	control.find('.b-input').onkeyup = e => {
 		const keyword = control.find('input').value,
 			regex = new RegExp(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* parseSafe */])(keyword), 'gi');
