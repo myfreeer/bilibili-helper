@@ -5,9 +5,9 @@
    },
    "content_scripts": [ {
       "all_frames": true,
-      "css": ["ABPlayer.css", "bilibili-helper.css", "colpick.css"],
-      "js": [ "content_scripts.js", "jquery.min.js", "ColPick.js", "CommentCoreLibrary.js", "ABPlayer.js", "flv.min.js" ],
-      "matches": [ "*://*.bilibili.com/*" ],
+      "css": ["ABPlayer.css", "bilibili-helper.css", "ColorPicker.css"],
+      "js": [ "content_scripts.js", "zepto.min.js", "ColorPicker.js", "CommentCoreLibrary.js", "ABPlayer.js", "flv.min.js" ],
+      "matches": [ "*://*.bilibili.com/video/av*", "*://*.bilibili.com/anime/*" ],
       "run_at": "document_end"
    } ],
    "default_locale": "zh_CN",

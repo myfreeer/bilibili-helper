@@ -316,14 +316,14 @@
   position: absolute;
   padding: 10px;
   left: 5px;
-  bottom: 25px;
+  bottom: 45px;
   border-radius: 5px;
   -webkit-box-shadow: 0 0 10px rgba(0,0,0,.2);
           box-shadow: 0 0 10px rgba(0,0,0,.2);
   -webkit-transition: opacity 0.1s ease-in-out;
           transition: opacity 0.1s ease-in-out;
   pointer-events: none;
-  z-index: 1;
+  z-index: 1000;
   opacity: 0;
   cursor: auto;
 }
@@ -412,7 +412,7 @@
   background: rgba(255,255,255,.9);
   position: absolute;
   left: 5px;
-  bottom: 25px;
+  bottom: 45px;
   border-radius: 5px;
   -webkit-box-shadow: 0 0 10px rgba(0,0,0,.2);
           box-shadow: 0 0 10px rgba(0,0,0,.2);

@@ -7,7 +7,6 @@ import xml2ass from './xml2ass';
 import {getDownloadOptions, getNiceSectionFilename} from './filename-sanitize';
 import {__GetCookie, __SetCookie} from './cookies';
 import MessageBox from './MessageBox.min';
-import SelectModule from './SelectModule.min';
 import genPageFunc from './genPageFunc';
 import addTitleLink from './addTitleLink';
 import sendComment from './sendComment';
@@ -167,7 +166,7 @@ const $h = html => {
 	videoLink.mediaDataSource.segments.forEach(createDownLinkElement);
 
 	if (videoLink.mediaDataSource.segments.length > 1) {
-	    var bhDownAllLink = $h(`<a class="b-btn">下载全部${videoLink.mediaDataSource.segments.length}个分段</a>`);
+	    let bhDownAllLink = $h(`<a class="b-btn">下载全部${videoLink.mediaDataSource.segments.length}个分段</a>`);
 	    biliHelper.mainBlock.downloaderSection.find('p').append(bhDownAllLink);
 	    bhDownAllLink.onclick=e=> biliHelper.mainBlock.downloaderSection.findAll('p .b-btn.w').each(e=>e.click());
 	}
@@ -207,13 +206,11 @@ const $h = html => {
 
 	// begin comment user query
 	biliHelper.comments = comment.xml.getElementsByTagName('d');
-	let control = $h('<div><input type="text" class="b-input" placeholder="根据关键词筛选弹幕"><div class="b-slt"><span class="txt">请选择需要查询的弹幕…</span><div class="b-slt-arrow"></div><ul class="list"><li disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</li></ul></div><span></span><span class="result">选择弹幕查看发送者…</span></div>');
+	let control = $h('<div><input type="text" class="b-input" placeholder="根据关键词筛选弹幕"><select class="list"><option disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</option></select><span class="result">选择弹幕查看发送者…</span></div>');
 	control.find('.b-input').onkeyup = e => {
 		const keyword = control.find('input').value,
 			regex = new RegExp(parseSafe(keyword), 'gi');
-		control.find('ul.list').html('<li disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</li>');
-		if (control.find('.b-slt .txt').text() != '请选择需要查询的弹幕' && keyword.trim() != '') control.find('.b-slt .txt').html(parseSafe(control.find('.b-slt .txt').text()));
-		if (keyword.trim() != '') control.find('.b-slt .txt').text(control.find('.b-slt .txt').text());
+		control.find('select.list').html('<option disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</option>');
 		for (let node of biliHelper.comments){
 			let text = node.childNodes[0];
 			if (text && node && regex.test(text.nodeValue)) {
@@ -221,10 +218,10 @@ const $h = html => {
 				const commentData = node.getAttribute('p').split(','),
 		                        sender = commentData[6],
 		                        time = parseTime(parseInt(commentData[0]) * 1000);
-		        let li = $h(`<li sender=${sender}></li>`);
-		        li.sender = sender;
-		        li.html('[' + time + '] ' + (keyword.trim() == '' ? parseSafe(text) : parseSafe(text).replace(regex, kw =>'<span class="kw">' + kw + '</span>')));
-		        control.find('ul.list').append(li);
+		        let option = $h(`<option sender=${sender}></option>`);
+		        option.sender = sender;
+		        option.html('[' + time + '] ' + (keyword.trim() == '' ? parseSafe(text) : parseSafe(text).replace(regex, kw =>'<span class="kw">' + kw + '</span>')));
+		        control.find('select.list').append(option);
 		    }
 		}
 	};
@@ -237,14 +234,12 @@ const $h = html => {
 	    s.parentNode.removeChild(s);
 	};
 	//jQuery is required here.
-	SelectModule.bind($(control.find('div.b-slt')), {
-	    onChange: item => {
-	        const sender = item[0].sender;
+	control.find('select.list').onchange = e=>{
+		const sender = control.find('select.list').selectedOptions[0].sender;
 	        control.find('.result').text('查询中…');
 	        if (sender.indexOf('D') == 0) return control.find('.result').text('游客弹幕');
 	        commentSenderQuery(sender).then(data=>displayUserInfo(data.mid,data));
-	    }
-	});
+	};
 	biliHelper.mainBlock.querySection.find('p').empty().append(control);
 
 	// video player switcher begin
@@ -315,13 +310,13 @@ const $h = html => {
 	        this.set('bilih5');
 	        _$('#bofqi').html('<div class="player"><div id="bilibiliPlayer"></div></div>');
 	        fetchretry("https://static.hdslb.com/player/js/bilibiliPlayer.min.js").then(res => res.text()).then(text => {
-	            var script = document.createElement('script');
+	            let script = document.createElement('script');
 	            script.appendChild(document.createTextNode(text + ";var player = new bilibiliPlayer({aid: " + avid + ",cid: " + cid + ",autoplay: false,as_wide: false,player_type: 0,pre_ad: 0,lastplaytime: null,enable_ssl: 1,extra_params: null,p: " + page + "})"));
 	            document.getElementsByTagName('head')[0].appendChild(script);
 	        });
 	        biliHelper.switcher.interval = setInterval(function () {
 	            try {
-	                var bilibilivideo = document.getElementsByClassName('bilibili-player-video')[0].firstChild;
+	                let bilibilivideo = document.getElementsByClassName('bilibili-player-video')[0].firstChild;
 	                if (bilibilivideo.tagName == "VIDEO") {
 	                    this.bind(bilibilivideo);
 	                    clearInterval(biliHelper.switcher.interval);
@@ -330,7 +325,7 @@ const $h = html => {
 	        }, 500);
 	    },
 	    html5: function (type) {
-	        var html5VideoUrl;
+	        let html5VideoUrl;
 	        switch (type) {
 	        case 'html5ld':
 	            this.set('html5ld');
@@ -381,7 +376,7 @@ const $h = html => {
 	                biliHelper.switcher.flvPlayer.on(flvjs.Events.MEDIA_INFO, e => console.log('分辨率: ' + e.width + "x" + e.height + ', FPS: ' + e.fps, '视频码率: ' + Math.round(e.videoDataRate * 100) / 100, '音频码率: ' + Math.round(e.audioDataRate * 100) / 100));
 	            }
 	        }, 1000);
-	        var lastTime;
+	        let lastTime;
 	        biliHelper.switcher.checkFinished = setInterval(function () {
 	            if (abp.video.currentTime !== lastTime) {
 	                lastTime = abp.video.currentTime;
@@ -399,7 +394,7 @@ const $h = html => {
 	    },
 	    html5hd: function () {
 	        this.set('html5hd');
-	        var abp = biliHelper.switcher.html5('html5hd');
+	        let abp = biliHelper.switcher.html5('html5hd');
 	        abp.video.querySelector('source').on('error', e => {
 	                if (videoLink.hd.length > 1) {
 	                    console.warn(e, 'HTML5 HD Error, try another link...');
@@ -410,7 +405,7 @@ const $h = html => {
 	    },
 	    html5ld: function () {
 	        this.set('html5ld');
-	        var abp = biliHelper.switcher.html5('html5ld');
+	        let abp = biliHelper.switcher.html5('html5ld');
 	        abp.video.querySelector('source').on('error', e => {
 	            if (videoLink.ld.length > 1) {
 	                console.warn(e, 'HTML5 LD Error, try another link...');

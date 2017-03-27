@@ -315,3 +315,8 @@ div[class^="ad-"],
 .sponsor-tosponsor img {
     z-index: 0!important
 }
+
+.b-input select.list {
+    max-width: 272px;
+    border-radius: 4px;
+}
