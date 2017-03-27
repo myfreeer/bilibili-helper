@@ -233,9 +233,12 @@ const $h = html => {
 	    document.body.appendChild(s);
 	    s.parentNode.removeChild(s);
 	};
-	//jQuery is required here.
-	control.find('select.list').onchange = e=>{
-		const sender = control.find('select.list').selectedOptions[0].sender;
+
+	const _selectList = control.find('select.list');
+	_selectList.style.maxWidth='272px';
+	_selectList.style.borderRadius = '3px';
+	_selectList.onchange = e=>{
+		const sender = _selectList.selectedOptions[0].sender;
 	        control.find('.result').text('查询中…');
 	        if (sender.indexOf('D') == 0) return control.find('.result').text('游客弹幕');
 	        commentSenderQuery(sender).then(data=>displayUserInfo(data.mid,data));
