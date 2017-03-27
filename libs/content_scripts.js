@@ -1,11 +1,10 @@
 // require external libs
 import {bilibiliVideoInfoProvider,bilibiliBangumiVideoInfoProvider} from './bilibiliVideoInfoProvider';
-import {parseSafe, parseTime, mySendMessage, parseXmlSafe, fetchretry, storageGet, _$, $h} from './utils';
+import {parseSafe, parseTime, mySendMessage, parseXmlSafe, fetchretry, storageGet, _$, $h, getCookie} from './utils';
 import commentSenderQuery from './commentSenderQuery';
 import bilibiliVideoProvider from './bilibiliVideoProvider';
 import xml2ass from './xml2ass';
 import {getDownloadOptions, getNiceSectionFilename} from './filename-sanitize';
-import {__GetCookie} from './cookies';
 import genPageFunc from './genPageFunc';
 import addTitleLink from './addTitleLink';
 import sendComment from './sendComment';
@@ -57,9 +56,10 @@ import sendComment from './sendComment';
 
     const videoPic = videoInfo.pic || (_$('img.cover_image') && _$('img.cover_image').attr('src'));
     //genPage func
-    if (!_$('.b-page-body')) genPage = decodeURIComponent(__GetCookie('redirectUrl'));
+    if (!_$('.b-page-body')) genPage = decodeURIComponent(getCookie('redirectUrl'));
     if (_$('.b-page-body .z-msg') > 0 && _$('.b-page-body .z-msg').text().indexOf('版权') > -1) genPage = 1;
     if (genPage) await genPageFunc(cid, videoInfo, genPage);
+
     //addTitleLink func
     _$('.viewbox .info .v-title h1').html(addTitleLink(_$('.viewbox .info .v-title h1').attr('title'), options.rel_search));
     const titleNumbers = document.getElementsByClassName('titleNumber');
@@ -70,7 +70,6 @@ import sendComment from './sendComment';
         el.parentNode.parentNode.style.overflow = 'visible';
         el.parentNode.parentNode.parentNode.style.overflow = 'visible';
     });
-    //if (_$(".titleNumber")) _$(".titleNumber").onclick = e => (new MessageBox).show(e.target, '<span class="popuptext">\u70b9\u51fb\u641c\u7d22\u76f8\u5173\u89c6\u9891\uff1a<br /><a target="_blank" href="http://www.bilibili.com/search?orderby=default&keyword=' + encodeURIComponent(e.target.attr("previous")) + '">' + e.target.attr("previous") + '</a><br /><a target="_blank" href="http://www.bilibili.com/search?orderby=ranklevel&keyword=' + encodeURIComponent(e.target.attr("next")) + '">' + e.target.attr("next") + '</a></span>', 1e3);
 
     //some ui code from original helper
     let biliHelper = $h(isBangumi && !genPage ? "<div class=\"v1-bangumi-info-btn helper\" id=\"bilibili_helper\"><span class=\"t\">哔哩哔哩助手</span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>" : "<div class=\"block helper\" id=\"bilibili_helper\"><span class=\"t\"><div class=\"icon\"></div><div class=\"t-right\"><span class=\"t-right-top middle\">助手</span><span class=\"t-right-bottom\">扩展菜单</span></div></span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>");

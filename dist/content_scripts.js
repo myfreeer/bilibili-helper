@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 10);
+/******/ 	return __webpack_require__(__webpack_require__.s = 9);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -71,6 +71,7 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (immutable) */ __webpack_exports__["e"] = getCookie;
 Element.prototype.find = Element.prototype.querySelector;
 Element.prototype.findAll = Element.prototype.querySelectorAll;
 Element.prototype.attr = Element.prototype.getAttribute;
@@ -97,19 +98,19 @@ NodeList.prototype.every = HTMLCollection.prototype.every = Array.prototype.ever
 NodeList.prototype.some = HTMLCollection.prototype.some = Array.prototype.some;
 HTMLCollection.prototype.forEach = Array.prototype.forEach;
 const sleep = (time = 0) => new Promise(r => setTimeout(r, time));
-/* harmony export (immutable) */ __webpack_exports__["i"] = sleep;
+/* harmony export (immutable) */ __webpack_exports__["j"] = sleep;
 
 const formatInt = (Source, Length) => (Source + '').padStart(Length, '0');
 /* unused harmony export formatInt */
 
 const parseSafe = text => ('' + text).replace(/&/g, "&amp;").replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-/* harmony export (immutable) */ __webpack_exports__["h"] = parseSafe;
+/* harmony export (immutable) */ __webpack_exports__["i"] = parseSafe;
 
 const parseTime = timecount => formatInt(parseInt(timecount / 60000), 2) + ':' + formatInt(parseInt((timecount / 1000) % 60), 2);
-/* harmony export (immutable) */ __webpack_exports__["g"] = parseTime;
+/* harmony export (immutable) */ __webpack_exports__["h"] = parseTime;
 
 const mySendMessage = obj => new Promise((resolve, reject) => chrome.runtime.sendMessage(obj,resolve));
-/* harmony export (immutable) */ __webpack_exports__["f"] = mySendMessage;
+/* harmony export (immutable) */ __webpack_exports__["g"] = mySendMessage;
 
 const parseXmlSafe = text => (new window.DOMParser()).parseFromString(text.replace(/[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}]/ug, ""), "text/xml");
 /* harmony export (immutable) */ __webpack_exports__["c"] = parseXmlSafe;
@@ -144,8 +145,13 @@ const $h = html => {
     template.innerHTML = html;
     return template.content.firstChild;
 };
-/* harmony export (immutable) */ __webpack_exports__["e"] = $h;
+/* harmony export (immutable) */ __webpack_exports__["f"] = $h;
 
+function getCookie(name) {
+  var value = "; " + document.cookie;
+  var parts = value.split("; " + name + "=");
+  if (parts.length == 2) return parts.pop().split(";").shift();
+}
 
 /***/ }),
 /* 1 */
@@ -190,7 +196,7 @@ const bilibiliVideoInfoProvider = async(avid, page = 1, credentials = 'include',
         if (!json || !(json && json.list && json.list.length) || json && json.code === -503) throw new Error('Can not get valid JSON.');
     } catch (e) {
         if (++n < retries) {
-            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* sleep */])(retryDelay);
+            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* sleep */])(retryDelay);
             json = await bilibiliVideoInfoProvider(avid, page, credentials, retries, retryDelay, n);
         } else throw e;
     }
@@ -214,7 +220,7 @@ const bilibiliBangumiVideoInfoProvider = async(epid, credentials = 'include', re
         videoInfo = await bilibiliVideoInfoProvider(json.result.currentEpisode.avId, json.result.currentEpisode.page || 1);
     } catch (e) {
         if (++n < retries) {
-            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* sleep */])(retryDelay);
+            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* sleep */])(retryDelay);
             videoInfo = await bilibiliBangumiVideoInfoProvider(epid, credentials, retries, retryDelay, n);
         } else throw e;
     }
@@ -229,7 +235,7 @@ const bilibiliBangumiVideoInfoProvider = async(epid, credentials = 'include', re
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__md5__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__md5__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__md5___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__md5__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(0);
 
@@ -305,7 +311,7 @@ const getToken = async(retries = 5, retryDelay = 500) => {
         return token;
     } catch (e) {
         if (--retries > 0) {
-            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* sleep */])(retryDelay);
+            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* sleep */])(retryDelay);
             return await getToken(retries);
         } else throw (e);
     }
@@ -320,7 +326,7 @@ const getVideoLink = async(url, type, retries = 5, credentials = 'include', retr
         } else json = await fetch(url, {credentials}).then(response => response.json());
     } catch (error) {
         if (--retries > 0) {
-            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* sleep */])(retryDelay);
+            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* sleep */])(retryDelay);
             return await getVideoLink(url, type, retries);
         } else json = {
             'code': -1,
@@ -378,7 +384,7 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__crc32__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__crc32__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__crc32___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__crc32__);
 
 const commentSenderQuery = async(hash, retries = 5) => {
@@ -399,46 +405,6 @@ const commentSenderQuery = async(hash, retries = 5) => {
 
 /***/ }),
 /* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-var utils = {
-    bindFn: function (e, f) {
-        var d = Array.prototype.slice.call(arguments, 2);
-        return function () {
-            return e.apply(f, d.concat(Array.prototype.slice.call(arguments)))
-        }
-    },
-    cookie: {
-        get: function (f) {
-            var h = "" + document.cookie,
-                e = h.indexOf(f + "=");
-            if (-1 === e || "" === f) {
-                return ""
-            }
-            var g = h.indexOf(";", e); - 1 === g && (g = h.length);
-            return unescape(h.substring(e + f.length + 1, g))
-        },
-        set: function (f, h, e) {
-            e = void 0 !== e ? e : 365;
-            var g = new Date;
-            g.setTime(g.getTime() + 86400000 * e);
-            document.cookie = f + "=" + escape(h) + ";expires=" + g.toGMTString() + "; path=/; domain=.bilibili.com"
-        },
-        "delete": function (b) {
-            this.set(b, "", -1)
-        }
-    }
-};
-const __GetCookie = utils.bindFn(utils.cookie.get, utils);
-/* harmony export (immutable) */ __webpack_exports__["a"] = __GetCookie;
-
-const __SetCookie = utils.bindFn(utils.cookie.set, utils);
-/* unused harmony export __SetCookie */
-
-
-/***/ }),
-/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -603,7 +569,7 @@ function getDownloadOptions(url, filename) {
 }
 
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -615,29 +581,29 @@ const genPageFunc = async(cid, videoInfo, redirectUrl) => {
     let alist = "";
     if (videoInfo && videoInfo.list && videoInfo.list.length > 1) {
         alist += "<select id='dedepagetitles' onchange='location.href=this.options[this.selectedIndex].value;'>";
-        alist += videoInfo.list.map(vPart => "<option value='/video/av" + videoInfo.avid + "/index_" + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* parseSafe */])(vPart.page) + ".html'>" + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* parseSafe */])(vPart.page) + "、" + (vPart.part ? vPart.part : ("P" + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* parseSafe */])(vPart.page))) + "</option>").join();
+        alist += videoInfo.list.map(vPart => "<option value='/video/av" + videoInfo.avid + "/index_" + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseSafe */])(vPart.page) + ".html'>" + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseSafe */])(vPart.page) + "、" + (vPart.part ? vPart.part : ("P" + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseSafe */])(vPart.page))) + "</option>").join();
         alist += "</select>";
     }
     if (videoInfo && videoInfo.tag) tagList += videoInfo.tag.split(",").map(tag => '<li><a class="tag-val" href="/tag/' + encodeURIComponent(tag) + '/" title="' + tag + '" target="_blank">' + tag + '</a></li>').join();
     if (!videoInfo.tag) videoInfo.tag = "";
     const template = await fetch(chrome.extension.getURL("template.html")).then(res => res.text());
     const page = template.replace(/__bl_avid/g, videoInfo.avid).replace(/__bl_page/g, videoInfo.currentPage).replace(/__bl_cid/g, cid).replace(/__bl_tid/g, videoInfo.tid).replace(/__bl_mid/g, videoInfo.mid)
-        .replace(/__bl_pic/g, videoInfo.pic).replace(/__bl_title/g, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* parseSafe */])(videoInfo.title)).replace(/__bl_sp_title_uri/g, videoInfo.sp_title ? encodeURIComponent(videoInfo.sp_title) : '')
-        .replace(/__bl_sp_title/g, videoInfo.sp_title ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* parseSafe */])(videoInfo.sp_title) : '').replace(/__bl_spid/g, videoInfo.spid).replace(/__bl_season_id/g, videoInfo.season_id)
-        .replace(/__bl_created_at/g, videoInfo.created_at).replace(/__bl_description/g, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* parseSafe */])(videoInfo.description)).replace(/__bl_redirectUrl/g, redirectUrl)
+        .replace(/__bl_pic/g, videoInfo.pic).replace(/__bl_title/g, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseSafe */])(videoInfo.title)).replace(/__bl_sp_title_uri/g, videoInfo.sp_title ? encodeURIComponent(videoInfo.sp_title) : '')
+        .replace(/__bl_sp_title/g, videoInfo.sp_title ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseSafe */])(videoInfo.sp_title) : '').replace(/__bl_spid/g, videoInfo.spid).replace(/__bl_season_id/g, videoInfo.season_id)
+        .replace(/__bl_created_at/g, videoInfo.created_at).replace(/__bl_description/g, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseSafe */])(videoInfo.description)).replace(/__bl_redirectUrl/g, redirectUrl)
         .replace(/__bl_tags/g, JSON.stringify(videoInfo.tag.split(","))).replace(/__bl_tag_list/g, tagList).replace(/__bl_alist/g, alist).replace(/__bl_bangumi_cover/g, videoInfo.bangumi ? videoInfo.bangumi.cover : '')
         .replace(/__bl_bangumi_desc/g, videoInfo.bangumi ? videoInfo.bangumi.desc : '');
     document.open();
     document.write(page);
     document.close();
-    await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* sleep */])(1500);
-    await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["f" /* mySendMessage */])({command: "injectCSS"});
+    await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* sleep */])(1500);
+    await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* mySendMessage */])({command: "injectCSS"});
     return false;
 };
 /* harmony default export */ __webpack_exports__["a"] = (genPageFunc);
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -672,7 +638,7 @@ const sendComment = async(avid, cid, page, commentData) => {
 /* harmony default export */ __webpack_exports__["a"] = (sendComment);
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1172,7 +1138,7 @@ const xml2ass = (xmldoc, opts) =>  '\ufeff' + generateASS(setPosition(parseXML('
 /* harmony default export */ __webpack_exports__["a"] = (xml2ass);
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1181,14 +1147,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__commentSenderQuery__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__bilibiliVideoProvider__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__xml2ass__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__filename_sanitize__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__cookies__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__genPageFunc__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__addTitleLink__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__sendComment__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__xml2ass__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__filename_sanitize__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__genPageFunc__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__addTitleLink__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__sendComment__ = __webpack_require__(7);
 // require external libs
-
 
 
 
@@ -1246,34 +1210,34 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
     const videoPic = videoInfo.pic || (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('img.cover_image') && __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('img.cover_image').attr('src'));
     //genPage func
-    if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.b-page-body')) genPage = decodeURIComponent(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6__cookies__["a" /* __GetCookie */])('redirectUrl'));
+    if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.b-page-body')) genPage = decodeURIComponent(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* getCookie */])('redirectUrl'));
     if (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.b-page-body .z-msg') > 0 && __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.b-page-body .z-msg').text().indexOf('版权') > -1) genPage = 1;
-    if (genPage) await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_7__genPageFunc__["a" /* default */])(cid, videoInfo, genPage);
+    if (genPage) await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6__genPageFunc__["a" /* default */])(cid, videoInfo, genPage);
+
     //addTitleLink func
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.viewbox .info .v-title h1').html(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_8__addTitleLink__["a" /* default */])(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.viewbox .info .v-title h1').attr('title'), options.rel_search));
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.viewbox .info .v-title h1').html(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_7__addTitleLink__["a" /* default */])(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.viewbox .info .v-title h1').attr('title'), options.rel_search));
     const titleNumbers = document.getElementsByClassName('titleNumber');
     if (titleNumbers.length > 0) titleNumbers.forEach(el => {
-        el.append(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* $h */])('<div class="popuptext">\u70b9\u51fb\u641c\u7d22\u76f8\u5173\u89c6\u9891\uff1a<br /><a target="_blank" href="http://www.bilibili.com/search?orderby=default&keyword=' + encodeURIComponent(el.attr("previous")) + '">' + el.attr("previous") + '</a><br /><a target="_blank" href="http://www.bilibili.com/search?orderby=ranklevel&keyword=' + encodeURIComponent(el.attr("next")) + '">' + el.attr("next") + '</a></div>'));
+        el.append(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="popuptext">\u70b9\u51fb\u641c\u7d22\u76f8\u5173\u89c6\u9891\uff1a<br /><a target="_blank" href="http://www.bilibili.com/search?orderby=default&keyword=' + encodeURIComponent(el.attr("previous")) + '">' + el.attr("previous") + '</a><br /><a target="_blank" href="http://www.bilibili.com/search?orderby=ranklevel&keyword=' + encodeURIComponent(el.attr("next")) + '">' + el.attr("next") + '</a></div>'));
         el.on('click', e => el.find('.popuptext').classList.toggle("show"));
         el.parentNode.style.overflow = 'visible';
         el.parentNode.parentNode.style.overflow = 'visible';
         el.parentNode.parentNode.parentNode.style.overflow = 'visible';
     });
-    //if (_$(".titleNumber")) _$(".titleNumber").onclick = e => (new MessageBox).show(e.target, '<span class="popuptext">\u70b9\u51fb\u641c\u7d22\u76f8\u5173\u89c6\u9891\uff1a<br /><a target="_blank" href="http://www.bilibili.com/search?orderby=default&keyword=' + encodeURIComponent(e.target.attr("previous")) + '">' + e.target.attr("previous") + '</a><br /><a target="_blank" href="http://www.bilibili.com/search?orderby=ranklevel&keyword=' + encodeURIComponent(e.target.attr("next")) + '">' + e.target.attr("next") + '</a></span>', 1e3);
 
     //some ui code from original helper
-    let biliHelper = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* $h */])(isBangumi && !genPage ? "<div class=\"v1-bangumi-info-btn helper\" id=\"bilibili_helper\"><span class=\"t\">哔哩哔哩助手</span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>" : "<div class=\"block helper\" id=\"bilibili_helper\"><span class=\"t\"><div class=\"icon\"></div><div class=\"t-right\"><span class=\"t-right-top middle\">助手</span><span class=\"t-right-bottom\">扩展菜单</span></div></span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>");
+    let biliHelper = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])(isBangumi && !genPage ? "<div class=\"v1-bangumi-info-btn helper\" id=\"bilibili_helper\"><span class=\"t\">哔哩哔哩助手</span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>" : "<div class=\"block helper\" id=\"bilibili_helper\"><span class=\"t\"><div class=\"icon\"></div><div class=\"t-right\"><span class=\"t-right-top middle\">助手</span><span class=\"t-right-bottom\">扩展菜单</span></div></span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.extension.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>");
     biliHelper.find('.t').onclick = () => biliHelper.toggleClass('active');
     biliHelper.blockInfo = biliHelper.find('.info');
     biliHelper.mainBlock = biliHelper.find('.main');
-    biliHelper.mainBlock.infoSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* $h */])('<div class="section video hidden"><h3>视频信息</h3><p><span></span><span>aid: ' + avid + '</span><span>pg: ' + page + '</span></p></div>');
+    biliHelper.mainBlock.infoSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="section video hidden"><h3>视频信息</h3><p><span></span><span>aid: ' + avid + '</span><span>pg: ' + page + '</span></p></div>');
     biliHelper.mainBlock.append(biliHelper.mainBlock.infoSection);
     biliHelper.mainBlock.ondblclick = e => e.shiftKey && biliHelper.mainBlock.infoSection.toggleClass('hidden');
     if (genPage && genPage.match && genPage.match('http')) {
-        biliHelper.mainBlock.redirectSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* $h */])('<div class="section redirect">生成页选项: <a class="b-btn w" href="' + genPage + '">前往原始跳转页</a></div>');
+        biliHelper.mainBlock.redirectSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="section redirect">生成页选项: <a class="b-btn w" href="' + genPage + '">前往原始跳转页</a></div>');
         biliHelper.mainBlock.append(biliHelper.mainBlock.redirectSection);
     }
-    biliHelper.mainBlock.speedSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* $h */])('<div class="section speed hidden"><h3>视频播放控制</h3><p><span id="bilibili_helper_html5_video_res"></span><a class="b-btn w" id="bilibili_helper_html5_video_mirror">镜像视频</a><br>视频播放速度: <input id="bilibili_helper_html5_video_speed" type="number" class="b-input" placeholder="1.0" value=1.0 style="width: 40px;">    旋转视频: <input id="bilibili_helper_html5_video_rotate" type="number" class="b-input" placeholder="0" value=0 style="width: 40px;"></p></div>');
+    biliHelper.mainBlock.speedSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="section speed hidden"><h3>视频播放控制</h3><p><span id="bilibili_helper_html5_video_res"></span><a class="b-btn w" id="bilibili_helper_html5_video_mirror">镜像视频</a><br>视频播放速度: <input id="bilibili_helper_html5_video_speed" type="number" class="b-input" placeholder="1.0" value=1.0 style="width: 40px;">    旋转视频: <input id="bilibili_helper_html5_video_rotate" type="number" class="b-input" placeholder="0" value=0 style="width: 40px;"></p></div>');
     biliHelper.mainBlock.append(biliHelper.mainBlock.speedSection);
     biliHelper.mainBlock.speedSection.input = biliHelper.mainBlock.speedSection.find('input#bilibili_helper_html5_video_speed.b-input');
     biliHelper.mainBlock.speedSection.input.step = 0.1;
@@ -1281,8 +1245,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     biliHelper.mainBlock.speedSection.mirror = biliHelper.mainBlock.speedSection.find('#bilibili_helper_html5_video_mirror');
     biliHelper.mainBlock.speedSection.rotate = biliHelper.mainBlock.speedSection.find('#bilibili_helper_html5_video_rotate');
     biliHelper.mainBlock.speedSection.rotate.step = 90;
-    biliHelper.mainBlock.switcherSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* $h */])('<div class="section switcher"><h3>播放器切换</h3></div>');
-    biliHelper.mainBlock.switcherSection.button = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* $h */])('<p><a class="b-btn w" type="original">原始播放器</a><a class="b-btn w" type="bilih5">原始HTML5</a><a class="b-btn w hidden" type="bilimac">Mac 客户端</a><a class="b-btn w hidden" type="swf">SWF 播放器</a><a class="b-btn w hidden" type="iframe">Iframe 播放器</a><a class="b-btn w hidden" type="html5">HTML5超清</a><a class="b-btn w hidden" type="html5hd">HTML5高清</a><a class="b-btn w hidden" type="html5ld">HTML5低清</a></p>');
+    biliHelper.mainBlock.switcherSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="section switcher"><h3>播放器切换</h3></div>');
+    biliHelper.mainBlock.switcherSection.button = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<p><a class="b-btn w" type="original">原始播放器</a><a class="b-btn w" type="bilih5">原始HTML5</a><a class="b-btn w hidden" type="bilimac">Mac 客户端</a><a class="b-btn w hidden" type="swf">SWF 播放器</a><a class="b-btn w hidden" type="iframe">Iframe 播放器</a><a class="b-btn w hidden" type="html5">HTML5超清</a><a class="b-btn w hidden" type="html5hd">HTML5高清</a><a class="b-btn w hidden" type="html5ld">HTML5低清</a></p>');
     biliHelper.mainBlock.switcherSection.button.onclick = e => biliHelper.switcher[e.target.attr('type')]();
     biliHelper.mainBlock.switcherSection.append(biliHelper.mainBlock.switcherSection.button);
     if (biliHelper.redirectUrl) {
@@ -1291,9 +1255,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     }
     if (localStorage.getItem('bilimac_player_type')) biliHelper.mainBlock.switcherSection.find('a[type="bilimac"]').removeClass('hidden');
     biliHelper.mainBlock.append(biliHelper.mainBlock.switcherSection);
-    biliHelper.mainBlock.downloaderSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* $h */])('<div class="section downloder"><h3>视频下载</h3><p><span></span>视频地址获取中，请稍等…</p></div>');
+    biliHelper.mainBlock.downloaderSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="section downloder"><h3>视频下载</h3><p><span></span>视频地址获取中，请稍等…</p></div>');
     biliHelper.mainBlock.append(biliHelper.mainBlock.downloaderSection);
-    biliHelper.mainBlock.querySection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* $h */])('<div class="section query"><h3>弹幕发送者查询</h3><p><span></span>正在加载全部弹幕, 请稍等…</p></div>');
+    biliHelper.mainBlock.querySection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="section query"><h3>弹幕发送者查询</h3><p><span></span>正在加载全部弹幕, 请稍等…</p></div>');
     biliHelper.mainBlock.append(biliHelper.mainBlock.querySection);
     (isBangumi && !genPage ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.v1-bangumi-info-operate .v1-app-btn').empty() : __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.player-wrapper .arc-toolbar')).append(biliHelper);
     __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').html('<div id="player_placeholder" class="player"></div>');
@@ -1302,7 +1266,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         -webkit-filter: blur(5px);
         overflow: hidden;
         visibility: visible;`;
-    let replaceNotice = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* $h */])('<div id="loading-notice">正在尝试替换播放器…<span id="cancel-replacing">取消</span></div>');
+    let replaceNotice = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div id="loading-notice">正在尝试替换播放器…<span id="cancel-replacing">取消</span></div>');
     replaceNotice.find('#cancel-replacing').onclick = () => !__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#loading-notice').remove() && biliHelper.switcher.original();
     __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').append(replaceNotice);
 
@@ -1310,17 +1274,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     videoLink = await _videoLink;
 
     //downloaderSection code
-    const clickDownLinkElementHandler = async(event) => !event.preventDefault() && await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* mySendMessage */])({
+    const clickDownLinkElementHandler = async(event) => !event.preventDefault() && await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* mySendMessage */])({
         command: 'requestForDownload',
         url: event.target.attr('href'),
         filename: event.target.attr('download')
     });
     const createDownLinkElement = (segmentInfo, index) => {
         const downloadOptions = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__filename_sanitize__["a" /* getDownloadOptions */])(segmentInfo.url, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__filename_sanitize__["b" /* getNiceSectionFilename */])(avid, page, videoInfo.pages || 1, index, videoLink.mediaDataSource.segments.length));
-        const length = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* parseTime */])(segmentInfo.duration);
+        const length = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* parseTime */])(segmentInfo.duration);
         const size = (segmentInfo.filesize / 1048576 + 0.5) >>> 0;
         const title = isNaN(size) ? (`长度: ${length}`) : (`长度: ${length} 大小: ${size} MB`);
-        let bhDownLink = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* $h */])(`<a class="b-btn w" rel="noreferrer" id="bili_helper_down_link_${index}" download="${downloadOptions.filename}" title="${title}" href="${segmentInfo.url}">${'分段 ' + (index + 1)}</a>`);
+        let bhDownLink = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])(`<a class="b-btn w" rel="noreferrer" id="bili_helper_down_link_${index}" download="${downloadOptions.filename}" title="${title}" href="${segmentInfo.url}">${'分段 ' + (index + 1)}</a>`);
         bhDownLink.download = downloadOptions.filename;
         bhDownLink.onclick = clickDownLinkElementHandler;
         biliHelper.mainBlock.downloaderSection.find('p').append(bhDownLink);
@@ -1329,12 +1293,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     videoLink.mediaDataSource.segments.forEach(createDownLinkElement);
 
     if (videoLink.mediaDataSource.segments.length > 1) {
-        let bhDownAllLink = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* $h */])(`<a class="b-btn">下载全部${videoLink.mediaDataSource.segments.length}个分段</a>`);
+        let bhDownAllLink = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])(`<a class="b-btn">下载全部${videoLink.mediaDataSource.segments.length}个分段</a>`);
         biliHelper.mainBlock.downloaderSection.find('p').append(bhDownAllLink);
         bhDownAllLink.onclick = () => biliHelper.mainBlock.downloaderSection.findAll('p .b-btn.w').each(e => e.click());
     }
-    biliHelper.mainBlock.downloaderSection.find('p').append(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* $h */])('<a class="b-btn" target="_blank" title="实验性功能，由bilibilijj提供，访问慢且不稳定" href="http://www.bilibilijj.com/Files/DownLoad/' + cid + '.mp3/www.bilibilijj.com.mp3?mp3=true">音频</a>'));
-    biliHelper.mainBlock.downloaderSection.find('p').append(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* $h */])('<a class="b-btn" target="_blank" href="' + videoPic + '">封面</a>'));
+    biliHelper.mainBlock.downloaderSection.find('p').append(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<a class="b-btn" target="_blank" title="实验性功能，由bilibilijj提供，访问慢且不稳定" href="http://www.bilibilijj.com/Files/DownLoad/' + cid + '.mp3/www.bilibilijj.com.mp3?mp3=true">音频</a>'));
+    biliHelper.mainBlock.downloaderSection.find('p').append(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<a class="b-btn" target="_blank" href="' + videoPic + '">封面</a>'));
     if (videoLink.mediaDataSource.type === 'mp4') delete videoLink.mediaDataSource.segments;
 
     // switcherSection begin
@@ -1344,8 +1308,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
     // comment begin
     biliHelper.downloadFileName = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__filename_sanitize__["a" /* getDownloadOptions */])(comment.url, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__filename_sanitize__["b" /* getNiceSectionFilename */])(avid, page, videoInfo.pages || 1, 1, 1)).filename;
-    biliHelper.mainBlock.infoSection.find('p').append(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* $h */])('<span>cid: ' + cid + '</span>'));
-    biliHelper.mainBlock.commentSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* $h */])(`<div class="section comment"><h3>弹幕下载</h3><p><a class="b-btn w" href="${comment.url}" download="${biliHelper.downloadFileName}">下载 XML 格式弹幕</a></p></div>`);
+    biliHelper.mainBlock.infoSection.find('p').append(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<span>cid: ' + cid + '</span>'));
+    biliHelper.mainBlock.commentSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])(`<div class="section comment"><h3>弹幕下载</h3><p><a class="b-btn w" href="${comment.url}" download="${biliHelper.downloadFileName}">下载 XML 格式弹幕</a></p></div>`);
     biliHelper.mainBlock.commentSection.find('a').onclick = clickDownLinkElementHandler;
     biliHelper.mainBlock.append(biliHelper.mainBlock.commentSection);
     comment.xml = await comment._xml;
@@ -1363,16 +1327,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         clickDownLinkElementHandler(event);
         document.addEventListener('unload',  () => window.URL.revokeObjectURL(assUrl));
     };
-    let assBtn = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* $h */])(`<a class="b-btn w" download="${biliHelper.downloadFileName.replace('.xml', '.ass')}" href>下载 ASS 格式弹幕</a>`);
+    let assBtn = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])(`<a class="b-btn w" download="${biliHelper.downloadFileName.replace('.xml', '.ass')}" href>下载 ASS 格式弹幕</a>`);
     assBtn.onclick = clickAssBtnHandler;
     biliHelper.mainBlock.commentSection.find('p').append(assBtn);
 
     // begin comment user query
     biliHelper.comments = comment.xml.getElementsByTagName('d');
-    let control = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* $h */])('<div><input type="text" class="b-input" placeholder="根据关键词筛选弹幕"><select class="list"><option disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</option></select><span class="result">选择弹幕查看发送者…</span></div>');
+    let control = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div><input type="text" class="b-input" placeholder="根据关键词筛选弹幕"><select class="list"><option disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</option></select><span class="result">选择弹幕查看发送者…</span></div>');
     control.find('.b-input').onkeyup = e => {
         const keyword = control.find('input').value,
-            regex = new RegExp(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* parseSafe */])(keyword), 'gi');
+            regex = new RegExp(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* parseSafe */])(keyword), 'gi');
         control.find('select.list').html('<option disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</option>');
         for (let node of biliHelper.comments){
             let text = node.childNodes[0];
@@ -1380,17 +1344,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 text = text.nodeValue;
                 const commentData = node.getAttribute('p').split(','),
     	                        sender = commentData[6],
-    	                        time = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* parseTime */])(parseInt(commentData[0]) * 1000);
-    	        let option = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* $h */])(`<option sender=${sender}></option>`);
+    	                        time = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* parseTime */])(parseInt(commentData[0]) * 1000);
+    	        let option = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])(`<option sender=${sender}></option>`);
     	        option.sender = sender;
-    	        option.html('[' + time + '] ' + (keyword.trim() === '' ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* parseSafe */])(text) : __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* parseSafe */])(text).replace(regex, kw => '<span class="kw">' + kw + '</span>')));
+    	        option.html('[' + time + '] ' + (keyword.trim() === '' ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* parseSafe */])(text) : __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* parseSafe */])(text).replace(regex, kw => '<span class="kw">' + kw + '</span>')));
     	        control.find('select.list').append(option);
     	    }
         }
     };
     control.find('.b-input').onkeyup();
     const displayUserInfo = (mid, data) => {
-        control.find('.result').html('发送者: <a href="http://space.bilibili.com/' + mid + '" target="_blank" card="' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* parseSafe */])(data.name) + '" mid="' + mid + '">' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* parseSafe */])(data.name) + '</a><div target="_blank" class="user-info-level l' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* parseSafe */])(data.level_info.current_level) + '"></div>');
+        control.find('.result').html('发送者: <a href="http://space.bilibili.com/' + mid + '" target="_blank" card="' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* parseSafe */])(data.name) + '" mid="' + mid + '">' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* parseSafe */])(data.name) + '</a><div target="_blank" class="user-info-level l' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* parseSafe */])(data.level_info.current_level) + '"></div>');
         let s = document.createElement('script');
         s.appendChild(document.createTextNode('UserCard.bind($("#bilibili_helper .query .result"));'));
         document.body.appendChild(s);
@@ -1400,7 +1364,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     const _selectList = control.find('select.list');
     _selectList.style.maxWidth = '272px';
     _selectList.style.borderRadius = '3px';
-    _selectList.style.height = '22px';
+    _selectList.style.height = '25px';
     _selectList.onchange = e => {
         const sender = _selectList.selectedOptions[0].sender;
         control.find('.result').text('查询中…');
@@ -1525,7 +1489,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 const commentId = e.detail.id,
                     commentData = e.detail;
                 delete e.detail.id;
-                __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_9__sendComment__["a" /* default */])(avid, cid, page, commentData).then(function (response) {
+                __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_8__sendComment__["a" /* default */])(avid, cid, page, commentData).then(function (response) {
                     response.tmp_id = commentId;
                     abp.commentCallback(response);
                 });
@@ -1602,7 +1566,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports) {
 
 (function (root) {
@@ -1707,7 +1671,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 })(this);
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;/*
