@@ -10,7 +10,7 @@ const genPageFunc = async(cid, videoInfo, redirectUrl) => {
     }
     if (videoInfo && videoInfo.tag) tagList += videoInfo.tag.split(",").map(tag => '<li><a class="tag-val" href="/tag/' + encodeURIComponent(tag) + '/" title="' + tag + '" target="_blank">' + tag + '</a></li>').join();
     if (!videoInfo.tag) videoInfo.tag = "";
-    const template = await fetch(chrome.extension.getURL("template.html")).then(res => res.text());
+    const template = await fetch(chrome.runtime.getURL("template.html")).then(res => res.text());
     const page = template.replace(/__bl_avid/g, videoInfo.avid).replace(/__bl_page/g, videoInfo.currentPage).replace(/__bl_cid/g, cid).replace(/__bl_tid/g, videoInfo.tid).replace(/__bl_mid/g, videoInfo.mid)
         .replace(/__bl_pic/g, videoInfo.pic).replace(/__bl_title/g, parseSafe(videoInfo.title)).replace(/__bl_sp_title_uri/g, videoInfo.sp_title ? encodeURIComponent(videoInfo.sp_title) : '')
         .replace(/__bl_sp_title/g, videoInfo.sp_title ? parseSafe(videoInfo.sp_title) : '').replace(/__bl_spid/g, videoInfo.spid).replace(/__bl_season_id/g, videoInfo.season_id)
