@@ -63,7 +63,16 @@ const parseJsonforFlvjs = (json) => {
 };
 
 const getToken = async(retries = 5, retryDelay = 500) => {
-    let token;
+    let token, _token;
+    const _body = (document.documentElement || document.body || document.getElementsByTagName('body')[0]);
+    if (_body && _body.innerHTML) {
+        _token = _body.innerHTML.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/i);
+        if (_token && _token[1]) {
+            token = _token[1];
+            sessionStorage['bilibiliVideoProvider_Token'] = token;
+            return token;
+        }
+    }
     try {
         let text = await fetch(location.protocol + '//www.bilibili.com/video/av7/').then(res => res.text())
         token = text.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/)[1];
