@@ -33,6 +33,7 @@ export const storageSet = data => new Promise((resolve, reject) => chrome.storag
 export const storageGet = keys => new Promise((resolve, reject) => chrome.storage.local.get(keys, resolve));
 export const storageRemove = keys => new Promise((resolve, reject) => chrome.storage.local.remove(keys, resolve));
 export const storageClear = () => new Promise((resolve, reject) => chrome.storage.local.clear(resolve));
+//https://gist.github.com/myfreeer/44f23611451119869804f8c28ee1a190
 export const fetchretry = (url, options) => {
     var retries = (options && options.retries) ? options.retries : 3;
     var retryDelay = (options && options.retryDelay) ? options.retryDelay : 500;
@@ -47,6 +48,7 @@ export const $h = html => {
     template.innerHTML = html;
     return template.content.firstChild;
 };
+//http://stackoverflow.com/a/15724300/30529
 export function getCookie(name) {
   var value = "; " + document.cookie;
   var parts = value.split("; " + name + "=");

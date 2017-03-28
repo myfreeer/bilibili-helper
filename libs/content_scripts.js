@@ -118,6 +118,9 @@ import sendComment from './sendComment';
 
     // process video links
     videoLink = await _videoLink;
+    //follow ws video url redircet
+    for (let i in videoLink.hd) if (videoLink.hd[i].match('ws.acgvideo.com')) fetch(videoLink.hd[i], {method: 'head'}).then(resp => resp.ok && (videoLink.hd[i] = resp.url));
+    for (let i in videoLink.ld) if (videoLink.ld[i].match('ws.acgvideo.com')) fetch(videoLink.ld[i], {method: 'head'}).then(resp => resp.ok && (videoLink.ld[i] = resp.url));
 
     //downloaderSection code
     const clickDownLinkElementHandler = async(event) => !event.preventDefault() && await mySendMessage({
@@ -372,24 +375,30 @@ import sendComment from './sendComment';
         html5hd: function () {
             this.set('html5hd');
             let abp = biliHelper.switcher.html5('html5hd');
-            abp.video.querySelector('source').on('error', e => {
+            const hdErrorHandler = e => {
+                if (e.toString().match('request was interrupted by a call')) throw e;
                 if (videoLink.hd.length > 1) {
                     console.warn(e, 'HTML5 HD Error, try another link...');
                     videoLink.hd.splice(0, 1);
                     biliHelper.switcher.html5('html5hd');
                 } else console.warn(e, 'HTML5 HD Error, switch back to HTML5 LD.', biliHelper.switcher.html5ld());
-            });
+            };
+            abp.video.querySelector('source').on('error', hdErrorHandler);
+            abp.video.on('error', hdErrorHandler);
         },
         html5ld: function () {
             this.set('html5ld');
             let abp = biliHelper.switcher.html5('html5ld');
-            abp.video.querySelector('source').on('error', e => {
+            const ldErrorHandler = e => {
+                if (e.toString().match('request was interrupted by a call')) throw e;
                 if (videoLink.ld.length > 1) {
                     console.warn(e, 'HTML5 LD Error, try another link...');
                     videoLink.ld.splice(0, 1);
                     biliHelper.switcher.html5('html5ld');
-                }
-            });
+                } else throw e;
+            };
+            abp.video.querySelector('source').on('error', ldErrorHandler);
+            abp.video.on('error', ldErrorHandler);
         },
         bilimac: function () {
             this.set('bilimac');
