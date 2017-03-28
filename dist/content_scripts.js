@@ -577,7 +577,7 @@ function getDownloadOptions(url, filename) {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(0);
 
-
+const docReady = () =>new Promise(r => document.addEventListener( "DOMContentLoaded", r));
 const genPageFunc = async(cid, videoInfo, redirectUrl) => {
     let tagList = "";
     let alist = "";
@@ -598,7 +598,8 @@ const genPageFunc = async(cid, videoInfo, redirectUrl) => {
     document.open();
     document.write(page);
     document.close();
-    await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* sleep */])(1500);
+    await docReady();
+    await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* sleep */])(500);
     await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* mySendMessage */])({command: "injectCSS"});
     return false;
 };

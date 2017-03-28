@@ -18,6 +18,7 @@ refreshOptions();
 const trackingUrls = [
     "*://data.bilibilijj.com/free/*.txt*",
     "*://tajs.qq.com/stats*",
+    "*://*.secureweb24.net/*",
     "*://*.cnzz.com/stat.php*",
     "*://*.hdslb.com/images/base/loading.gif",
     "*://*.hdslb.com/message/img/infocenterIcon-*.png",

@@ -1,5 +1,5 @@
 import {sleep, parseSafe, mySendMessage} from './utils';
-
+const docReady = () =>new Promise(r => document.addEventListener( "DOMContentLoaded", r));
 const genPageFunc = async(cid, videoInfo, redirectUrl) => {
     let tagList = "";
     let alist = "";
@@ -20,7 +20,8 @@ const genPageFunc = async(cid, videoInfo, redirectUrl) => {
     document.open();
     document.write(page);
     document.close();
-    await sleep(1500);
+    await docReady();
+    await sleep(500);
     await mySendMessage({command: "injectCSS"});
     return false;
 };
