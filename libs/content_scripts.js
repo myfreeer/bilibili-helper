@@ -105,6 +105,7 @@ import sendComment from './sendComment';
     biliHelper.mainBlock.append(biliHelper.mainBlock.downloaderSection);
     biliHelper.mainBlock.querySection = $h('<div class="section query"><h3>弹幕发送者查询</h3><p><span></span>正在加载全部弹幕, 请稍等…</p></div>');
     biliHelper.mainBlock.append(biliHelper.mainBlock.querySection);
+    biliHelper.originalPlayer = _$('#bofqi').innerHTML;
     (isBangumi && !genPage ? _$('.v1-bangumi-info-operate .v1-app-btn').empty() : _$('.player-wrapper .arc-toolbar')).append(biliHelper);
     _$('#bofqi').html('<div id="player_placeholder" class="player"></div>');
     _$('#bofqi').find('#player_placeholder').style.cssText =
@@ -276,7 +277,7 @@ import sendComment from './sendComment';
         original: function () {
             this.set('original');
             _$('#bofqi').html(biliHelper.originalPlayer);
-            if (_$('#bofqi embed').attr('width') == 950) _$('#bofqi embed').setAttribute('width', 980);
+            if (_$('#bofqi object').attr('width') == 950) _$('#bofqi object').setAttribute('width', 980);
         },
         swf: function () {
             this.set('swf');
@@ -288,21 +289,7 @@ import sendComment from './sendComment';
         },
         bilih5: function () {
             this.set('bilih5');
-            _$('#bofqi').html('<div class="player"><div id="bilibiliPlayer"></div></div>');
-            fetchretry("https://static.hdslb.com/player/js/bilibiliPlayer.min.js").then(res => res.text()).then(text => {
-                let script = document.createElement('script');
-                script.appendChild(document.createTextNode(text + ";var player = new bilibiliPlayer({aid: " + avid + ",cid: " + cid + ",autoplay: false,as_wide: false,player_type: 0,pre_ad: 0,lastplaytime: null,enable_ssl: 1,extra_params: null,p: " + page + "})"));
-                document.getElementsByTagName('head')[0].appendChild(script);
-            });
-            biliHelper.switcher.interval = setInterval(function () {
-                try {
-                    let bilibilivideo = document.getElementsByClassName('bilibili-player-video')[0].firstChild;
-                    if (bilibilivideo.tagName == "VIDEO") {
-                        this.bind(bilibilivideo);
-                        clearInterval(biliHelper.switcher.interval);
-                    }
-                } catch (e) {}
-            }, 500);
+            _$('#bofqi').html('<iframe height="536" width="980" class="player" src="//www.bilibili.com/html/html5player.html?cid=' + cid + '&aid=' + avid + '" scrolling="no" border="0" frameborder="no" framespacing="0"></iframe>');
         },
         html5: function (type) {
             let html5VideoUrl;
