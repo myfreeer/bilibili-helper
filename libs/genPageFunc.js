@@ -9,7 +9,7 @@ const genPageFunc = async(cid, videoInfo, redirectUrl) => {
         alist += videoInfo.list.map(vPart => "<option value='/video/av" + videoInfo.avid + "/index_" + parseSafe(vPart.page) + ".html'>" + parseSafe(vPart.page) + "、" + (vPart.part ? vPart.part : ("P" + parseSafe(vPart.page))) + "</option>").join();
         alist += "</select>";
     }
-    if (videoInfo && videoInfo.tag) tagList += videoInfo.tag.split(",").map(tag => '<li><a class="tag-val" href="/tag/' + encodeURIComponent(tag) + '/" title="' + tag + '" target="_blank">' + tag + '</a></li>').join();
+    if (videoInfo && videoInfo.tag) tagList += videoInfo.tag.split(",").map(tag => '<li><a class="tag-val" href="/tag/' + encodeURIComponent(tag) + '/" title="' + tag + '" target="_blank">' + tag + '</a></li>').join('');
     if (!videoInfo.tag) videoInfo.tag = "";
     const template = await fetch(chrome.runtime.getURL("template.html")).then(res => res.text());
     let page = template.replace(/__bl_page/g, videoInfo.currentPage)
