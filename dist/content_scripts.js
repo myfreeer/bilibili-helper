@@ -202,7 +202,7 @@ const bilibiliVideoInfoProvider = async(avid, page = 1, credentials = 'include',
             json = await bilibiliVideoInfoProvider(avid, page, credentials, retries, retryDelay, n);
         } else throw e;
     }
-    if (!json.pages) json.pages = json.list.length;
+    json.pages = json.list.length;
     json.avid = avid;
     json.currentPage = page;
     sessionStorage[avid + '_' + page] = JSON.stringify(json);
@@ -402,9 +402,9 @@ const commentSenderQuery = async(hash, retries = 5) => {
     if (sessionStorage['commentSender_hash_' + hash]) return JSON.parse(sessionStorage['commentSender_hash_' + hash]);
     if (hash.indexOf('D') === 0) return {};
     let mid = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__crc32__["checkCRCHash"])(hash);
-    if (!mid) return mid;
+    if (!mid) return {mid};
     try {
-        let json = await fetch('http://api.bilibili.com/cardrich?mid=' + mid).then(res => res.json());
+        let json = await fetch(`${location.protocol}//api.bilibili.com/cardrich?mid=${mid}`).then(res => res.json());
         if (hash && (__WEBPACK_IMPORTED_MODULE_0__crc32__["CRC32"].bstr("" + mid) >>> 0) === parseInt(hash, 16)) sessionStorage['commentSender_hash_' + hash] = JSON.stringify(json.data.card);
         return json.data.card;
     } catch (e) {
@@ -523,7 +523,7 @@ var filenameSanitize = (function () {
     };
 })();
 
-function getNiceSectionFilename(avid, page, totalPage, idx, numParts) {
+function getNiceSectionFilename(avid, page, totalPage, idx, numParts, videoInfo) {
     // TODO inspect the page to get better section name
     var idName = 'av' + avid,
         // page/part name is only shown when there are more than one pages/parts
@@ -533,14 +533,14 @@ function getNiceSectionFilename(avid, page, totalPage, idx, numParts) {
 
     // try to find a good page name
     if (pageIdName) {
-        pageName = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('.player-wrapper #plist > span').text();
+        pageName = videoInfo.list[page - 1].part;
         pageName = pageName.substr(pageName.indexOf('、') + 1);
-        if (!partIdName) document.title = pageName + '_' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('div.v-title').text() + '_' + idName + '_' + pageIdName;
-        return partIdName ? pageName + '_' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('div.v-title').text() + '_' + idName + '_' + pageIdName + '_' + partIdName : pageName + '_' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('div.v-title').text() + '_' + idName + '_' + pageIdName;
+        if (!partIdName) document.title = pageName + '_' + videoInfo.title + '_' + idName + '_' + pageIdName;
+        return partIdName ? pageName + '_' + videoInfo.title + '_' + idName + '_' + pageIdName + '_' + partIdName : pageName + '_' + videoInfo.title + '_' + idName + '_' + pageIdName;
     }
-    if (!partIdName) document.title = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('div.v-title').text() + '_' + idName;
+    if (!partIdName) document.title = videoInfo.title + '_' + idName;
     // document.title contains other info feeling too much
-    return partIdName ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('div.v-title').text() + '_' + idName + '_' + partIdName : __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('div.v-title').text() + '_' + idName;
+    return partIdName ? videoInfo.title + '_' + idName + '_' + partIdName : videoInfo.title + '_' + idName;
 }
 
 // Helper function, return object {url, filename}, options object used by
@@ -587,6 +587,7 @@ function getDownloadOptions(url, filename) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(0);
 
 const docReady = () =>new Promise(r => document.addEventListener( "DOMContentLoaded", r));
+const replaceList = ["avid", "author", "play", "video_review", "coins", "favorites", "tid", "mid", "pic", "spid", "season_id", "created_at", "face"];
 const genPageFunc = async(cid, videoInfo, redirectUrl) => {
     let tagList = "";
     let alist = "";
@@ -598,12 +599,19 @@ const genPageFunc = async(cid, videoInfo, redirectUrl) => {
     if (videoInfo && videoInfo.tag) tagList += videoInfo.tag.split(",").map(tag => '<li><a class="tag-val" href="/tag/' + encodeURIComponent(tag) + '/" title="' + tag + '" target="_blank">' + tag + '</a></li>').join();
     if (!videoInfo.tag) videoInfo.tag = "";
     const template = await fetch(chrome.runtime.getURL("template.html")).then(res => res.text());
-    const page = template.replace(/__bl_avid/g, videoInfo.avid).replace(/__bl_page/g, videoInfo.currentPage).replace(/__bl_cid/g, cid).replace(/__bl_tid/g, videoInfo.tid).replace(/__bl_mid/g, videoInfo.mid)
-        .replace(/__bl_pic/g, videoInfo.pic).replace(/__bl_title/g, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseSafe */])(videoInfo.title)).replace(/__bl_sp_title_uri/g, videoInfo.sp_title ? encodeURIComponent(videoInfo.sp_title) : '')
-        .replace(/__bl_sp_title/g, videoInfo.sp_title ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseSafe */])(videoInfo.sp_title) : '').replace(/__bl_spid/g, videoInfo.spid).replace(/__bl_season_id/g, videoInfo.season_id)
-        .replace(/__bl_created_at/g, videoInfo.created_at).replace(/__bl_description/g, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseSafe */])(videoInfo.description)).replace(/__bl_redirectUrl/g, redirectUrl)
-        .replace(/__bl_tags/g, JSON.stringify(videoInfo.tag.split(","))).replace(/__bl_tag_list/g, tagList).replace(/__bl_alist/g, alist).replace(/__bl_bangumi_cover/g, videoInfo.bangumi ? videoInfo.bangumi.cover : '')
-        .replace(/__bl_bangumi_desc/g, videoInfo.bangumi ? videoInfo.bangumi.desc : '');
+    let page = template.replace(/__bl_page/g, videoInfo.currentPage)
+        .replace(/__bl_cid/g, cid)
+        .replace(/__bl_title/g, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseSafe */])(videoInfo.title))
+        .replace(/__bl_sp_title_uri/g, videoInfo.sp_title ? encodeURIComponent(videoInfo.sp_title) : '')
+        .replace(/__bl_sp_title/g, videoInfo.sp_title ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseSafe */])(videoInfo.sp_title) : '')
+        .replace(/__bl_description/g, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseSafe */])(videoInfo.description))
+        .replace(/__bl_redirectUrl/g, redirectUrl)
+        .replace(/__bl_tags/g, JSON.stringify(videoInfo.tag.split(",")))
+        .replace(/__bl_tag_list/g, tagList)
+        .replace(/__bl_alist/g, alist)
+        .replace(/__bl_bangumi_cover/g, videoInfo.pic)
+        .replace(/__bl_bangumi_desc/g, videoInfo.description);
+       for (let i of replaceList) page = page.replace(new RegExp('__bl_' + i, 'g'), videoInfo[i])
     document.open();
     document.write(page);
     document.close();
@@ -1296,7 +1304,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         filename: event.target.attr('download')
     });
     const createDownLinkElement = (segmentInfo, index) => {
-        const downloadOptions = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__filename_sanitize__["a" /* getDownloadOptions */])(segmentInfo.url, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__filename_sanitize__["b" /* getNiceSectionFilename */])(avid, page, videoInfo.pages || 1, index, videoLink.mediaDataSource.segments.length));
+        const downloadOptions = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__filename_sanitize__["a" /* getDownloadOptions */])(segmentInfo.url, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__filename_sanitize__["b" /* getNiceSectionFilename */])(avid, page, videoInfo.pages || 1, index, videoLink.mediaDataSource.segments.length, videoInfo));
         const length = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* parseTime */])(segmentInfo.duration);
         const size = (segmentInfo.filesize / 1048576 + 0.5) >>> 0;
         const title = isNaN(size) ? (`长度: ${length}`) : (`长度: ${length} 大小: ${size} MB`);
@@ -1323,7 +1331,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     if (videoLink.ld.length > 0) biliHelper.mainBlock.switcherSection.find('a[type="html5ld"]').removeClass('hidden');
 
     // comment begin
-    biliHelper.downloadFileName = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__filename_sanitize__["a" /* getDownloadOptions */])(comment.url, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__filename_sanitize__["b" /* getNiceSectionFilename */])(avid, page, videoInfo.pages || 1, 1, 1)).filename;
+    biliHelper.downloadFileName = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__filename_sanitize__["a" /* getDownloadOptions */])(comment.url, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__filename_sanitize__["b" /* getNiceSectionFilename */])(avid, page, videoInfo.pages || 1, 1, 1, videoInfo)).filename;
     biliHelper.mainBlock.infoSection.find('p').append(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<span>cid: ' + cid + '</span>'));
     biliHelper.mainBlock.commentSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])(`<div class="section comment"><h3>弹幕下载</h3><p><a class="b-btn w" href="${comment.url}" download="${biliHelper.downloadFileName}">下载 XML 格式弹幕</a></p></div>`);
     biliHelper.mainBlock.commentSection.find('a').onclick = clickDownLinkElementHandler;
@@ -1333,7 +1341,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     const clickAssBtnHandler = event => {
         event.preventDefault();
         if (!assData) assData = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__xml2ass__["a" /* default */])(comment.xml, {
-            'title': __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__filename_sanitize__["b" /* getNiceSectionFilename */])(avid, page, videoInfo.pages || 1, 1, 1),
+            'title': __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__filename_sanitize__["b" /* getNiceSectionFilename */])(avid, page, videoInfo.pages || 1, 1, 1, videoInfo),
             'ori': location.href,
             'opacity': options.opacity || 0.75
         });
@@ -1370,6 +1378,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     };
     control.find('.b-input').onkeyup();
     const displayUserInfo = (mid, data) => {
+        if (!mid) return control.find('.result').text('查询失败');
         control.find('.result').html('发送者: <a href="http://space.bilibili.com/' + mid + '" target="_blank" card="' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* parseSafe */])(data.name) + '" mid="' + mid + '">' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* parseSafe */])(data.name) + '</a><div target="_blank" class="user-info-level l' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* parseSafe */])(data.level_info.current_level) + '"></div>');
         let s = document.createElement('script');
         s.appendChild(document.createTextNode('UserCard.bind($("#bilibili_helper .query .result"));'));

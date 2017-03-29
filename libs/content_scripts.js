@@ -130,7 +130,7 @@ import sendComment from './sendComment';
         filename: event.target.attr('download')
     });
     const createDownLinkElement = (segmentInfo, index) => {
-        const downloadOptions = getDownloadOptions(segmentInfo.url, getNiceSectionFilename(avid, page, videoInfo.pages || 1, index, videoLink.mediaDataSource.segments.length));
+        const downloadOptions = getDownloadOptions(segmentInfo.url, getNiceSectionFilename(avid, page, videoInfo.pages || 1, index, videoLink.mediaDataSource.segments.length, videoInfo));
         const length = parseTime(segmentInfo.duration);
         const size = (segmentInfo.filesize / 1048576 + 0.5) >>> 0;
         const title = isNaN(size) ? (`长度: ${length}`) : (`长度: ${length} 大小: ${size} MB`);
@@ -157,7 +157,7 @@ import sendComment from './sendComment';
     if (videoLink.ld.length > 0) biliHelper.mainBlock.switcherSection.find('a[type="html5ld"]').removeClass('hidden');
 
     // comment begin
-    biliHelper.downloadFileName = getDownloadOptions(comment.url, getNiceSectionFilename(avid, page, videoInfo.pages || 1, 1, 1)).filename;
+    biliHelper.downloadFileName = getDownloadOptions(comment.url, getNiceSectionFilename(avid, page, videoInfo.pages || 1, 1, 1, videoInfo)).filename;
     biliHelper.mainBlock.infoSection.find('p').append($h('<span>cid: ' + cid + '</span>'));
     biliHelper.mainBlock.commentSection = $h(`<div class="section comment"><h3>弹幕下载</h3><p><a class="b-btn w" href="${comment.url}" download="${biliHelper.downloadFileName}">下载 XML 格式弹幕</a></p></div>`);
     biliHelper.mainBlock.commentSection.find('a').onclick = clickDownLinkElementHandler;
@@ -167,7 +167,7 @@ import sendComment from './sendComment';
     const clickAssBtnHandler = event => {
         event.preventDefault();
         if (!assData) assData = xml2ass(comment.xml, {
-            'title': getNiceSectionFilename(avid, page, videoInfo.pages || 1, 1, 1),
+            'title': getNiceSectionFilename(avid, page, videoInfo.pages || 1, 1, 1, videoInfo),
             'ori': location.href,
             'opacity': options.opacity || 0.75
         });
@@ -204,6 +204,7 @@ import sendComment from './sendComment';
     };
     control.find('.b-input').onkeyup();
     const displayUserInfo = (mid, data) => {
+        if (!mid) return control.find('.result').text('查询失败');
         control.find('.result').html('发送者: <a href="http://space.bilibili.com/' + mid + '" target="_blank" card="' + parseSafe(data.name) + '" mid="' + mid + '">' + parseSafe(data.name) + '</a><div target="_blank" class="user-info-level l' + parseSafe(data.level_info.current_level) + '"></div>');
         let s = document.createElement('script');
         s.appendChild(document.createTextNode('UserCard.bind($("#bilibili_helper .query .result"));'));

@@ -99,7 +99,7 @@ var filenameSanitize = (function () {
     };
 })();
 
-export function getNiceSectionFilename(avid, page, totalPage, idx, numParts) {
+export function getNiceSectionFilename(avid, page, totalPage, idx, numParts, videoInfo) {
     // TODO inspect the page to get better section name
     var idName = 'av' + avid,
         // page/part name is only shown when there are more than one pages/parts
@@ -109,14 +109,14 @@ export function getNiceSectionFilename(avid, page, totalPage, idx, numParts) {
 
     // try to find a good page name
     if (pageIdName) {
-        pageName = _$('.player-wrapper #plist > span').text();
+        pageName = videoInfo.list[page - 1].part;
         pageName = pageName.substr(pageName.indexOf('、') + 1);
-        if (!partIdName) document.title = pageName + '_' + _$('div.v-title').text() + '_' + idName + '_' + pageIdName;
-        return partIdName ? pageName + '_' + _$('div.v-title').text() + '_' + idName + '_' + pageIdName + '_' + partIdName : pageName + '_' + _$('div.v-title').text() + '_' + idName + '_' + pageIdName;
+        if (!partIdName) document.title = pageName + '_' + videoInfo.title + '_' + idName + '_' + pageIdName;
+        return partIdName ? pageName + '_' + videoInfo.title + '_' + idName + '_' + pageIdName + '_' + partIdName : pageName + '_' + videoInfo.title + '_' + idName + '_' + pageIdName;
     }
-    if (!partIdName) document.title = _$('div.v-title').text() + '_' + idName;
+    if (!partIdName) document.title = videoInfo.title + '_' + idName;
     // document.title contains other info feeling too much
-    return partIdName ? _$('div.v-title').text() + '_' + idName + '_' + partIdName : _$('div.v-title').text() + '_' + idName;
+    return partIdName ? videoInfo.title + '_' + idName + '_' + partIdName : videoInfo.title + '_' + idName;
 }
 
 // Helper function, return object {url, filename}, options object used by

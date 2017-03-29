@@ -14,7 +14,7 @@ export const bilibiliVideoInfoProvider = async(avid, page = 1, credentials = 'in
             json = await bilibiliVideoInfoProvider(avid, page, credentials, retries, retryDelay, n);
         } else throw e;
     }
-    if (!json.pages) json.pages = json.list.length;
+    json.pages = json.list.length;
     json.avid = avid;
     json.currentPage = page;
     sessionStorage[avid + '_' + page] = JSON.stringify(json);
