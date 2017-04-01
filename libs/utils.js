@@ -49,8 +49,18 @@ export const $h = html => {
     return template.content.firstChild;
 };
 //http://stackoverflow.com/a/15724300/30529
-export function getCookie(name) {
-  var value = "; " + document.cookie;
-  var parts = value.split("; " + name + "=");
+export const getCookie = name => {
+  const value = "; " + document.cookie;
+  let parts = value.split("; " + name + "=");
   if (parts.length == 2) return parts.pop().split(";").shift();
 }
+//http://stackoverflow.com/a/11986374
+export const findPosTop = obj => {
+    let curtop = obj.offsetTop;
+    if (obj.offsetParent) {
+        while (obj = obj.offsetParent) {
+            curtop += obj.offsetTop;
+        }
+    }
+    return curtop;
+};

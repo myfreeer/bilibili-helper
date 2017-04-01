@@ -1,6 +1,6 @@
 // require external libs
 import {bilibiliVideoInfoProvider,bilibiliBangumiVideoInfoProvider} from './bilibiliVideoInfoProvider';
-import {parseSafe, parseTime, mySendMessage, parseXmlSafe, fetchretry, storageGet, _$, $h, getCookie} from './utils';
+import {parseSafe, parseTime, mySendMessage, parseXmlSafe, fetchretry, storageGet, _$, $h, getCookie, findPosTop} from './utils';
 import commentSenderQuery from './commentSenderQuery';
 import bilibiliVideoProvider from './bilibiliVideoProvider';
 import xml2ass from './xml2ass';
@@ -95,7 +95,7 @@ import sendComment from './sendComment';
     biliHelper.mainBlock.switcherSection.button = $h('<p><a class="b-btn w" type="original">原始播放器</a><a class="b-btn w" type="bilih5">原始HTML5</a><a class="b-btn w hidden" type="bilimac">Mac 客户端</a><a class="b-btn w hidden" type="swf">SWF 播放器</a><a class="b-btn w hidden" type="iframe">Iframe 播放器</a><a class="b-btn w hidden" type="html5">HTML5超清</a><a class="b-btn w hidden" type="html5hd">HTML5高清</a><a class="b-btn w hidden" type="html5ld">HTML5低清</a></p>');
     biliHelper.mainBlock.switcherSection.button.onclick = e => biliHelper.switcher[e.target.attr('type')]();
     biliHelper.mainBlock.switcherSection.append(biliHelper.mainBlock.switcherSection.button);
-    if (biliHelper.redirectUrl) {
+    if (genPage) {
         biliHelper.mainBlock.switcherSection.find('a[type="original"]').addClass('hidden');
         biliHelper.mainBlock.switcherSection.find('a[type="swf"],a[type="iframe"]').removeClass('hidden');
     }
@@ -116,6 +116,7 @@ import sendComment from './sendComment';
     let replaceNotice = $h('<div id="loading-notice">正在尝试替换播放器…<span id="cancel-replacing">取消</span></div>');
     replaceNotice.find('#cancel-replacing').onclick = () => !_$('#loading-notice').remove() && biliHelper.switcher.original();
     _$('#bofqi').append(replaceNotice);
+    if (options.scrollToPlayer) window.scroll(window.pageXOffset, findPosTop(_$('#bofqi')) - 30);
 
     // process video links
     videoLink = await _videoLink;
@@ -358,7 +359,7 @@ import sendComment from './sendComment';
                         }
                     }
                 }
-            }, 600);
+            }, 200);
         },
         html5hd: function () {
             this.set('html5hd');

@@ -69,14 +69,14 @@ const getToken = async(retries = 5, retryDelay = 500) => {
         _token = _body.innerHTML.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/i);
         if (_token && _token[1]) {
             token = _token[1];
-            sessionStorage['bilibiliVideoProvider_Token'] = token;
+            sessionStorage.bilibiliVideoProvider_Token = token;
             return token;
         }
     }
     try {
-        let text = await fetch(location.protocol + '//www.bilibili.com/video/av7/').then(res => res.text())
+        let text = await fetch(location.protocol + '//www.bilibili.com/video/av7/').then(res => res.text());
         token = text.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/)[1];
-        sessionStorage['bilibiliVideoProvider_Token'] = token;
+        sessionStorage.bilibiliVideoProvider_Token = token;
         return token;
     } catch (e) {
         if (--retries > 0) {
@@ -108,7 +108,7 @@ const getVideoLink = async(url, type, retries = 5, credentials = 'include', retr
 const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include', retries = 5, retryDelay = 500) => {
     let url = {};
     let token;
-    if (sessionStorage['bilibiliVideoProvider_Token']) token = sessionStorage['bilibiliVideoProvider_Token'];
+    if (sessionStorage.bilibiliVideoProvider_Token) token = sessionStorage.bilibiliVideoProvider_Token;
     if (!token) token = await getToken(retries);
     url.low = `${location.protocol}//api.bilibili.com/playurl?aid=${avid}&page=${page}&platform=html5&vtype=mp4&token=${token}`;
     url._base = location.protocol + '//interface.bilibili.com/playurl?';

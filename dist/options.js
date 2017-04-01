@@ -14,6 +14,7 @@ Element.prototype.addClass = function(){ return this.classList.add(...arguments)
         $$('.button').forEach(e => e.classList.remove('on'));
         $(`div[option="${options.rel_search}"].rel_search`).addClass("on");
         $(`div[option="${options.trackingBlock}"].trackingBlock`).addClass("on");
+        $(`div[option="${options.scrollToPlayer}"].scrollToPlayer`).addClass("on");
         $(`div[option="${options.replace}"].replace`).addClass("on");
         $(`div[option="${options.player}"].player`).addClass("on");
         $(`div[option="${options.api}"].api`).addClass("on");

@@ -4,6 +4,7 @@ let options = {
     "player": "html5", //original swf iframe bilih5 html5 html5hd html5ld
     "rel_search": "with", //off without with
     "trackingBlock": true,
+    "scrollToPlayer": true,
     "api": 'offical',
     "opacity": 1,
     "prop": false,

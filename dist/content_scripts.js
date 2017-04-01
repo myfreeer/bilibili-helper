@@ -71,7 +71,6 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["e"] = getCookie;
 Element.prototype.find = Element.prototype.querySelector;
 Element.prototype.findAll = Element.prototype.querySelectorAll;
 Element.prototype.attr = Element.prototype.getAttribute;
@@ -98,19 +97,19 @@ NodeList.prototype.every = HTMLCollection.prototype.every = Array.prototype.ever
 NodeList.prototype.some = HTMLCollection.prototype.some = Array.prototype.some;
 HTMLCollection.prototype.forEach = Array.prototype.forEach;
 const sleep = (time = 0) => new Promise(r => setTimeout(r, time));
-/* harmony export (immutable) */ __webpack_exports__["j"] = sleep;
+/* harmony export (immutable) */ __webpack_exports__["k"] = sleep;
 
 const formatInt = (Source, Length) => (Source + '').padStart(Length, '0');
 /* unused harmony export formatInt */
 
 const parseSafe = text => ('' + text).replace(/&/g, "&amp;").replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-/* harmony export (immutable) */ __webpack_exports__["i"] = parseSafe;
+/* harmony export (immutable) */ __webpack_exports__["j"] = parseSafe;
 
 const parseTime = timecount => formatInt(parseInt(timecount / 60000), 2) + ':' + formatInt(parseInt((timecount / 1000) % 60), 2);
-/* harmony export (immutable) */ __webpack_exports__["h"] = parseTime;
+/* harmony export (immutable) */ __webpack_exports__["i"] = parseTime;
 
 const mySendMessage = obj => new Promise((resolve, reject) => chrome.runtime.sendMessage(obj,resolve));
-/* harmony export (immutable) */ __webpack_exports__["g"] = mySendMessage;
+/* harmony export (immutable) */ __webpack_exports__["h"] = mySendMessage;
 
 const parseXmlSafe = text => (new window.DOMParser()).parseFromString(text.replace(/[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}]/ug, ""), "text/xml");
 /* harmony export (immutable) */ __webpack_exports__["c"] = parseXmlSafe;
@@ -149,11 +148,25 @@ const $h = html => {
 /* harmony export (immutable) */ __webpack_exports__["f"] = $h;
 
 //http://stackoverflow.com/a/15724300/30529
-function getCookie(name) {
-  var value = "; " + document.cookie;
-  var parts = value.split("; " + name + "=");
+const getCookie = name => {
+  const value = "; " + document.cookie;
+  let parts = value.split("; " + name + "=");
   if (parts.length == 2) return parts.pop().split(";").shift();
 }
+/* harmony export (immutable) */ __webpack_exports__["e"] = getCookie;
+
+//http://stackoverflow.com/a/11986374
+const findPosTop = obj => {
+    let curtop = obj.offsetTop;
+    if (obj.offsetParent) {
+        while (obj = obj.offsetParent) {
+            curtop += obj.offsetTop;
+        }
+    }
+    return curtop;
+};
+/* harmony export (immutable) */ __webpack_exports__["g"] = findPosTop;
+
 
 /***/ }),
 /* 1 */
@@ -198,7 +211,7 @@ const bilibiliVideoInfoProvider = async(avid, page = 1, credentials = 'include',
         if (!json || !(json && json.list && json.list.length) || json && json.code === -503) throw new Error('Can not get valid JSON.');
     } catch (e) {
         if (++n < retries) {
-            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* sleep */])(retryDelay);
+            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["k" /* sleep */])(retryDelay);
             json = await bilibiliVideoInfoProvider(avid, page, credentials, retries, retryDelay, n);
         } else throw e;
     }
@@ -222,7 +235,7 @@ const bilibiliBangumiVideoInfoProvider = async(epid, credentials = 'include', re
         videoInfo = await bilibiliVideoInfoProvider(json.result.currentEpisode.avId, json.result.currentEpisode.page || 1);
     } catch (e) {
         if (++n < retries) {
-            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* sleep */])(retryDelay);
+            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["k" /* sleep */])(retryDelay);
             videoInfo = await bilibiliBangumiVideoInfoProvider(epid, credentials, retries, retryDelay, n);
         } else throw e;
     }
@@ -311,18 +324,18 @@ const getToken = async(retries = 5, retryDelay = 500) => {
         _token = _body.innerHTML.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/i);
         if (_token && _token[1]) {
             token = _token[1];
-            sessionStorage['bilibiliVideoProvider_Token'] = token;
+            sessionStorage.bilibiliVideoProvider_Token = token;
             return token;
         }
     }
     try {
-        let text = await fetch(location.protocol + '//www.bilibili.com/video/av7/').then(res => res.text())
+        let text = await fetch(location.protocol + '//www.bilibili.com/video/av7/').then(res => res.text());
         token = text.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/)[1];
-        sessionStorage['bilibiliVideoProvider_Token'] = token;
+        sessionStorage.bilibiliVideoProvider_Token = token;
         return token;
     } catch (e) {
         if (--retries > 0) {
-            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* sleep */])(retryDelay);
+            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* sleep */])(retryDelay);
             return await getToken(retries);
         } else throw (e);
     }
@@ -337,7 +350,7 @@ const getVideoLink = async(url, type, retries = 5, credentials = 'include', retr
         } else json = await fetch(url, {credentials}).then(response => response.json());
     } catch (error) {
         if (--retries > 0) {
-            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* sleep */])(retryDelay);
+            await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["k" /* sleep */])(retryDelay);
             return await getVideoLink(url, type, retries);
         } else json = {
             'code': -1,
@@ -350,7 +363,7 @@ const getVideoLink = async(url, type, retries = 5, credentials = 'include', retr
 const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include', retries = 5, retryDelay = 500) => {
     let url = {};
     let token;
-    if (sessionStorage['bilibiliVideoProvider_Token']) token = sessionStorage['bilibiliVideoProvider_Token'];
+    if (sessionStorage.bilibiliVideoProvider_Token) token = sessionStorage.bilibiliVideoProvider_Token;
     if (!token) token = await getToken(retries);
     url.low = `${location.protocol}//api.bilibili.com/playurl?aid=${avid}&page=${page}&platform=html5&vtype=mp4&token=${token}`;
     url._base = location.protocol + '//interface.bilibili.com/playurl?';
@@ -459,73 +472,70 @@ const commentSenderQuery = async(hash, retries = 5) => {
 //
 // TODO Through my own tests, I find actually Chrome can sanitize the file path
 // automatically but there are no API found for it though?
-var filenameSanitize = (function () {
-    var illegalRe = /[\/\?<>\\:\*\|":~]/g;
-    var controlRe = /[\x00-\x1f\x80-\x9f]/g;
-    var reservedRe = /^\.+$/;
-    var windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
+const illegalRe = /[\/\?<>\\:\*\|":~]/g;
+const controlRe = /[\x00-\x1f\x80-\x9f]/g;
+const reservedRe = /^\.+$/;
+const windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
 
-    // Truncate string by size in bytes
-    function truncate(str, maxByteSize) {
-        var strLen = str.length,
-            curByteSize = 0,
-            codePoint = -1;
+// Truncate string by size in bytes
+function truncate(str, maxByteSize) {
+    let strLen = str.length,
+        curByteSize = 0,
+        codePoint = -1;
 
-        for (var i = 0; i < strLen; i++) {
-            codePoint = str.charCodeAt(i);
+    for (let i = 0; i < strLen; i++) {
+        codePoint = str.charCodeAt(i);
 
-            // handle 4-byte non-BMP chars
-            // low surrogate
-            if (codePoint >= 0xdc00 && codePoint <= 0xdfff) {
-                // when parsing previous hi-surrogate, 3 is added to curByteSize
-                curByteSize++;
-                if (curByteSize > maxByteSize) {
-                    return str.substring(0, i - 1);
-                }
-
-                continue;
-            }
-
-            if (codePoint <= 0x7f) {
-                curByteSize++;
-            } else if (codePoint >= 0x80 && codePoint <= 0x7ff) {
-                curByteSize += 2;
-            } else if (codePoint >= 0x800 && codePoint <= 0xffff) {
-                curByteSize += 3;
-            }
-
+        // handle 4-byte non-BMP chars
+        // low surrogate
+        if (codePoint >= 0xdc00 && codePoint <= 0xdfff) {
+            // when parsing previous hi-surrogate, 3 is added to curByteSize
+            curByteSize++;
             if (curByteSize > maxByteSize) {
-                return str.substring(0, i);
+                return str.substring(0, i - 1);
             }
+            continue;
         }
 
-        // never exceeds the upper limit
-        return str;
-    }
-
-    function sanitize(input, replacement, max) {
-        var sanitized = input
-            .replace(illegalRe, replacement)
-            .replace(controlRe, replacement)
-            .replace(reservedRe, replacement)
-            .replace(windowsReservedRe, replacement);
-        return truncate(sanitized, max);
-    }
-
-    return function (input, options) {
-        var replacement = (options && options.replacement) || '';
-        var max = (options && options.max && (options.max < 255)) ? options.max : 255;
-        var output = sanitize(input, replacement, max);
-        if (replacement === '') {
-            return output;
+        if (codePoint <= 0x7f) {
+            curByteSize++;
+        } else if (codePoint >= 0x80 && codePoint <= 0x7ff) {
+            curByteSize += 2;
+        } else if (codePoint >= 0x800 && codePoint <= 0xffff) {
+            curByteSize += 3;
         }
-        return sanitize(output, '');
-    };
-})();
+
+        if (curByteSize > maxByteSize) {
+            return str.substring(0, i);
+        }
+    }
+
+    // never exceeds the upper limit
+    return str;
+}
+
+function sanitize(input, replacement, max) {
+    const sanitized = input
+        .replace(illegalRe, replacement)
+        .replace(controlRe, replacement)
+        .replace(reservedRe, replacement)
+        .replace(windowsReservedRe, replacement);
+    return truncate(sanitized, max);
+}
+
+var filenameSanitize = function (input, options) {
+    const replacement = (options && options.replacement) || '';
+    const max = (options && options.max && (options.max < 255)) ? options.max : 255;
+    const output = sanitize(input, replacement, max);
+    if (replacement === '') {
+        return output;
+    }
+    return sanitize(output, '');
+};
 
 function getNiceSectionFilename(avid, page, totalPage, idx, numParts, videoInfo) {
     // TODO inspect the page to get better section name
-    var idName = 'av' + avid,
+    let idName = 'av' + avid,
         // page/part name is only shown when there are more than one pages/parts
         pageIdName = (totalPage && (totalPage > 1)) ? ('p' + page) : "",
         pageName = "",
@@ -551,7 +561,7 @@ function getDownloadOptions(url, filename) {
     // Parsing the url should be ok in most cases, but the best way should
     // use MIME types and tentative file names returned by server. Not
     // feasible at this stage.
-    var resFn = null,
+    let resFn = null,
         fileBaseName = url.split(/[\\/]/).pop().split('?')[0],
         // arbitrarily default to "mp4" for no better reason...
         fileExt = fileBaseName.match(/[.]/) ? fileBaseName.match(/[^.]+$/) : 'mp4';
@@ -593,7 +603,7 @@ const genPageFunc = async(cid, videoInfo, redirectUrl) => {
     let alist = "";
     if (videoInfo && videoInfo.list && videoInfo.list.length > 1) {
         alist += "<select id='dedepagetitles' onchange='location.href=this.options[this.selectedIndex].value;'>";
-        alist += videoInfo.list.map(vPart => "<option value='/video/av" + videoInfo.avid + "/index_" + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseSafe */])(vPart.page) + ".html'>" + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseSafe */])(vPart.page) + "、" + (vPart.part ? vPart.part : ("P" + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseSafe */])(vPart.page))) + "</option>").join();
+        alist += videoInfo.list.map(vPart => "<option value='/video/av" + videoInfo.avid + "/index_" + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(vPart.page) + ".html'>" + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(vPart.page) + "、" + (vPart.part ? vPart.part : ("P" + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(vPart.page))) + "</option>").join();
         alist += "</select>";
     }
     if (videoInfo && videoInfo.tag) tagList += videoInfo.tag.split(",").map(tag => '<li><a class="tag-val" href="/tag/' + encodeURIComponent(tag) + '/" title="' + tag + '" target="_blank">' + tag + '</a></li>').join('');
@@ -601,10 +611,10 @@ const genPageFunc = async(cid, videoInfo, redirectUrl) => {
     const template = await fetch(chrome.runtime.getURL("template.html")).then(res => res.text());
     let page = template.replace(/__bl_page/g, videoInfo.currentPage)
         .replace(/__bl_cid/g, cid)
-        .replace(/__bl_title/g, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseSafe */])(videoInfo.title))
+        .replace(/__bl_title/g, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(videoInfo.title))
         .replace(/__bl_sp_title_uri/g, videoInfo.sp_title ? encodeURIComponent(videoInfo.sp_title) : '')
-        .replace(/__bl_sp_title/g, videoInfo.sp_title ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseSafe */])(videoInfo.sp_title) : '')
-        .replace(/__bl_description/g, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseSafe */])(videoInfo.description))
+        .replace(/__bl_sp_title/g, videoInfo.sp_title ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(videoInfo.sp_title) : '')
+        .replace(/__bl_description/g, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(videoInfo.description))
         .replace(/__bl_redirectUrl/g, redirectUrl)
         .replace(/__bl_tags/g, JSON.stringify(videoInfo.tag.split(",")))
         .replace(/__bl_tag_list/g, tagList)
@@ -616,8 +626,8 @@ const genPageFunc = async(cid, videoInfo, redirectUrl) => {
     document.write(page);
     document.close();
     await docReady();
-    await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* sleep */])(500);
-    await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* mySendMessage */])({command: "injectCSS"});
+    await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["k" /* sleep */])(500);
+    await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* mySendMessage */])({command: "injectCSS"});
     return false;
 };
 /* harmony default export */ __webpack_exports__["a"] = (genPageFunc);
@@ -1269,7 +1279,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     biliHelper.mainBlock.switcherSection.button = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<p><a class="b-btn w" type="original">原始播放器</a><a class="b-btn w" type="bilih5">原始HTML5</a><a class="b-btn w hidden" type="bilimac">Mac 客户端</a><a class="b-btn w hidden" type="swf">SWF 播放器</a><a class="b-btn w hidden" type="iframe">Iframe 播放器</a><a class="b-btn w hidden" type="html5">HTML5超清</a><a class="b-btn w hidden" type="html5hd">HTML5高清</a><a class="b-btn w hidden" type="html5ld">HTML5低清</a></p>');
     biliHelper.mainBlock.switcherSection.button.onclick = e => biliHelper.switcher[e.target.attr('type')]();
     biliHelper.mainBlock.switcherSection.append(biliHelper.mainBlock.switcherSection.button);
-    if (biliHelper.redirectUrl) {
+    if (genPage) {
         biliHelper.mainBlock.switcherSection.find('a[type="original"]').addClass('hidden');
         biliHelper.mainBlock.switcherSection.find('a[type="swf"],a[type="iframe"]').removeClass('hidden');
     }
@@ -1290,6 +1300,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     let replaceNotice = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div id="loading-notice">正在尝试替换播放器…<span id="cancel-replacing">取消</span></div>');
     replaceNotice.find('#cancel-replacing').onclick = () => !__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#loading-notice').remove() && biliHelper.switcher.original();
     __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').append(replaceNotice);
+    if (options.scrollToPlayer) window.scroll(window.pageXOffset, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* findPosTop */])(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi')) - 30);
 
     // process video links
     videoLink = await _videoLink;
@@ -1298,14 +1309,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     for (let i in videoLink.ld) if (videoLink.ld[i].match('ws.acgvideo.com')) fetch(videoLink.ld[i], {method: 'head'}).then(resp => resp.ok && (videoLink.ld[i] = resp.url));
 
     //downloaderSection code
-    const clickDownLinkElementHandler = async(event) => !event.preventDefault() && await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* mySendMessage */])({
+    const clickDownLinkElementHandler = async(event) => !event.preventDefault() && await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* mySendMessage */])({
         command: 'requestForDownload',
         url: event.target.attr('href'),
         filename: event.target.attr('download')
     });
     const createDownLinkElement = (segmentInfo, index) => {
         const downloadOptions = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__filename_sanitize__["a" /* getDownloadOptions */])(segmentInfo.url, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__filename_sanitize__["b" /* getNiceSectionFilename */])(avid, page, videoInfo.pages || 1, index, videoLink.mediaDataSource.segments.length, videoInfo));
-        const length = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* parseTime */])(segmentInfo.duration);
+        const length = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* parseTime */])(segmentInfo.duration);
         const size = (segmentInfo.filesize / 1048576 + 0.5) >>> 0;
         const title = isNaN(size) ? (`长度: ${length}`) : (`长度: ${length} 大小: ${size} MB`);
         let bhDownLink = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])(`<a class="b-btn w" rel="noreferrer" id="bili_helper_down_link_${index}" download="${downloadOptions.filename}" title="${title}" href="${segmentInfo.url}">${'分段 ' + (index + 1)}</a>`);
@@ -1360,7 +1371,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     let control = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div><input type="text" class="b-input" placeholder="根据关键词筛选弹幕"><select class="list"><option disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</option></select><span class="result">选择弹幕查看发送者…</span></div>');
     control.find('.b-input').onkeyup = e => {
         const keyword = control.find('input').value,
-            regex = new RegExp(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* parseSafe */])(keyword), 'gi');
+            regex = new RegExp(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* parseSafe */])(keyword), 'gi');
         control.find('select.list').html('<option disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</option>');
         for (let node of biliHelper.comments){
             let text = node.childNodes[0];
@@ -1368,10 +1379,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 text = text.nodeValue;
                 const commentData = node.getAttribute('p').split(','),
     	                        sender = commentData[6],
-    	                        time = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* parseTime */])(parseInt(commentData[0]) * 1000);
+    	                        time = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* parseTime */])(parseInt(commentData[0]) * 1000);
     	        let option = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])(`<option sender=${sender}></option>`);
     	        option.sender = sender;
-    	        option.html('[' + time + '] ' + (keyword.trim() === '' ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* parseSafe */])(text) : __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* parseSafe */])(text).replace(regex, kw => '<span class="kw">' + kw + '</span>')));
+    	        option.html('[' + time + '] ' + (keyword.trim() === '' ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* parseSafe */])(text) : __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* parseSafe */])(text).replace(regex, kw => '<span class="kw">' + kw + '</span>')));
     	        control.find('select.list').append(option);
     	    }
         }
@@ -1379,7 +1390,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     control.find('.b-input').onkeyup();
     const displayUserInfo = (mid, data) => {
         if (!mid) return control.find('.result').text('查询失败');
-        control.find('.result').html('发送者: <a href="http://space.bilibili.com/' + mid + '" target="_blank" card="' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* parseSafe */])(data.name) + '" mid="' + mid + '">' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* parseSafe */])(data.name) + '</a><div target="_blank" class="user-info-level l' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* parseSafe */])(data.level_info.current_level) + '"></div>');
+        control.find('.result').html('发送者: <a href="http://space.bilibili.com/' + mid + '" target="_blank" card="' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* parseSafe */])(data.name) + '" mid="' + mid + '">' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* parseSafe */])(data.name) + '</a><div target="_blank" class="user-info-level l' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["j" /* parseSafe */])(data.level_info.current_level) + '"></div>');
         let s = document.createElement('script');
         s.appendChild(document.createTextNode('UserCard.bind($("#bilibili_helper .query .result"));'));
         document.body.appendChild(s);
@@ -1532,7 +1543,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                         }
                     }
                 }
-            }, 600);
+            }, 200);
         },
         html5hd: function () {
             this.set('html5hd');
@@ -1691,7 +1702,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var __WEBPACK_AMD_DEFINE_RESULT__;/*
+"use strict";
+/*
  * JavaScript MD5
  * https://github.com/blueimp/JavaScript-MD5
  *
@@ -1709,270 +1721,222 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/*
  * Distributed under the BSD License
  * See http://pajhome.org.uk/crypt/md5 for more info.
  */
-
 /* global define */
 
-(function ($) {
-    'use strict'
 
-  /*
-  * Add integers, wrapping at 2^32. This uses 16-bit operations internally
-  * to work around bugs in some JS interpreters.
-  */
-    function safeAdd (x, y) {
-        var lsw = (x & 0xFFFF) + (y & 0xFFFF)
-        var msw = (x >> 16) + (y >> 16) + (lsw >> 16)
-        return (msw << 16) | (lsw & 0xFFFF)
-    }
+/*
+ * Add integers, wrapping at 2^32. This uses 16-bit operations internally
+ * to work around bugs in some JS interpreters.
+ */
+function safeAdd(x, y) {
+	var lsw = (x & 0xFFFF) + (y & 0xFFFF)
+	var msw = (x >> 16) + (y >> 16) + (lsw >> 16)
+	return (msw << 16) | (lsw & 0xFFFF)
+}
 
-  /*
-  * Bitwise rotate a 32-bit number to the left.
-  */
-    function bitRotateLeft (num, cnt) {
-        return (num << cnt) | (num >>> (32 - cnt))
-    }
+/*
+ * Bitwise rotate a 32-bit number to the left.
+ */
+function bitRotateLeft(num, cnt) {
+	return (num << cnt) | (num >>> (32 - cnt))
+}
 
-  /*
-  * These functions implement the four basic operations the algorithm uses.
-  */
-    function md5cmn (q, a, b, x, s, t) {
-        return safeAdd(bitRotateLeft(safeAdd(safeAdd(a, q), safeAdd(x, t)), s), b)
-    }
-    function md5ff (a, b, c, d, x, s, t) {
-        return md5cmn((b & c) | ((~b) & d), a, b, x, s, t)
-    }
-    function md5gg (a, b, c, d, x, s, t) {
-        return md5cmn((b & d) | (c & (~d)), a, b, x, s, t)
-    }
-    function md5hh (a, b, c, d, x, s, t) {
-        return md5cmn(b ^ c ^ d, a, b, x, s, t)
-    }
-    function md5ii (a, b, c, d, x, s, t) {
-        return md5cmn(c ^ (b | (~d)), a, b, x, s, t)
-    }
+/*
+ * These functions implement the four basic operations the algorithm uses.
+ */
+function md5cmn(q, a, b, x, s, t) {
+	return safeAdd(bitRotateLeft(safeAdd(safeAdd(a, q), safeAdd(x, t)), s), b)
+}
 
-  /*
-  * Calculate the MD5 of an array of little-endian words, and a bit length.
-  */
-    function binlMD5 (x, len) {
-    /* append padding */
-        x[len >> 5] |= 0x80 << (len % 32)
-        x[(((len + 64) >>> 9) << 4) + 14] = len
+function md5ff(a, b, c, d, x, s, t) {
+	return md5cmn((b & c) | ((~b) & d), a, b, x, s, t)
+}
 
-        var i
-        var olda
-        var oldb
-        var oldc
-        var oldd
-        var a = 1732584193
-        var b = -271733879
-        var c = -1732584194
-        var d = 271733878
+function md5gg(a, b, c, d, x, s, t) {
+	return md5cmn((b & d) | (c & (~d)), a, b, x, s, t)
+}
 
-        for (i = 0; i < x.length; i += 16) {
-            olda = a
-            oldb = b
-            oldc = c
-            oldd = d
+function md5hh(a, b, c, d, x, s, t) {
+	return md5cmn(b ^ c ^ d, a, b, x, s, t)
+}
 
-            a = md5ff(a, b, c, d, x[i], 7, -680876936)
-            d = md5ff(d, a, b, c, x[i + 1], 12, -389564586)
-            c = md5ff(c, d, a, b, x[i + 2], 17, 606105819)
-            b = md5ff(b, c, d, a, x[i + 3], 22, -1044525330)
-            a = md5ff(a, b, c, d, x[i + 4], 7, -176418897)
-            d = md5ff(d, a, b, c, x[i + 5], 12, 1200080426)
-            c = md5ff(c, d, a, b, x[i + 6], 17, -1473231341)
-            b = md5ff(b, c, d, a, x[i + 7], 22, -45705983)
-            a = md5ff(a, b, c, d, x[i + 8], 7, 1770035416)
-            d = md5ff(d, a, b, c, x[i + 9], 12, -1958414417)
-            c = md5ff(c, d, a, b, x[i + 10], 17, -42063)
-            b = md5ff(b, c, d, a, x[i + 11], 22, -1990404162)
-            a = md5ff(a, b, c, d, x[i + 12], 7, 1804603682)
-            d = md5ff(d, a, b, c, x[i + 13], 12, -40341101)
-            c = md5ff(c, d, a, b, x[i + 14], 17, -1502002290)
-            b = md5ff(b, c, d, a, x[i + 15], 22, 1236535329)
+function md5ii(a, b, c, d, x, s, t) {
+	return md5cmn(c ^ (b | (~d)), a, b, x, s, t)
+}
 
-            a = md5gg(a, b, c, d, x[i + 1], 5, -165796510)
-            d = md5gg(d, a, b, c, x[i + 6], 9, -1069501632)
-            c = md5gg(c, d, a, b, x[i + 11], 14, 643717713)
-            b = md5gg(b, c, d, a, x[i], 20, -373897302)
-            a = md5gg(a, b, c, d, x[i + 5], 5, -701558691)
-            d = md5gg(d, a, b, c, x[i + 10], 9, 38016083)
-            c = md5gg(c, d, a, b, x[i + 15], 14, -660478335)
-            b = md5gg(b, c, d, a, x[i + 4], 20, -405537848)
-            a = md5gg(a, b, c, d, x[i + 9], 5, 568446438)
-            d = md5gg(d, a, b, c, x[i + 14], 9, -1019803690)
-            c = md5gg(c, d, a, b, x[i + 3], 14, -187363961)
-            b = md5gg(b, c, d, a, x[i + 8], 20, 1163531501)
-            a = md5gg(a, b, c, d, x[i + 13], 5, -1444681467)
-            d = md5gg(d, a, b, c, x[i + 2], 9, -51403784)
-            c = md5gg(c, d, a, b, x[i + 7], 14, 1735328473)
-            b = md5gg(b, c, d, a, x[i + 12], 20, -1926607734)
+/*
+ * Calculate the MD5 of an array of little-endian words, and a bit length.
+ */
+function binlMD5(x, len) {
+	/* append padding */
+	x[len >> 5] |= 0x80 << (len % 32)
+	x[(((len + 64) >>> 9) << 4) + 14] = len
 
-            a = md5hh(a, b, c, d, x[i + 5], 4, -378558)
-            d = md5hh(d, a, b, c, x[i + 8], 11, -2022574463)
-            c = md5hh(c, d, a, b, x[i + 11], 16, 1839030562)
-            b = md5hh(b, c, d, a, x[i + 14], 23, -35309556)
-            a = md5hh(a, b, c, d, x[i + 1], 4, -1530992060)
-            d = md5hh(d, a, b, c, x[i + 4], 11, 1272893353)
-            c = md5hh(c, d, a, b, x[i + 7], 16, -155497632)
-            b = md5hh(b, c, d, a, x[i + 10], 23, -1094730640)
-            a = md5hh(a, b, c, d, x[i + 13], 4, 681279174)
-            d = md5hh(d, a, b, c, x[i], 11, -358537222)
-            c = md5hh(c, d, a, b, x[i + 3], 16, -722521979)
-            b = md5hh(b, c, d, a, x[i + 6], 23, 76029189)
-            a = md5hh(a, b, c, d, x[i + 9], 4, -640364487)
-            d = md5hh(d, a, b, c, x[i + 12], 11, -421815835)
-            c = md5hh(c, d, a, b, x[i + 15], 16, 530742520)
-            b = md5hh(b, c, d, a, x[i + 2], 23, -995338651)
+	var i
+	var olda
+	var oldb
+	var oldc
+	var oldd
+	var a = 1732584193
+	var b = -271733879
+	var c = -1732584194
+	var d = 271733878
 
-            a = md5ii(a, b, c, d, x[i], 6, -198630844)
-            d = md5ii(d, a, b, c, x[i + 7], 10, 1126891415)
-            c = md5ii(c, d, a, b, x[i + 14], 15, -1416354905)
-            b = md5ii(b, c, d, a, x[i + 5], 21, -57434055)
-            a = md5ii(a, b, c, d, x[i + 12], 6, 1700485571)
-            d = md5ii(d, a, b, c, x[i + 3], 10, -1894986606)
-            c = md5ii(c, d, a, b, x[i + 10], 15, -1051523)
-            b = md5ii(b, c, d, a, x[i + 1], 21, -2054922799)
-            a = md5ii(a, b, c, d, x[i + 8], 6, 1873313359)
-            d = md5ii(d, a, b, c, x[i + 15], 10, -30611744)
-            c = md5ii(c, d, a, b, x[i + 6], 15, -1560198380)
-            b = md5ii(b, c, d, a, x[i + 13], 21, 1309151649)
-            a = md5ii(a, b, c, d, x[i + 4], 6, -145523070)
-            d = md5ii(d, a, b, c, x[i + 11], 10, -1120210379)
-            c = md5ii(c, d, a, b, x[i + 2], 15, 718787259)
-            b = md5ii(b, c, d, a, x[i + 9], 21, -343485551)
+	for (i = 0; i < x.length; i += 16) {
+		olda = a
+		oldb = b
+		oldc = c
+		oldd = d
 
-            a = safeAdd(a, olda)
-            b = safeAdd(b, oldb)
-            c = safeAdd(c, oldc)
-            d = safeAdd(d, oldd)
-        }
-        return [a, b, c, d]
-    }
+		a = md5ff(a, b, c, d, x[i], 7, -680876936)
+		d = md5ff(d, a, b, c, x[i + 1], 12, -389564586)
+		c = md5ff(c, d, a, b, x[i + 2], 17, 606105819)
+		b = md5ff(b, c, d, a, x[i + 3], 22, -1044525330)
+		a = md5ff(a, b, c, d, x[i + 4], 7, -176418897)
+		d = md5ff(d, a, b, c, x[i + 5], 12, 1200080426)
+		c = md5ff(c, d, a, b, x[i + 6], 17, -1473231341)
+		b = md5ff(b, c, d, a, x[i + 7], 22, -45705983)
+		a = md5ff(a, b, c, d, x[i + 8], 7, 1770035416)
+		d = md5ff(d, a, b, c, x[i + 9], 12, -1958414417)
+		c = md5ff(c, d, a, b, x[i + 10], 17, -42063)
+		b = md5ff(b, c, d, a, x[i + 11], 22, -1990404162)
+		a = md5ff(a, b, c, d, x[i + 12], 7, 1804603682)
+		d = md5ff(d, a, b, c, x[i + 13], 12, -40341101)
+		c = md5ff(c, d, a, b, x[i + 14], 17, -1502002290)
+		b = md5ff(b, c, d, a, x[i + 15], 22, 1236535329)
 
-  /*
-  * Convert an array of little-endian words to a string
-  */
-    function binl2rstr (input) {
-        var i
-        var output = ''
-        var length32 = input.length * 32
-        for (i = 0; i < length32; i += 8) {
-            output += String.fromCharCode((input[i >> 5] >>> (i % 32)) & 0xFF)
-        }
-        return output
-    }
+		a = md5gg(a, b, c, d, x[i + 1], 5, -165796510)
+		d = md5gg(d, a, b, c, x[i + 6], 9, -1069501632)
+		c = md5gg(c, d, a, b, x[i + 11], 14, 643717713)
+		b = md5gg(b, c, d, a, x[i], 20, -373897302)
+		a = md5gg(a, b, c, d, x[i + 5], 5, -701558691)
+		d = md5gg(d, a, b, c, x[i + 10], 9, 38016083)
+		c = md5gg(c, d, a, b, x[i + 15], 14, -660478335)
+		b = md5gg(b, c, d, a, x[i + 4], 20, -405537848)
+		a = md5gg(a, b, c, d, x[i + 9], 5, 568446438)
+		d = md5gg(d, a, b, c, x[i + 14], 9, -1019803690)
+		c = md5gg(c, d, a, b, x[i + 3], 14, -187363961)
+		b = md5gg(b, c, d, a, x[i + 8], 20, 1163531501)
+		a = md5gg(a, b, c, d, x[i + 13], 5, -1444681467)
+		d = md5gg(d, a, b, c, x[i + 2], 9, -51403784)
+		c = md5gg(c, d, a, b, x[i + 7], 14, 1735328473)
+		b = md5gg(b, c, d, a, x[i + 12], 20, -1926607734)
 
-  /*
-  * Convert a raw string to an array of little-endian words
-  * Characters >255 have their high-byte silently ignored.
-  */
-    function rstr2binl (input) {
-        var i
-        var output = []
-        output[(input.length >> 2) - 1] = undefined
-        for (i = 0; i < output.length; i += 1) {
-            output[i] = 0
-        }
-        var length8 = input.length * 8
-        for (i = 0; i < length8; i += 8) {
-            output[i >> 5] |= (input.charCodeAt(i / 8) & 0xFF) << (i % 32)
-        }
-        return output
-    }
+		a = md5hh(a, b, c, d, x[i + 5], 4, -378558)
+		d = md5hh(d, a, b, c, x[i + 8], 11, -2022574463)
+		c = md5hh(c, d, a, b, x[i + 11], 16, 1839030562)
+		b = md5hh(b, c, d, a, x[i + 14], 23, -35309556)
+		a = md5hh(a, b, c, d, x[i + 1], 4, -1530992060)
+		d = md5hh(d, a, b, c, x[i + 4], 11, 1272893353)
+		c = md5hh(c, d, a, b, x[i + 7], 16, -155497632)
+		b = md5hh(b, c, d, a, x[i + 10], 23, -1094730640)
+		a = md5hh(a, b, c, d, x[i + 13], 4, 681279174)
+		d = md5hh(d, a, b, c, x[i], 11, -358537222)
+		c = md5hh(c, d, a, b, x[i + 3], 16, -722521979)
+		b = md5hh(b, c, d, a, x[i + 6], 23, 76029189)
+		a = md5hh(a, b, c, d, x[i + 9], 4, -640364487)
+		d = md5hh(d, a, b, c, x[i + 12], 11, -421815835)
+		c = md5hh(c, d, a, b, x[i + 15], 16, 530742520)
+		b = md5hh(b, c, d, a, x[i + 2], 23, -995338651)
 
-  /*
-  * Calculate the MD5 of a raw string
-  */
-    function rstrMD5 (s) {
-        return binl2rstr(binlMD5(rstr2binl(s), s.length * 8))
-    }
+		a = md5ii(a, b, c, d, x[i], 6, -198630844)
+		d = md5ii(d, a, b, c, x[i + 7], 10, 1126891415)
+		c = md5ii(c, d, a, b, x[i + 14], 15, -1416354905)
+		b = md5ii(b, c, d, a, x[i + 5], 21, -57434055)
+		a = md5ii(a, b, c, d, x[i + 12], 6, 1700485571)
+		d = md5ii(d, a, b, c, x[i + 3], 10, -1894986606)
+		c = md5ii(c, d, a, b, x[i + 10], 15, -1051523)
+		b = md5ii(b, c, d, a, x[i + 1], 21, -2054922799)
+		a = md5ii(a, b, c, d, x[i + 8], 6, 1873313359)
+		d = md5ii(d, a, b, c, x[i + 15], 10, -30611744)
+		c = md5ii(c, d, a, b, x[i + 6], 15, -1560198380)
+		b = md5ii(b, c, d, a, x[i + 13], 21, 1309151649)
+		a = md5ii(a, b, c, d, x[i + 4], 6, -145523070)
+		d = md5ii(d, a, b, c, x[i + 11], 10, -1120210379)
+		c = md5ii(c, d, a, b, x[i + 2], 15, 718787259)
+		b = md5ii(b, c, d, a, x[i + 9], 21, -343485551)
 
-  /*
-  * Calculate the HMAC-MD5, of a key and some data (raw strings)
-  */
-    function rstrHMACMD5 (key, data) {
-        var i
-        var bkey = rstr2binl(key)
-        var ipad = []
-        var opad = []
-        var hash
-        ipad[15] = opad[15] = undefined
-        if (bkey.length > 16) {
-            bkey = binlMD5(bkey, key.length * 8)
-        }
-        for (i = 0; i < 16; i += 1) {
-            ipad[i] = bkey[i] ^ 0x36363636
-            opad[i] = bkey[i] ^ 0x5C5C5C5C
-        }
-        hash = binlMD5(ipad.concat(rstr2binl(data)), 512 + data.length * 8)
-        return binl2rstr(binlMD5(opad.concat(hash), 512 + 128))
-    }
+		a = safeAdd(a, olda)
+		b = safeAdd(b, oldb)
+		c = safeAdd(c, oldc)
+		d = safeAdd(d, oldd)
+	}
+	return [a, b, c, d]
+}
 
-  /*
-  * Convert a raw string to a hex string
-  */
-    function rstr2hex (input) {
-        var hexTab = '0123456789abcdef'
-        var output = ''
-        var x
-        var i
-        for (i = 0; i < input.length; i += 1) {
-            x = input.charCodeAt(i)
-            output += hexTab.charAt((x >>> 4) & 0x0F) +
-      hexTab.charAt(x & 0x0F)
-        }
-        return output
-    }
+/*
+ * Convert an array of little-endian words to a string
+ */
+function binl2rstr(input) {
+	var i
+	var output = ''
+	var length32 = input.length * 32
+	for (i = 0; i < length32; i += 8) {
+		output += String.fromCharCode((input[i >> 5] >>> (i % 32)) & 0xFF)
+	}
+	return output
+}
 
-  /*
-  * Encode a string as utf-8
-  */
-    function str2rstrUTF8 (input) {
-        return unescape(encodeURIComponent(input))
-    }
+/*
+ * Convert a raw string to an array of little-endian words
+ * Characters >255 have their high-byte silently ignored.
+ */
+function rstr2binl(input) {
+	var i
+	var output = []
+	output[(input.length >> 2) - 1] = undefined
+	for (i = 0; i < output.length; i += 1) {
+		output[i] = 0
+	}
+	var length8 = input.length * 8
+	for (i = 0; i < length8; i += 8) {
+		output[i >> 5] |= (input.charCodeAt(i / 8) & 0xFF) << (i % 32)
+	}
+	return output
+}
 
-  /*
-  * Take string arguments and return either raw or hex encoded strings
-  */
-    function rawMD5 (s) {
-        return rstrMD5(str2rstrUTF8(s))
-    }
-    function hexMD5 (s) {
-        return rstr2hex(rawMD5(s))
-    }
-    function rawHMACMD5 (k, d) {
-        return rstrHMACMD5(str2rstrUTF8(k), str2rstrUTF8(d))
-    }
-    function hexHMACMD5 (k, d) {
-        return rstr2hex(rawHMACMD5(k, d))
-    }
+/*
+ * Calculate the MD5 of a raw string
+ */
+function rstrMD5(s) {
+	return binl2rstr(binlMD5(rstr2binl(s), s.length * 8))
+}
 
-    function md5 (string, key, raw) {
-        if (!key) {
-            if (!raw) {
-                return hexMD5(string)
-            }
-            return rawMD5(string)
-        }
-        if (!raw) {
-            return hexHMACMD5(key, string)
-        }
-        return rawHMACMD5(key, string)
-    }
+/*
+ * Convert a raw string to a hex string
+ */
+function rstr2hex(input) {
+	var hexTab = '0123456789abcdef'
+	var output = ''
+	var x
+	var i
+	for (i = 0; i < input.length; i += 1) {
+		x = input.charCodeAt(i)
+		output += hexTab.charAt((x >>> 4) & 0x0F) +
+			hexTab.charAt(x & 0x0F)
+	}
+	return output
+}
 
-    if (true) {
-        !(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
-            return md5
-        }.call(exports, __webpack_require__, exports, module),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
-    } else if (typeof module === 'object' && module.exports) {
-        module.exports = md5
-    } else {
-        $.md5 = md5
-    }
-}(this))
+/*
+ * Encode a string as utf-8
+ */
+function str2rstrUTF8(input) {
+	return unescape(encodeURIComponent(input))
+}
+
+/*
+ * Take string arguments and return either raw or hex encoded strings
+ */
+function rawMD5(s) {
+	return rstrMD5(str2rstrUTF8(s))
+}
+
+function hexMD5(s) {
+	return rstr2hex(rawMD5(s))
+}
+
+module.exports = hexMD5
 
 /***/ })
 /******/ ]);

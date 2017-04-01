@@ -35,73 +35,70 @@ import {_$} from './utils';
 //
 // TODO Through my own tests, I find actually Chrome can sanitize the file path
 // automatically but there are no API found for it though?
-var filenameSanitize = (function () {
-    var illegalRe = /[\/\?<>\\:\*\|":~]/g;
-    var controlRe = /[\x00-\x1f\x80-\x9f]/g;
-    var reservedRe = /^\.+$/;
-    var windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
+const illegalRe = /[\/\?<>\\:\*\|":~]/g;
+const controlRe = /[\x00-\x1f\x80-\x9f]/g;
+const reservedRe = /^\.+$/;
+const windowsReservedRe = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
 
-    // Truncate string by size in bytes
-    function truncate(str, maxByteSize) {
-        var strLen = str.length,
-            curByteSize = 0,
-            codePoint = -1;
+// Truncate string by size in bytes
+function truncate(str, maxByteSize) {
+    let strLen = str.length,
+        curByteSize = 0,
+        codePoint = -1;
 
-        for (var i = 0; i < strLen; i++) {
-            codePoint = str.charCodeAt(i);
+    for (let i = 0; i < strLen; i++) {
+        codePoint = str.charCodeAt(i);
 
-            // handle 4-byte non-BMP chars
-            // low surrogate
-            if (codePoint >= 0xdc00 && codePoint <= 0xdfff) {
-                // when parsing previous hi-surrogate, 3 is added to curByteSize
-                curByteSize++;
-                if (curByteSize > maxByteSize) {
-                    return str.substring(0, i - 1);
-                }
-
-                continue;
-            }
-
-            if (codePoint <= 0x7f) {
-                curByteSize++;
-            } else if (codePoint >= 0x80 && codePoint <= 0x7ff) {
-                curByteSize += 2;
-            } else if (codePoint >= 0x800 && codePoint <= 0xffff) {
-                curByteSize += 3;
-            }
-
+        // handle 4-byte non-BMP chars
+        // low surrogate
+        if (codePoint >= 0xdc00 && codePoint <= 0xdfff) {
+            // when parsing previous hi-surrogate, 3 is added to curByteSize
+            curByteSize++;
             if (curByteSize > maxByteSize) {
-                return str.substring(0, i);
+                return str.substring(0, i - 1);
             }
+            continue;
         }
 
-        // never exceeds the upper limit
-        return str;
-    }
-
-    function sanitize(input, replacement, max) {
-        var sanitized = input
-            .replace(illegalRe, replacement)
-            .replace(controlRe, replacement)
-            .replace(reservedRe, replacement)
-            .replace(windowsReservedRe, replacement);
-        return truncate(sanitized, max);
-    }
-
-    return function (input, options) {
-        var replacement = (options && options.replacement) || '';
-        var max = (options && options.max && (options.max < 255)) ? options.max : 255;
-        var output = sanitize(input, replacement, max);
-        if (replacement === '') {
-            return output;
+        if (codePoint <= 0x7f) {
+            curByteSize++;
+        } else if (codePoint >= 0x80 && codePoint <= 0x7ff) {
+            curByteSize += 2;
+        } else if (codePoint >= 0x800 && codePoint <= 0xffff) {
+            curByteSize += 3;
         }
-        return sanitize(output, '');
-    };
-})();
+
+        if (curByteSize > maxByteSize) {
+            return str.substring(0, i);
+        }
+    }
+
+    // never exceeds the upper limit
+    return str;
+}
+
+function sanitize(input, replacement, max) {
+    const sanitized = input
+        .replace(illegalRe, replacement)
+        .replace(controlRe, replacement)
+        .replace(reservedRe, replacement)
+        .replace(windowsReservedRe, replacement);
+    return truncate(sanitized, max);
+}
+
+var filenameSanitize = function (input, options) {
+    const replacement = (options && options.replacement) || '';
+    const max = (options && options.max && (options.max < 255)) ? options.max : 255;
+    const output = sanitize(input, replacement, max);
+    if (replacement === '') {
+        return output;
+    }
+    return sanitize(output, '');
+};
 
 export function getNiceSectionFilename(avid, page, totalPage, idx, numParts, videoInfo) {
     // TODO inspect the page to get better section name
-    var idName = 'av' + avid,
+    let idName = 'av' + avid,
         // page/part name is only shown when there are more than one pages/parts
         pageIdName = (totalPage && (totalPage > 1)) ? ('p' + page) : "",
         pageName = "",
@@ -127,7 +124,7 @@ export function getDownloadOptions(url, filename) {
     // Parsing the url should be ok in most cases, but the best way should
     // use MIME types and tentative file names returned by server. Not
     // feasible at this stage.
-    var resFn = null,
+    let resFn = null,
         fileBaseName = url.split(/[\\/]/).pop().split('?')[0],
         // arbitrarily default to "mp4" for no better reason...
         fileExt = fileBaseName.match(/[.]/) ? fileBaseName.match(/[^.]+$/) : 'mp4';
