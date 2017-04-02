@@ -11,6 +11,7 @@ const commentsHistorySection = async(cid, element, changeComments) => {
         return e
     }
     let date = new Date();
+    if (!(rolldate && rolldate.length > 0)) return false;
     dmrollUI.innerHTML = `<option value="${location.protocol}//comment.bilibili.com/${cid}.xml" selected="selected">历史弹幕：现在</option>` + rolldate.map(e => `<option value="${location.protocol + '//comment.bilibili.com/dmroll,' + e.timestamp + ',' + cid}">历史弹幕：${(date.setTime(parseInt(e.timestamp) * 1000, 10)) && date.toLocaleDateString()}，新增${e.new}条</option>`).join('');
     dmrollUI.onchange = event => changeComments(dmrollUI.selectedOptions[0].value);
     element.empty().appendChild(dmrollUI);

@@ -199,7 +199,7 @@ import sendComment from './sendComment';
         commentQuerySection(biliHelper.comments, biliHelper.mainBlock.querySection.find('p'));
         if (biliHelper.switcher.cmManager) comment.ccl.forEach(cmt => biliHelper.switcher.cmManager.insert(cmt));
     };
-    commentsHistorySection(cid, biliHelper.mainBlock.historySection.find('p'), changeComments);
+    commentsHistorySection(cid, biliHelper.mainBlock.historySection.find('p'), changeComments).then(event => (event !== true) && biliHelper.mainBlock.historySection.hide());
 
     // video player switcher begin
     const restartVideo = video => !video.paused && !video.pause() && !video.play();

@@ -506,6 +506,7 @@ const commentsHistorySection = async(cid, element, changeComments) => {
         return e
     }
     let date = new Date();
+    if (!(rolldate && rolldate.length > 0)) return false;
     dmrollUI.innerHTML = `<option value="${location.protocol}//comment.bilibili.com/${cid}.xml" selected="selected">历史弹幕：现在</option>` + rolldate.map(e => `<option value="${location.protocol + '//comment.bilibili.com/dmroll,' + e.timestamp + ',' + cid}">历史弹幕：${(date.setTime(parseInt(e.timestamp) * 1000, 10)) && date.toLocaleDateString()}，新增${e.new}条</option>`).join('');
     dmrollUI.onchange = event => changeComments(dmrollUI.selectedOptions[0].value);
     element.empty().appendChild(dmrollUI);
@@ -1471,7 +1472,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__commentQuerySection__["a" /* default */])(biliHelper.comments, biliHelper.mainBlock.querySection.find('p'));
         if (biliHelper.switcher.cmManager) comment.ccl.forEach(cmt => biliHelper.switcher.cmManager.insert(cmt));
     };
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__commentsHistorySection__["a" /* default */])(cid, biliHelper.mainBlock.historySection.find('p'), changeComments);
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__commentsHistorySection__["a" /* default */])(cid, biliHelper.mainBlock.historySection.find('p'), changeComments).then(event => (event !== true) && biliHelper.mainBlock.historySection.hide());
 
     // video player switcher begin
     const restartVideo = video => !video.paused && !video.pause() && !video.play();
