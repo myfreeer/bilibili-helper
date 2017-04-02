@@ -1,7 +1,6 @@
 // require external libs
-import {bilibiliVideoInfoProvider,bilibiliBangumiVideoInfoProvider} from './bilibiliVideoInfoProvider';
-import {parseSafe, parseTime, mySendMessage, parseXmlSafe, fetchretry, storageGet, _$, $h, getCookie, findPosTop} from './utils';
-import commentSenderQuery from './commentSenderQuery';
+import {bilibiliVideoInfoProvider, bilibiliBangumiVideoInfoProvider} from './bilibiliVideoInfoProvider';
+import {parseTime, mySendMessage, parseXmlSafe, fetchretry, storageGet, _$, $h, getCookie, findPosTop} from './utils';
 import commentQuerySection from './commentQuerySection';
 import commentsHistorySection from './commentsHistorySection';
 import bilibiliVideoProvider from './bilibiliVideoProvider';
@@ -11,18 +10,18 @@ import genPageFunc from './genPageFunc';
 import addTitleLink from './addTitleLink';
 import sendComment from './sendComment';
 
-//main func
+// main func
 (async function() {
     const url = location.href;
     let avid, page, epid, cid, videoInfo, videoLink, options, isBangumi, genPage;
-    //preload options
+    // preload options
     const _options = storageGet();
-    //prevent offical html5 autoload
+    // prevent offical html5 autoload
     localStorage.removeItem('defaulth5');
 
-    //get video info
+    // get video info
     switch (location.hostname) {
-    case 'www.bilibili.com':
+    case 'www.bilibili.com': {
         const _avid = url.match(/bilibili.com\/video\/av([0-9]+)/);
         if (!_avid) return console.warn('cannot match avid');
         avid = url.match(/bilibili.com\/video\/av([0-9]+)/)[1];
@@ -30,7 +29,8 @@ import sendComment from './sendComment';
         page = _page ? _page[1] : 1;
         videoInfo = await bilibiliVideoInfoProvider(avid, page);
         break;
-    case 'bangumi.bilibili.com':
+    }
+    case 'bangumi.bilibili.com': {
         const hash = location.hash;
         epid = hash.length > 1 && hash.match(/^\#[0-9]+$/) && hash.substr(1);
         const _epid = url.match(/bangumi.bilibili.com\/anime\/v\/([0-9]+)/);
@@ -41,6 +41,7 @@ import sendComment from './sendComment';
         page = Number(videoInfo.currentPage);
         isBangumi = true;
         break;
+    }
     default:
         return;
     }
@@ -53,34 +54,34 @@ import sendComment from './sendComment';
 
     // preload comments
     comment.url = `${location.protocol}//comment.bilibili.com/${cid}.xml`;
-    comment._xml = fetchretry(comment.url).then(res => res.text()).then(text => parseXmlSafe(text));
+    comment._xml = fetchretry(comment.url).then((res) => res.text()).then((text) => parseXmlSafe(text));
     options = await _options;
 
     const videoPic = videoInfo.pic || (_$('img.cover_image') && _$('img.cover_image').attr('src'));
-    //genPage func
+    // genPage func
     if (!_$('.b-page-body')) genPage = decodeURIComponent(getCookie('redirectUrl'));
     if (_$('.b-page-body .z-msg') > 0 && _$('.b-page-body .z-msg').text().indexOf('版权') > -1) genPage = 1;
     if (genPage) await genPageFunc(cid, videoInfo, genPage);
 
-    //addTitleLink func
+    // addTitleLink func
     _$('.viewbox .info .v-title h1').html(addTitleLink(_$('.viewbox .info .v-title h1').attr('title'), options.rel_search));
     const titleNumbers = document.getElementsByClassName('titleNumber');
-    if (titleNumbers.length > 0) titleNumbers.forEach(el => {
-        el.append($h('<div class="popuptext">\u70b9\u51fb\u641c\u7d22\u76f8\u5173\u89c6\u9891\uff1a<br /><a target="_blank" href="http://www.bilibili.com/search?orderby=default&keyword=' + encodeURIComponent(el.attr("previous")) + '">' + el.attr("previous") + '</a><br /><a target="_blank" href="http://www.bilibili.com/search?orderby=ranklevel&keyword=' + encodeURIComponent(el.attr("next")) + '">' + el.attr("next") + '</a></div>'));
-        el.on('click', e => el.find('.popuptext').classList.toggle("show"));
+    if (titleNumbers.length > 0) titleNumbers.forEach((el) => {
+        el.append($h('<div class="popuptext">\u70b9\u51fb\u641c\u7d22\u76f8\u5173\u89c6\u9891\uff1a<br /><a target="_blank" href="http://www.bilibili.com/search?orderby=default&keyword=' + encodeURIComponent(el.attr('previous')) + '">' + el.attr('previous') + '</a><br /><a target="_blank" href="http://www.bilibili.com/search?orderby=ranklevel&keyword=' + encodeURIComponent(el.attr('next')) + '">' + el.attr('next') + '</a></div>'));
+        el.on('click', () => el.find('.popuptext').classList.toggle('show'));
         el.parentNode.style.overflow = 'visible';
         el.parentNode.parentNode.style.overflow = 'visible';
         el.parentNode.parentNode.parentNode.style.overflow = 'visible';
     });
 
-    //some ui code from original helper
-    let biliHelper = $h(isBangumi && !genPage ? "<div class=\"v1-bangumi-info-btn helper\" id=\"bilibili_helper\"><span class=\"t\">哔哩哔哩助手</span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.runtime.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>" : "<div class=\"block helper\" id=\"bilibili_helper\"><span class=\"t\"><div class=\"icon\"></div><div class=\"t-right\"><span class=\"t-right-top middle\">助手</span><span class=\"t-right-bottom\">扩展菜单</span></div></span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.runtime.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>");
+    // some ui code from original helper
+    let biliHelper = $h(isBangumi && !genPage ? '<div class="v1-bangumi-info-btn helper" id="bilibili_helper"><span class="t">哔哩哔哩助手</span><div class="info"><div class="main"></div><div class="version">哔哩哔哩助手 ' + chrome.runtime.getManifest().version + '<a class="setting b-btn w" href="' + chrome.runtime.getURL('options.html') + '" target="_blank">设置</a></div></div></div>' : '<div class="block helper" id="bilibili_helper"><span class="t"><div class="icon"></div><div class="t-right"><span class="t-right-top middle">助手</span><span class="t-right-bottom">扩展菜单</span></div></span><div class="info"><div class="main"></div><div class="version">哔哩哔哩助手 ' + chrome.runtime.getManifest().version + '<a class="setting b-btn w" href="' + chrome.runtime.getURL('options.html') + '" target="_blank">设置</a></div></div></div>');
     biliHelper.find('.t').onclick = () => biliHelper.toggleClass('active');
     biliHelper.blockInfo = biliHelper.find('.info');
     biliHelper.mainBlock = biliHelper.find('.main');
     biliHelper.mainBlock.infoSection = $h('<div class="section video hidden"><h3>视频信息</h3><p><span></span><span>aid: ' + avid + '</span><span>pg: ' + page + '</span></p></div>');
     biliHelper.mainBlock.append(biliHelper.mainBlock.infoSection);
-    biliHelper.mainBlock.ondblclick = e => e.shiftKey && biliHelper.mainBlock.infoSection.toggleClass('hidden');
+    biliHelper.mainBlock.ondblclick = (e) => e.shiftKey && biliHelper.mainBlock.infoSection.toggleClass('hidden');
     if (genPage && genPage.match && genPage.match('http')) {
         biliHelper.mainBlock.redirectSection = $h('<div class="section redirect">生成页选项: <a class="b-btn w" href="' + genPage + '">前往原始跳转页</a></div>');
         biliHelper.mainBlock.append(biliHelper.mainBlock.redirectSection);
@@ -95,7 +96,7 @@ import sendComment from './sendComment';
     biliHelper.mainBlock.speedSection.rotate.step = 90;
     biliHelper.mainBlock.switcherSection = $h('<div class="section switcher"><h3>播放器切换</h3></div>');
     biliHelper.mainBlock.switcherSection.button = $h('<p><a class="b-btn w" type="original">原始播放器</a><a class="b-btn w" type="bilih5">原始HTML5</a><a class="b-btn w hidden" type="bilimac">Mac 客户端</a><a class="b-btn w hidden" type="swf">SWF 播放器</a><a class="b-btn w hidden" type="iframe">Iframe 播放器</a><a class="b-btn w hidden" type="html5">HTML5超清</a><a class="b-btn w hidden" type="html5hd">HTML5高清</a><a class="b-btn w hidden" type="html5ld">HTML5低清</a></p>');
-    biliHelper.mainBlock.switcherSection.button.onclick = e => biliHelper.switcher[e.target.attr('type')]();
+    biliHelper.mainBlock.switcherSection.button.onclick = (e) => biliHelper.switcher[e.target.attr('type')]();
     biliHelper.mainBlock.switcherSection.append(biliHelper.mainBlock.switcherSection.button);
     if (genPage) {
         biliHelper.mainBlock.switcherSection.find('a[type="original"]').addClass('hidden');
@@ -124,15 +125,15 @@ import sendComment from './sendComment';
 
     // process video links
     videoLink = await _videoLink;
-    //follow ws video url redircet
-    for (let i in videoLink.hd) if (videoLink.hd[i].match('ws.acgvideo.com')) fetch(videoLink.hd[i], {method: 'head'}).then(resp => resp.ok && (videoLink.hd[i] = resp.url));
-    for (let i in videoLink.ld) if (videoLink.ld[i].match('ws.acgvideo.com')) fetch(videoLink.ld[i], {method: 'head'}).then(resp => resp.ok && (videoLink.ld[i] = resp.url));
+    // follow ws video url redircet
+    for (let i in videoLink.hd) if (videoLink.hd[i].match('ws.acgvideo.com')) fetch(videoLink.hd[i], {method: 'head'}).then((resp) => resp.ok && (videoLink.hd[i] = resp.url));
+    for (let i in videoLink.ld) if (videoLink.ld[i].match('ws.acgvideo.com')) fetch(videoLink.ld[i], {method: 'head'}).then((resp) => resp.ok && (videoLink.ld[i] = resp.url));
 
-    //downloaderSection code
+    // downloaderSection code
     const clickDownLinkElementHandler = async(event) => !event.preventDefault() && await mySendMessage({
         command: 'requestForDownload',
         url: event.target.attr('href'),
-        filename: event.target.attr('download')
+        filename: event.target.attr('download'),
     });
     const createDownLinkElement = (segmentInfo, index) => {
         const downloadOptions = getDownloadOptions(segmentInfo.url, getNiceSectionFilename(avid, page, videoInfo.pages || 1, index, videoLink.mediaDataSource.segments.length, videoInfo));
@@ -150,7 +151,7 @@ import sendComment from './sendComment';
     if (videoLink.mediaDataSource.segments.length > 1) {
         let bhDownAllLink = $h(`<a class="b-btn">下载全部${videoLink.mediaDataSource.segments.length}个分段</a>`);
         biliHelper.mainBlock.downloaderSection.find('p').append(bhDownAllLink);
-        bhDownAllLink.onclick = () => biliHelper.mainBlock.downloaderSection.findAll('p .b-btn.w').each(e => e.click());
+        bhDownAllLink.onclick = () => biliHelper.mainBlock.downloaderSection.findAll('p .b-btn.w').each((e) => e.click());
     }
     biliHelper.mainBlock.downloaderSection.find('p').append($h('<a class="b-btn" target="_blank" title="实验性功能，由bilibilijj提供，访问慢且不稳定" href="http://www.bilibilijj.com/Files/DownLoad/' + cid + '.mp3/www.bilibilijj.com.mp3?mp3=true">音频</a>'));
     biliHelper.mainBlock.downloaderSection.find('p').append($h('<a class="b-btn" target="_blank" href="' + videoPic + '">封面</a>'));
@@ -169,18 +170,18 @@ import sendComment from './sendComment';
     biliHelper.mainBlock.append(biliHelper.mainBlock.commentSection);
     comment.xml = await comment._xml;
     let assData;
-    const clickAssBtnHandler = event => {
+    const clickAssBtnHandler = (event) => {
         event.preventDefault();
         if (!assData) assData = xml2ass(comment.xml, {
             'title': getNiceSectionFilename(avid, page, videoInfo.pages || 1, 1, 1, videoInfo),
             'ori': location.href,
-            'opacity': options.opacity || 0.75
+            'opacity': options.opacity || 0.75,
         });
         const assBlob = new Blob([assData], {type: 'application/octet-stream'}),
             assUrl = window.URL.createObjectURL(assBlob);
         event.target.href = assUrl;
         clickDownLinkElementHandler(event);
-        document.addEventListener('unload',  () => window.URL.revokeObjectURL(assUrl));
+        document.addEventListener('unload', () => window.URL.revokeObjectURL(assUrl));
     };
     let assBtn = $h(`<a class="b-btn w" download="${biliHelper.downloadFileName.replace('.xml', '.ass')}" href>下载 ASS 格式弹幕</a>`);
     assBtn.onclick = clickAssBtnHandler;
@@ -192,32 +193,33 @@ import sendComment from './sendComment';
     commentQuerySection(biliHelper.comments, biliHelper.mainBlock.querySection.find('p'));
     const changeComments = async(url) => {
         comment.url = url;
-        comment._xml = fetchretry(comment.url).then(res => res.text()).then(text => parseXmlSafe(text));
+        comment._xml = fetchretry(comment.url).then((res) => res.text()).then((text) => parseXmlSafe(text));
         comment.xml = await comment._xml;
         biliHelper.comments = comment.xml.getElementsByTagName('d');
         comment.ccl = BilibiliParser(comment.xml);
         commentQuerySection(biliHelper.comments, biliHelper.mainBlock.querySection.find('p'));
-        if (biliHelper.switcher.cmManager) comment.ccl.forEach(cmt => biliHelper.switcher.cmManager.insert(cmt));
+        biliHelper.mainBlock.commentSection.find('a[download*=xml]').href = comment.url;
+        if (biliHelper.switcher.cmManager) comment.ccl.forEach((cmt) => biliHelper.switcher.cmManager.insert(cmt));
     };
-    commentsHistorySection(cid, biliHelper.mainBlock.historySection.find('p'), changeComments).then(event => (event !== true) && biliHelper.mainBlock.historySection.hide());
+    commentsHistorySection(cid, biliHelper.mainBlock.historySection.find('p'), changeComments).then((event) => (event !== true) && biliHelper.mainBlock.historySection.hide());
 
     // video player switcher begin
-    const restartVideo = video => !video.paused && !video.pause() && !video.play();
-    const mirrorAndRotateHandler = e => {
+    const restartVideo = (video) => !video.paused && !video.pause() && !video.play();
+    const mirrorAndRotateHandler = (e) => {
         biliHelper.mainBlock.speedSection.rotate.value %= 360;
         let transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg)';
-        if (e.target == biliHelper.mainBlock.speedSection.mirror) {
-        	if (e.target.hasClass('w')) transform += 'matrix(-1, 0, 0, 1, 0, 0)';
-        	e.target.toggleClass('w');
+        if (e.target === biliHelper.mainBlock.speedSection.mirror) {
+            if (e.target.hasClass('w')) transform += 'matrix(-1, 0, 0, 1, 0, 0)';
+            e.target.toggleClass('w');
         } else if (!biliHelper.mainBlock.speedSection.mirror.hasClass('w')) transform += 'matrix(-1, 0, 0, 1, 0, 0)';
         biliHelper.switcher.video.style.transform = transform;
     };
     biliHelper.switcher = {
-        current: "original",
+        current: 'original',
         inited: false,
-        _init: function (video) {
+        _init: function(video) {
             this.video = video;
-            biliHelper.mainBlock.speedSection.input.on("change", e => {
+            biliHelper.mainBlock.speedSection.input.on('change', (e) => {
                 if (Number(e.target.value)) {
                     biliHelper.switcher.video.playbackRate = Number(e.target.value);
                     restartVideo(biliHelper.switcher.video);
@@ -225,52 +227,52 @@ import sendComment from './sendComment';
                     e.target.value = 1.0;
                 }
             });
-            biliHelper.mainBlock.speedSection.rotate.on("change", mirrorAndRotateHandler);
-            biliHelper.mainBlock.speedSection.mirror.on("click", mirrorAndRotateHandler);
+            biliHelper.mainBlock.speedSection.rotate.on('change', mirrorAndRotateHandler);
+            biliHelper.mainBlock.speedSection.mirror.on('click', mirrorAndRotateHandler);
             this.inited = 1;
         },
-        bind: function (video) {
+        bind: function(video) {
             this.video = video;
-            video.on("loadedmetadata", e => biliHelper.mainBlock.speedSection.res.innerText = '分辨率: ' + e.target.videoWidth + "x" + e.target.videoHeight);
+            video.on('loadedmetadata', (e) => biliHelper.mainBlock.speedSection.res.innerText = '分辨率: ' + e.target.videoWidth + 'x' + e.target.videoHeight);
             if (!this.inited) this._init(video);
             biliHelper.mainBlock.speedSection.removeClass('hidden');
         },
-        unbind: function () {
+        unbind: function() {
             this.video = null;
             biliHelper.mainBlock.speedSection.addClass('hidden');
         },
-        set: function (newMode) {
+        set: function(newMode) {
             biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + this.current + '"]').addClass('w');
             biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + newMode + '"]').removeClass('w');
             localStorage.removeItem('defaulth5');
-            if (this.current == 'html5' && this.flvPlayer) this.flvPlayer.destroy();
+            if (this.current === 'html5' && this.flvPlayer) this.flvPlayer.destroy();
             if (this.checkFinished) clearInterval(this.checkFinished);
             if (this.interval) clearInterval(this.interval);
             if (this.cmManager) this.cmManager = null;
             if (!newMode.match('html5')) this.unbind();
-            biliHelper.mainBlock.speedSection.res.innerText = "";
+            biliHelper.mainBlock.speedSection.res.innerText = '';
             biliHelper.mainBlock.speedSection.input.onchange = null;
             biliHelper.mainBlock.speedSection.input.value = 1.0;
             this.current = newMode;
         },
-        original: function () {
+        original: function() {
             this.set('original');
             _$('#bofqi').html(biliHelper.originalPlayer);
-            if (_$('#bofqi object').attr('width') == 950) _$('#bofqi object').setAttribute('width', 980);
+            if (_$('#bofqi object').attr('width') === 950) _$('#bofqi object').setAttribute('width', 980);
         },
-        swf: function () {
+        swf: function() {
             this.set('swf');
-            _$('#bofqi').html('<object type="application/x-shockwave-flash" class="player" data="https://static-s.bilibili.com/play.swf" id="player_placeholder" style="visibility: visible;"><param name="allowfullscreeninteractive" value="true"><param name="allowfullscreen" value="true"><param name="quality" value="high"><param name="allowscriptaccess" value="always"><param name="wmode" value="opaque"><param name="flashvars" value="cid=' + cid + '&aid=' + avid + '"></object>');
+            _$('#bofqi').html(`<object type="application/x-shockwave-flash" class="player" data="https://static-s.bilibili.com/play.swf" id="player_placeholder" style="visibility: visible;"><param name="allowfullscreeninteractive" value="true"><param name="allowfullscreen" value="true"><param name="quality" value="high"><param name="allowscriptaccess" value="always"><param name="wmode" value="opaque"><param name="flashvars" value="cid=${cid}&aid=${avid}"></object>`);
         },
-        iframe: function () {
+        iframe: function() {
             this.set('iframe');
-            _$('#bofqi').html('<iframe height="536" width="980" class="player" src="https://secure.bilibili.com/secure,cid=' + cid + '&aid=' + avid + '" scrolling="no" border="0" frameborder="no" framespacing="0" onload="window.securePlayerFrameLoaded=true"></iframe>');
+            _$('#bofqi').html(`<iframe height="536" width="980" class="player" src="https://secure.bilibili.com/secure,cid=${cid}&aid=${avid}" scrolling="no" border="0" frameborder="no" framespacing="0" onload="window.securePlayerFrameLoaded=true"></iframe>`);
         },
-        bilih5: function () {
+        bilih5: function() {
             this.set('bilih5');
-            _$('#bofqi').html('<iframe height="536" width="980" class="player" src="//www.bilibili.com/html/html5player.html?cid=' + cid + '&aid=' + avid + '" scrolling="no" border="0" frameborder="no" framespacing="0"></iframe>');
+            _$('#bofqi').html(`<iframe height="536" width="980" class="player" src="//www.bilibili.com/html/html5player.html?cid=${cid}&aid=${avid}" scrolling="no" border="0" frameborder="no" framespacing="0"></iframe>`);
         },
-        html5: function (type) {
+        html5: function(type) {
             let html5VideoUrl;
             switch (type) {
             case 'html5ld':
@@ -284,47 +286,47 @@ import sendComment from './sendComment';
             default:
                 this.set('html5');
                 html5VideoUrl = videoLink.hd[0];
-                if (videoLink.mediaDataSource.type === 'mp4') return console.warn('No Flv urls available, switch back to html5 hd',biliHelper.switcher.html5hd());
+                if (videoLink.mediaDataSource.type === 'mp4') return console.warn('No Flv urls available, switch back to html5 hd', biliHelper.switcher.html5hd());
             }
             _$('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + videoPic + '" crossorigin="anonymous"><source src="' + html5VideoUrl + '" type="video/mp4"></video></div>');
-            let abp = ABP.create(document.getElementById("bilibili_helper_html5_player"), {
+            let abp = ABP.create(document.getElementById('bilibili_helper_html5_player'), {
                 src: {
                     playlist: [{
-                        video: document.getElementById("bilibili_helper_html5_player_video"),
-                        comments: comment.ccl
-                    }]
+                        video: document.getElementById('bilibili_helper_html5_player_video'),
+                        comments: comment.ccl,
+                    }],
                 },
-                width: "100%",
-                height: "100%",
-                config: options
+                width: '100%',
+                height: '100%',
+                config: options,
             });
-            abp.playerUnit.addEventListener("wide", () => _$("#bofqi").addClass("wide"));
-            abp.playerUnit.addEventListener("normal", () => _$("#bofqi").removeClass("wide"));
-            abp.playerUnit.addEventListener("sendcomment", function (e) {
+            abp.playerUnit.addEventListener('wide', () => _$('#bofqi').addClass('wide'));
+            abp.playerUnit.addEventListener('normal', () => _$('#bofqi').removeClass('wide'));
+            abp.playerUnit.addEventListener('sendcomment', function(e) {
                 const commentId = e.detail.id,
                     commentData = e.detail;
                 delete e.detail.id;
-                sendComment(avid, cid, page, commentData).then(function (response) {
+                sendComment(avid, cid, page, commentData).then(function(response) {
                     response.tmp_id = commentId;
                     abp.commentCallback(response);
                 });
             });
-            abp.playerUnit.addEventListener("saveconfig",  e => e.detail && Object.assign(options, e.detail) && chrome.storage.local.set(options));
+            abp.playerUnit.addEventListener('saveconfig', (e) => e.detail && Object.assign(options, e.detail) && chrome.storage.local.set(options));
             this.bind(abp.video);
             this.cmManager = abp.cmManager;
             if (type && type.match(/hd|ld/)) return abp;
             this.flvPlayer = flvjs.createPlayer(videoLink.mediaDataSource);
-            biliHelper.switcher.interval = setInterval(function () {
+            biliHelper.switcher.interval = setInterval(function() {
                 if (abp.commentObjArray && biliHelper.switcher.flvPlayer) {
                     clearInterval(biliHelper.switcher.interval);
                     biliHelper.switcher.flvPlayer.attachMediaElement(abp.video);
                     biliHelper.switcher.flvPlayer.load();
-                    biliHelper.switcher.flvPlayer.on(flvjs.Events.ERROR, e => console.warn(e, 'Switch back to HTML5 HD.', biliHelper.switcher.html5hd()));
-                    biliHelper.switcher.flvPlayer.on(flvjs.Events.MEDIA_INFO, e => console.log('分辨率: ' + e.width + "x" + e.height + ', FPS: ' + e.fps, '视频码率: ' + Math.round(e.videoDataRate * 100) / 100, '音频码率: ' + Math.round(e.audioDataRate * 100) / 100));
+                    biliHelper.switcher.flvPlayer.on(flvjs.Events.ERROR, (e) => console.warn(e, 'Switch back to HTML5 HD.', biliHelper.switcher.html5hd()));
+                    biliHelper.switcher.flvPlayer.on(flvjs.Events.MEDIA_INFO, (e) => console.log('分辨率: ' + e.width + 'x' + e.height + ', FPS: ' + e.fps, '视频码率: ' + Math.round(e.videoDataRate * 100) / 100, '音频码率: ' + Math.round(e.audioDataRate * 100) / 100));
                 }
             }, 100);
             let lastTime;
-            biliHelper.switcher.checkFinished = setInterval(function () {
+            biliHelper.switcher.checkFinished = setInterval(function() {
                 if (abp.video.currentTime !== lastTime) {
                     lastTime = abp.video.currentTime;
                 } else {
@@ -333,16 +335,16 @@ import sendComment from './sendComment';
                         if (!abp.video.loop) {
                             abp.video.pause();
                             setTimeout(abp.video.pause, 200);
-                            document.querySelector('.button.ABP-Play.ABP-Pause.icon-pause').className = "button ABP-Play icon-play";
+                            document.querySelector('.button.ABP-Play.ABP-Pause.icon-pause').className = 'button ABP-Play icon-play';
                         }
                     }
                 }
             }, 200);
         },
-        html5hd: function () {
+        html5hd: function() {
             this.set('html5hd');
             let abp = biliHelper.switcher.html5('html5hd');
-            const hdErrorHandler = e => {
+            const hdErrorHandler = (e) => {
                 if (e.toString().match('request was interrupted by a call')) throw e;
                 if (videoLink.hd.length > 1) {
                     console.warn(e, 'HTML5 HD Error, try another link...');
@@ -353,10 +355,10 @@ import sendComment from './sendComment';
             abp.video.querySelector('source').on('error', hdErrorHandler);
             abp.video.on('error', hdErrorHandler);
         },
-        html5ld: function () {
+        html5ld: function() {
             this.set('html5ld');
             let abp = biliHelper.switcher.html5('html5ld');
-            const ldErrorHandler = e => {
+            const ldErrorHandler = (e) => {
                 if (e.toString().match('request was interrupted by a call')) throw e;
                 if (videoLink.ld.length > 1) {
                     console.warn(e, 'HTML5 LD Error, try another link...');
@@ -367,7 +369,7 @@ import sendComment from './sendComment';
             abp.video.querySelector('source').on('error', ldErrorHandler);
             abp.video.on('error', ldErrorHandler);
         },
-        bilimac: function () {
+        bilimac: function() {
             this.set('bilimac');
             _$('#bofqi').html('<div id="player_placeholder" class="player"></div><div id="loading-notice">正在加载 Bilibili Mac 客户端…</div>');
             _$('#bofqi').find('#player_placeholder').style.cssText =
@@ -375,13 +377,13 @@ import sendComment from './sendComment';
                 -webkit-filter: blur(20px);
                 overflow: hidden;
                 visibility: visible;`;
-            fetch("http://localhost:23330/rpc", {
-                method: "POST",
-                headers: {"Content-Type": "application/x-www-form-urlencoded"},
-                body: `action=playVideoByCID&data=${cid}|${window.location.href}|${document.title}|1`
-            }).then(res => res.ok && _$('#bofqi').find('#loading-notice').text('已在 Bilibili Mac 客户端中加载'))
-                .catch(e => _$('#bofqi').find('#loading-notice').text('调用 Bilibili Mac 客户端失败 :('));
-        }
+            fetch('http://localhost:23330/rpc', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `action=playVideoByCID&data=${cid}|${window.location.href}|${document.title}|1`,
+            }).then((res) => res.ok && _$('#bofqi').find('#loading-notice').text('已在 Bilibili Mac 客户端中加载'))
+                .catch(() => _$('#bofqi').find('#loading-notice').text('调用 Bilibili Mac 客户端失败 :('));
+        },
     };
     biliHelper.switcher[options.player]();
 })();

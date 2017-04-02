@@ -1,7 +1,6 @@
 // adapted from https://github.com/parshap/node-sanitize-filename/blob/master/index.js
 // remove node "Buffer" to work in browser.
 'use strict';
-import {_$} from './utils';
 /**
  * Replaces characters in strings that are illegal/unsafe for filenames.
  * Unsafe characters are either removed or replaced by a substitute set
@@ -86,7 +85,7 @@ function sanitize(input, replacement, max) {
     return truncate(sanitized, max);
 }
 
-var filenameSanitize = function (input, options) {
+let filenameSanitize = function(input, options) {
     const replacement = (options && options.replacement) || '';
     const max = (options && options.max && (options.max < 255)) ? options.max : 255;
     const output = sanitize(input, replacement, max);
@@ -100,9 +99,9 @@ export function getNiceSectionFilename(avid, page, totalPage, idx, numParts, vid
     // TODO inspect the page to get better section name
     let idName = 'av' + avid,
         // page/part name is only shown when there are more than one pages/parts
-        pageIdName = (totalPage && (totalPage > 1)) ? ('p' + page) : "",
-        pageName = "",
-        partIdName = (numParts && (numParts > 1)) ? ('' + idx) : "";
+        pageIdName = (totalPage && (totalPage > 1)) ? ('p' + page) : '',
+        pageName = '',
+        partIdName = (numParts && (numParts > 1)) ? ('' + idx) : '';
 
     // try to find a good page name
     if (pageIdName) {
@@ -134,8 +133,8 @@ export function getDownloadOptions(url, filename) {
     // Some sources are known to give weird file extensions, do our best to
     // convert them.
     switch (fileExt) {
-    case "letv":
-        fileExt = "flv";
+    case 'letv':
+        fileExt = 'flv';
         break;
     default:
          // remain the same, nothing
@@ -143,11 +142,11 @@ export function getDownloadOptions(url, filename) {
 
     resFn = filenameSanitize(filename, {
         replacement: '_',
-        max: 255 - fileExt.length - 1
+        max: 255 - fileExt.length - 1,
     }) + '.' + fileExt;
 
     return {
-        "url": url,
-        "filename": resFn
+        'url': url,
+        'filename': resFn,
     };
 }

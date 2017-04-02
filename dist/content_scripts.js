@@ -77,17 +77,39 @@ Element.prototype.attr = Element.prototype.getAttribute;
 Element.prototype.on = Element.prototype.addEventListener;
 Element.prototype.off = Element.prototype.removeEventListener;
 // arrow functions binds no this nor arguments
-Element.prototype.data = function(str){ return this.dataset[str]; };
-Element.prototype.text = function(str){ return str ? (this.innerText = str) : this.innerText; };
-Element.prototype.empty = function(){ this.innerHTML = ''; return this; };
-Element.prototype.html = function(str){ return str ? (this.innerHTML = str) && this : this.innerHTML; };
-Element.prototype.hide = function(){ this.style.display = 'none'; };
-Element.prototype.show = function(){ this.style.display = ''; };
-Element.prototype.addClass = function(){ return this.classList.add(...arguments); };
-Element.prototype.removeClass = function(){ return this.classList.remove(...arguments); };
-Element.prototype.toggleClass = function(){ return this.classList.toggle(...arguments); };
-Element.prototype.hasClass = function(){ return this.classList.contains(...arguments); };
-Element.prototype.replaceClass = function(){ return this.classList.replace(...arguments); };
+Element.prototype.data = function(str) {
+    return this.dataset[str];
+};
+Element.prototype.text = function(str) {
+    return str ? (this.innerText = str) : this.innerText;
+};
+Element.prototype.empty = function() {
+    this.innerHTML = ''; return this;
+};
+Element.prototype.html = function(str) {
+    return str ? (this.innerHTML = str) && this : this.innerHTML;
+};
+Element.prototype.hide = function() {
+    this.style.display = 'none';
+};
+Element.prototype.show = function() {
+    this.style.display = '';
+};
+Element.prototype.addClass = function(...args) {
+    return this.classList.add(...args);
+};
+Element.prototype.removeClass = function(...args) {
+    return this.classList.remove(...args);
+};
+Element.prototype.toggleClass = function(...args) {
+    return this.classList.toggle(...args);
+};
+Element.prototype.hasClass = function(...args) {
+    return this.classList.contains(...args);
+};
+Element.prototype.replaceClass = function(...args) {
+    return this.classList.replace(...args);
+};
 NodeList.prototype.map = HTMLCollection.prototype.map = Array.prototype.map;
 NodeList.prototype.each = HTMLCollection.prototype.each = NodeList.prototype.forEach;
 NodeList.prototype.filter = HTMLCollection.prototype.filter = Array.prototype.filter;
@@ -96,67 +118,67 @@ NodeList.prototype.reduceRight = HTMLCollection.prototype.reduceRight = Array.pr
 NodeList.prototype.every = HTMLCollection.prototype.every = Array.prototype.every;
 NodeList.prototype.some = HTMLCollection.prototype.some = Array.prototype.some;
 HTMLCollection.prototype.forEach = Array.prototype.forEach;
-const sleep = (time = 0) => new Promise(r => setTimeout(r, time));
+const sleep = (time = 0) => new Promise((r) => setTimeout(r, time));
 /* harmony export (immutable) */ __webpack_exports__["l"] = sleep;
 
 const formatInt = (Source, Length) => (Source + '').padStart(Length, '0');
 /* unused harmony export formatInt */
 
-const parseSafe = text => ('' + text).replace(/&/g, "&amp;").replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+const parseSafe = (text) => ('' + text).replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 /* harmony export (immutable) */ __webpack_exports__["j"] = parseSafe;
 
-const parseTime = timecount => formatInt(parseInt(timecount / 60000), 2) + ':' + formatInt(parseInt((timecount / 1000) % 60), 2);
+const parseTime = (timecount) => formatInt(parseInt(timecount / 60000), 2) + ':' + formatInt(parseInt((timecount / 1000) % 60), 2);
 /* harmony export (immutable) */ __webpack_exports__["i"] = parseTime;
 
-const mySendMessage = obj => new Promise((resolve, reject) => chrome.runtime.sendMessage(obj,resolve));
+const mySendMessage = (obj) => new Promise((resolve) => chrome.runtime.sendMessage(obj, resolve));
 /* harmony export (immutable) */ __webpack_exports__["h"] = mySendMessage;
 
-const parseXmlSafe = text => (new window.DOMParser()).parseFromString(text.replace(/[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}]/ug, ""), "text/xml");
+const parseXmlSafe = (text) => (new window.DOMParser()).parseFromString(text.replace(/[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}]/ug, ''), 'text/xml');
 /* harmony export (immutable) */ __webpack_exports__["c"] = parseXmlSafe;
 
-const storageSet = data => new Promise((resolve, reject) => chrome.storage.local.set(data, () => resolve()));
+const storageSet = (data) => new Promise((resolve) => chrome.storage.local.set(data, () => resolve()));
 /* unused harmony export storageSet */
 
-const storageGet = keys => new Promise((resolve, reject) => chrome.storage.local.get(keys, resolve));
+const storageGet = (keys) => new Promise((resolve) => chrome.storage.local.get(keys, resolve));
 /* harmony export (immutable) */ __webpack_exports__["a"] = storageGet;
 
-const storageRemove = keys => new Promise((resolve, reject) => chrome.storage.local.remove(keys, resolve));
+const storageRemove = (keys) => new Promise((resolve) => chrome.storage.local.remove(keys, resolve));
 /* unused harmony export storageRemove */
 
-const storageClear = () => new Promise((resolve, reject) => chrome.storage.local.clear(resolve));
+const storageClear = () => new Promise((resolve) => chrome.storage.local.clear(resolve));
 /* unused harmony export storageClear */
 
-//https://gist.github.com/myfreeer/44f23611451119869804f8c28ee1a190
+// https://gist.github.com/myfreeer/44f23611451119869804f8c28ee1a190
 const fetchretry = (url, options) => {
-    var retries = (options && options.retries) ? options.retries : 3;
-    var retryDelay = (options && options.retryDelay) ? options.retryDelay : 500;
+    let retries = (options && options.retries) ? options.retries : 3;
+    let retryDelay = (options && options.retryDelay) ? options.retryDelay : 500;
     return new Promise((resolve, reject) => {
-        let wrappedFetch = n => fetch(url, options).then(response => resolve(response)).catch(error => n > 0 ? setTimeout(() => wrappedFetch(--n), retryDelay) : reject(error));
+        let wrappedFetch = (n) => fetch(url, options).then((response) => resolve(response)).catch((error) => n > 0 ? setTimeout(() => wrappedFetch(--n), retryDelay) : reject(error));
         wrappedFetch(retries);
     });
 };
 /* harmony export (immutable) */ __webpack_exports__["b"] = fetchretry;
 
-const _$ = e => document.querySelector(e);
+const _$ = (e) => document.querySelector(e);
 /* harmony export (immutable) */ __webpack_exports__["d"] = _$;
 
-const $h = html => {
+const $h = (html) => {
     let template = document.createElement('template');
     template.innerHTML = html;
     return template.content.firstChild;
 };
 /* harmony export (immutable) */ __webpack_exports__["f"] = $h;
 
-//http://stackoverflow.com/a/15724300/30529
-const getCookie = name => {
-  const value = "; " + document.cookie;
-  let parts = value.split("; " + name + "=");
-  if (parts.length == 2) return parts.pop().split(";").shift();
-}
+// http://stackoverflow.com/a/15724300/30529
+const getCookie = (name) => {
+    const value = '; ' + document.cookie;
+    let parts = value.split('; ' + name + '=');
+    if (parts.length === 2) return parts.pop().split(';').shift();
+};
 /* harmony export (immutable) */ __webpack_exports__["e"] = getCookie;
 
-//http://stackoverflow.com/a/11986374
-const findPosTop = obj => {
+// http://stackoverflow.com/a/11986374
+const findPosTop = (obj) => {
     let curtop = obj.offsetTop;
     if (obj.offsetParent) {
         while (obj = obj.offsetParent) {
@@ -168,13 +190,14 @@ const findPosTop = obj => {
 /* harmony export (immutable) */ __webpack_exports__["g"] = findPosTop;
 
 
-const unsafeEval = string => {
-	let script = document.createElement('script');
-	script.appendChild(document.createTextNode(string));
-	(document.body || document.getElementsByTagName('body')[0]).appendChild(script);
-	script.parentNode.removeChild(script);
+const unsafeEval = (string) => {
+    let script = document.createElement('script');
+    script.appendChild(document.createTextNode(string));
+    (document.body || document.getElementsByTagName('body')[0]).appendChild(script);
+    script.parentNode.removeChild(script);
 };
 /* harmony export (immutable) */ __webpack_exports__["k"] = unsafeEval;
+
 
 
 /***/ }),
@@ -182,52 +205,29 @@ const unsafeEval = string => {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__crc32__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__crc32___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__crc32__);
-
-const commentSenderQuery = async(hash, retries = 5) => {
-    if (sessionStorage['commentSender_hash_' + hash]) return JSON.parse(sessionStorage['commentSender_hash_' + hash]);
-    if (hash.indexOf('D') === 0) return {};
-    let mid = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__crc32__["checkCRCHash"])(hash);
-    if (!mid) return {mid};
-    try {
-        let json = await fetch(`${location.protocol}//api.bilibili.com/cardrich?mid=${mid}`).then(res => res.json());
-        if (hash && (__WEBPACK_IMPORTED_MODULE_0__crc32__["CRC32"].bstr("" + mid) >>> 0) === parseInt(hash, 16)) sessionStorage['commentSender_hash_' + hash] = JSON.stringify(json.data.card);
-        return json.data.card;
-    } catch (e) {
-        if (--retries > 0) return await commentSenderQuery(hash, retries);
-        else return mid;
-    }
-};
-/* harmony default export */ __webpack_exports__["a"] = (commentSenderQuery);
-
-/***/ }),
-/* 2 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 function addTitleLink(text, mode) {
-    if (mode === "off") return text;
-    return text.replace(/(\d+)/g, function (mathchedText, $1, offset, str) {
-        for (var i = offset; i >= 0; i--) {
-            if (str[i] === "】") break;
-            else if (str[i] === "【") return mathchedText;
+    if (mode === 'off') return text;
+    return text.replace(/(\d+)/g, function(mathchedText, $1, offset, str) {
+        for (let i = offset; i >= 0; i--) {
+            if (str[i] === '】') break;
+            else if (str[i] === '【') return mathchedText;
         }
-        var previous = str.substring(0, offset) + ((parseInt(mathchedText) - 1 >= 10 || (parseInt(mathchedText) - 1 < 0) ? ((parseInt(mathchedText) - 1).toString()) : ('0' + (parseInt(mathchedText) - 1).toString())) + str.substring(offset + mathchedText.length, str.length)),
+        let previous = str.substring(0, offset) + ((parseInt(mathchedText) - 1 >= 10 || (parseInt(mathchedText) - 1 < 0) ? ((parseInt(mathchedText) - 1).toString()) : ('0' + (parseInt(mathchedText) - 1).toString())) + str.substring(offset + mathchedText.length, str.length)),
             next = str.substring(0, offset) + ((parseInt(mathchedText) + 1 >= 10 || (parseInt(mathchedText) - 1 < 0) ? ((parseInt(mathchedText) + 1).toString()) : ('0' + (parseInt(mathchedText) + 1).toString())) + str.substring(offset + mathchedText.length, str.length));
-        previous = previous.replace(/(#)/g, " ");
-        next = next.replace(/(#)/g, " ");
-        if (mode === "without") {
-            previous = previous.replace(/(\【.*?\】)/g, "");
-            next = next.replace(/(\【.*?\】)/g, "");
+        previous = previous.replace(/(#)/g, ' ');
+        next = next.replace(/(#)/g, ' ');
+        if (mode === 'without') {
+            previous = previous.replace(/(\【.*?\】)/g, '');
+            next = next.replace(/(\【.*?\】)/g, '');
         }
-        return "<span class=\"titleNumber\" previous = \"" + previous + "\" next = \"" + next + "\">" + mathchedText + "</span>";
+        return '<span class="titleNumber" previous = "' + previous + '" next = "' + next + '">' + mathchedText + '</span>';
     });
 }
 /* harmony default export */ __webpack_exports__["a"] = (addTitleLink);
 
+
 /***/ }),
-/* 3 */
+/* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -236,11 +236,11 @@ function addTitleLink(text, mode) {
 
 const bilibiliVideoInfoProvider = async(avid, page = 1, credentials = 'include', retries = 5, retryDelay = 500, n = 0) => {
     if (!avid) throw new Error('bilibiliVideoInfoProvider: avid is reuired');
-    const url = [location.protocol + "//api.bilibili.com/view?type=json&appkey=8e9fc618fbd41e28&id=" + avid + "&page=" + page + "&batch=true", "https://www.biliplus.com/api/view?id=" + avid];
+    const url = [location.protocol + '//api.bilibili.com/view?type=json&appkey=8e9fc618fbd41e28&id=' + avid + '&page=' + page + '&batch=true', 'https://www.biliplus.com/api/view?id=' + avid];
     if (sessionStorage[avid + '_' + page]) return JSON.parse(sessionStorage[avid + '_' + page]);
     let json;
     try {
-        json = await fetch(n % 2 ? url[1] : url[0], {credentials}).then(response => response.json());
+        json = await fetch(n % 2 ? url[1] : url[0], {credentials}).then((response) => response.json());
         if (!json || !(json && json.list && json.list.length) || json && json.code === -503) throw new Error('Can not get valid JSON.');
     } catch (e) {
         if (++n < retries) {
@@ -259,11 +259,11 @@ const bilibiliVideoInfoProvider = async(avid, page = 1, credentials = 'include',
 
 const bilibiliBangumiVideoInfoProvider = async(epid, credentials = 'include', retries = 5, retryDelay = 500, n = 0) => {
     if (!epid) throw new Error('bilibiliBangumiVideoInfoProvider: epid is required');
-    var url = location.protocol + '//bangumi.bilibili.com/web_api/episode/' + epid + '.json';
+    let url = location.protocol + '//bangumi.bilibili.com/web_api/episode/' + epid + '.json';
     if (sessionStorage['ep_' + epid]) return JSON.parse(sessionStorage['ep_' + epid]);
     let json, videoInfo;
     try {
-        json = await fetch(url, {credentials}).then(response => response.json());
+        json = await fetch(url, {credentials}).then((response) => response.json());
         if (!json || !(json && json.result && json.result.currentEpisode && json.result.currentEpisode.avId) || json && json.code === -503) throw new Error('Can not get valid JSON.');
         videoInfo = await bilibiliVideoInfoProvider(json.result.currentEpisode.avId, json.result.currentEpisode.page || 1);
     } catch (e) {
@@ -278,8 +278,9 @@ const bilibiliBangumiVideoInfoProvider = async(epid, credentials = 'include', re
 /* harmony export (immutable) */ __webpack_exports__["b"] = bilibiliBangumiVideoInfoProvider;
 
 
+
 /***/ }),
-/* 4 */
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -298,24 +299,24 @@ const APPSECRET = '94aba54af9065f71de72f5508f1cd42e';
 // https://github.com/soimort/you-get/blob/0f0da0ccd72e93a3c93d51b5b90c81513ef77d15/src/you_get/extractors/bilibili.py#L15
 const SECRETKEY_MINILOADER = '1c15888dc316e05a15fdd0a02ed6584f';
 
-const processXmlObj = obj => {
+const processXmlObj = (obj) => {
     if (obj.video) obj = obj.video;
     if (obj.durl && !obj.durl.push) obj.durl = [obj.durl];
     if (obj.durl.length && obj.durl.length > 0 && obj.durl[0] && obj.durl[0].backup_url && !obj.durl[0].backup_url.push && obj.durl[0].backup_url.url) {
         obj.durl[0].backup_url = obj.durl[0].backup_url.url;
         if (!obj.durl[0].backup_url.push) obj.durl[0].backup_url = [obj.durl[0].backup_url];
     }
-    if (obj.accept_quality && !obj.accept_quality.push) obj.accept_quality = obj.accept_quality.split(',').map(e => Number(e));
+    if (obj.accept_quality && !obj.accept_quality.push) obj.accept_quality = obj.accept_quality.split(',').map((e) => Number(e));
     return obj;
 };
 
-const xml2obj = xml => {
+const xml2obj = (xml) => {
     try {
         let text, obj = {};
         if (xml.children.length > 0) {
-            [...xml.children].map(item => {
+            [...xml.children].map((item) => {
                 let nodeName = item.nodeName;
-                if (typeof (obj[nodeName]) === "undefined") obj[nodeName] = xml2obj(item);
+                if (typeof (obj[nodeName]) === 'undefined') obj[nodeName] = xml2obj(item);
                 else {
                     if (!obj[nodeName].push) obj[nodeName] = [obj[nodeName]];
                     obj[nodeName].push(xml2obj(item));
@@ -335,16 +336,16 @@ const xml2obj = xml => {
 
 const parseJsonforFlvjs = (json) => {
     if (!json) return console.warn('parseJsonforFlvjs Failed: No JSON provided.');
-    var mediaDataSource = {};
+    let mediaDataSource = {};
     mediaDataSource.type = 'flv';
     if (parseInt(json.timelength)) mediaDataSource.duration = parseInt(json.timelength);
-    if (json.durl) mediaDataSource.segments = json.durl.map(obj => ({
-        "duration": obj.length,
-        "filesize": obj.size,
-        "url": obj.url.match("ws.acgvideo.com") ? obj.url : obj.url.replace(/^http:\/\//, "https://")
+    if (json.durl) mediaDataSource.segments = json.durl.map((obj) => ({
+        'duration': obj.length,
+        'filesize': obj.size,
+        'url': obj.url.match('ws.acgvideo.com') ? obj.url : obj.url.replace(/^http:\/\//, 'https://'),
     }));
     if (!json.durl) return console.warn('parseJsonforFlvjs Failed: Nothing to play.');
-    if (mediaDataSource.segments.length === 1 && json.durl[0].backup_url && json.durl[0].backup_url.length === 1 && !mediaDataSource.segments[0].url.match('flv') && json.durl[0].backup_url[0].match('flv')) mediaDataSource.segments[0].url = json.durl[0].backup_url[0].replace(/^http:\/\//,"https://");
+    if (mediaDataSource.segments.length === 1 && json.durl[0].backup_url && json.durl[0].backup_url.length === 1 && !mediaDataSource.segments[0].url.match('flv') && json.durl[0].backup_url[0].match('flv')) mediaDataSource.segments[0].url = json.durl[0].backup_url[0].replace(/^http:\/\//, 'https://');
     if (!mediaDataSource.segments[0].url.match('flv') && mediaDataSource.segments.length === 1) mediaDataSource.type = 'mp4';
     if (mediaDataSource.type === 'mp4') Object.assign(mediaDataSource, mediaDataSource.segments[0]);
     return mediaDataSource;
@@ -362,7 +363,7 @@ const getToken = async(retries = 5, retryDelay = 500) => {
         }
     }
     try {
-        let text = await fetch(location.protocol + '//www.bilibili.com/video/av7/').then(res => res.text());
+        let text = await fetch(location.protocol + '//www.bilibili.com/video/av7/').then((res) => res.text());
         token = text.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/)[1];
         sessionStorage.bilibiliVideoProvider_Token = token;
         return token;
@@ -378,16 +379,16 @@ const getVideoLink = async(url, type, retries = 5, credentials = 'include', retr
     let json;
     try {
         if (type === 'flv') {
-            let xmltext = await fetch(url, {credentials}).then(res => res.text());
+            let xmltext = await fetch(url, {credentials}).then((res) => res.text());
             json = processXmlObj(xml2obj((new DOMParser()).parseFromString(xmltext, 'text/xml')));
-        } else json = await fetch(url, {credentials}).then(response => response.json());
+        } else json = await fetch(url, {credentials}).then((response) => response.json());
     } catch (error) {
         if (--retries > 0) {
             await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["l" /* sleep */])(retryDelay);
             return await getVideoLink(url, type, retries);
         } else json = {
             'code': -1,
-            'message': error
+            'message': error,
         };
     }
     return json;
@@ -404,28 +405,28 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
     url.mp4 = url._base + url._query('mp4') + '&sign=' + __WEBPACK_IMPORTED_MODULE_0__md5___default()(url._query('mp4') + APPSECRET);
     url.flv = url._base + url._query('flv') + '&sign=' + __WEBPACK_IMPORTED_MODULE_0__md5___default()(url._query('flv') + APPSECRET);
     const interfaceUrl = (cid, ts) => `cid=${cid}&player=1&ts=${ts}`;
-    const calcSign = (cid, ts) => __WEBPACK_IMPORTED_MODULE_0__md5___default()(`${interfaceUrl(cid,ts)}${SECRETKEY_MINILOADER}`);
+    const calcSign = (cid, ts) => __WEBPACK_IMPORTED_MODULE_0__md5___default()(`${interfaceUrl(cid, ts)}${SECRETKEY_MINILOADER}`);
     let video = {};
     const types = ['low', 'mp4', 'flv'];
     for (let i of types) video[i] = await getVideoLink(url[i], null, retries, credentials, retryDelay);
     video.mediaDataSource = parseJsonforFlvjs(video.flv);
     video.hd = [];
     video.ld = [];
-    const processVideoUrl = url => {
+    const processVideoUrl = (url) => {
         if (!url) return;
-        if (!url.match('ws.acgvideo.com')) url = url.replace(/^http:\/\//, "https://");
+        if (!url.match('ws.acgvideo.com')) url = url.replace(/^http:\/\//, 'https://');
         if (url.match('hd.mp4')) video.hd.push(url);
         else if (url.match('.mp4')) video.ld.push(url);
     };
-    const processVideoUrlObj = obj => {
+    const processVideoUrlObj = (obj) => {
         if (!(obj.durl && obj.durl[0] && obj.durl[0].url)) return;
-        obj.durl.forEach(durl => processVideoUrl(durl.url));
-        if (obj.durl[0].backup_url && obj.durl[0].backup_url[0]) obj.durl[0].backup_url.forEach(url => processVideoUrl(url));
+        obj.durl.forEach((durl) => processVideoUrl(durl.url));
+        if (obj.durl[0].backup_url && obj.durl[0].backup_url[0]) obj.durl[0].backup_url.forEach((url) => processVideoUrl(url));
     };
     for (let i of types) processVideoUrlObj(video[i]);
     if (video.mediaDataSource.type === 'mp4') {
         const ts = Math.ceil(Date.now() / 1000);
-        url.flv = url._base + `${interfaceUrl(cid,ts)}&sign=${calcSign(cid,ts)}`;
+        url.flv = url._base + `${interfaceUrl(cid, ts)}&sign=${calcSign(cid, ts)}`;
         video.flv = await getVideoLink(url.flv, 'flv', retries, credentials, retryDelay);
         processVideoUrlObj(video.flv);
         video.mediaDataSource = parseJsonforFlvjs(video.flv);
@@ -436,34 +437,35 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
 };
 /* harmony default export */ __webpack_exports__["a"] = (bilibiliVideoProvider);
 
+
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__commentSenderQuery__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__commentSenderQuery__ = __webpack_require__(10);
 
 
 
 const commentQuerySection = (comments, element) => {
     let control = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["f" /* $h */])('<div><input type="text" class="b-input" placeholder="根据关键词筛选弹幕"><select class="list"><option disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</option></select><span class="result">选择弹幕查看发送者…</span></div>');
-    control.find('.b-input').onkeyup = e => {
+    control.find('.b-input').onkeyup = () => {
         const keyword = control.find('input').value,
             regex = new RegExp(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(keyword), 'gi');
         control.find('select.list').html('<option disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</option>');
-        for (let node of comments){
+        for (let node of comments) {
             let text = node.childNodes[0];
             if (text && node && regex.test(text.nodeValue)) {
                 text = text.nodeValue;
                 const commentData = node.getAttribute('p').split(','),
-    	                        sender = commentData[6],
-    	                        time = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseTime */])(parseInt(commentData[0]) * 1000);
-    	        let option = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["f" /* $h */])(`<option sender=${sender}></option>`);
-    	        option.sender = sender;
-    	        option.html('[' + time + '] ' + (keyword.trim() === '' ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(text) : __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(text).replace(regex, kw => '<span class="kw">' + kw + '</span>')));
-    	        control.find('select.list').append(option);
-    	    }
+                    sender = commentData[6],
+                    time = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["i" /* parseTime */])(parseInt(commentData[0]) * 1000);
+                let option = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["f" /* $h */])(`<option sender=${sender}></option>`);
+                option.sender = sender;
+                option.html('[' + time + '] ' + (keyword.trim() === '' ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(text) : __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(text).replace(regex, (kw) => '<span class="kw">' + kw + '</span>')));
+                control.find('select.list').append(option);
+            }
         }
     };
     control.find('.b-input').onkeyup();
@@ -477,18 +479,19 @@ const commentQuerySection = (comments, element) => {
     _selectList.style.maxWidth = '272px';
     _selectList.style.borderRadius = '3px';
     _selectList.style.height = '25px';
-    _selectList.onchange = e => {
+    _selectList.onchange = () => {
         const sender = _selectList.selectedOptions[0].sender;
         control.find('.result').text('查询中…');
-        if (sender.indexOf('D') == 0) return control.find('.result').text('游客弹幕');
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__commentSenderQuery__["a" /* default */])(sender).then(data => displayUserInfo(data.mid,data));
+        if (sender.indexOf('D') === 0) return control.find('.result').text('游客弹幕');
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__commentSenderQuery__["a" /* default */])(sender).then((data) => displayUserInfo(data.mid, data));
     };
     element.empty().append(control);
 };
 /* harmony default export */ __webpack_exports__["a"] = (commentQuerySection);
 
+
 /***/ }),
-/* 6 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -496,35 +499,34 @@ const commentQuerySection = (comments, element) => {
 
 
 const commentsHistorySection = async(cid, element, changeComments) => {
-    let _rolldate = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* fetchretry */])(`${location.protocol}//comment.bilibili.com/rolldate,${cid}`).then(res => res.json());
+    let _rolldate = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* fetchretry */])(`${location.protocol}//comment.bilibili.com/rolldate,${cid}`).then((res) => res.json());
     let dmrollUI = document.createElement('select');
     dmrollUI.style.cssText = 'max-width: 272px;height: 25px;border-radius: 4px;';
     let rolldate;
     try {
         rolldate = await _rolldate;
     } catch (e) {
-        return e
+        return e;
     }
     let date = new Date();
     if (!(rolldate && rolldate.length > 0)) return false;
-    dmrollUI.innerHTML = `<option value="${location.protocol}//comment.bilibili.com/${cid}.xml" selected="selected">历史弹幕：现在</option>` + rolldate.map(e => `<option value="${location.protocol + '//comment.bilibili.com/dmroll,' + e.timestamp + ',' + cid}">历史弹幕：${(date.setTime(parseInt(e.timestamp) * 1000, 10)) && date.toLocaleDateString()}，新增${e.new}条</option>`).join('');
-    dmrollUI.onchange = event => changeComments(dmrollUI.selectedOptions[0].value);
+    dmrollUI.innerHTML = `<option value="${location.protocol}//comment.bilibili.com/${cid}.xml" selected="selected">历史弹幕：现在</option>` + rolldate.map((e) => `<option value="${location.protocol + '//comment.bilibili.com/dmroll,' + e.timestamp + ',' + cid}">历史弹幕：${(date.setTime(parseInt(e.timestamp) * 1000, 10)) && date.toLocaleDateString()}，新增${e.new}条</option>`).join('');
+    dmrollUI.onchange = () => changeComments(dmrollUI.selectedOptions[0].value);
     element.empty().appendChild(dmrollUI);
     return true;
 };
 /* harmony default export */ __webpack_exports__["a"] = (commentsHistorySection);
 
+
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(0);
 /* harmony export (immutable) */ __webpack_exports__["b"] = getNiceSectionFilename;
 /* harmony export (immutable) */ __webpack_exports__["a"] = getDownloadOptions;
 // adapted from https://github.com/parshap/node-sanitize-filename/blob/master/index.js
 // remove node "Buffer" to work in browser.
-
 
 /**
  * Replaces characters in strings that are illegal/unsafe for filenames.
@@ -610,7 +612,7 @@ function sanitize(input, replacement, max) {
     return truncate(sanitized, max);
 }
 
-var filenameSanitize = function (input, options) {
+let filenameSanitize = function(input, options) {
     const replacement = (options && options.replacement) || '';
     const max = (options && options.max && (options.max < 255)) ? options.max : 255;
     const output = sanitize(input, replacement, max);
@@ -624,9 +626,9 @@ function getNiceSectionFilename(avid, page, totalPage, idx, numParts, videoInfo)
     // TODO inspect the page to get better section name
     let idName = 'av' + avid,
         // page/part name is only shown when there are more than one pages/parts
-        pageIdName = (totalPage && (totalPage > 1)) ? ('p' + page) : "",
-        pageName = "",
-        partIdName = (numParts && (numParts > 1)) ? ('' + idx) : "";
+        pageIdName = (totalPage && (totalPage > 1)) ? ('p' + page) : '',
+        pageName = '',
+        partIdName = (numParts && (numParts > 1)) ? ('' + idx) : '';
 
     // try to find a good page name
     if (pageIdName) {
@@ -658,8 +660,8 @@ function getDownloadOptions(url, filename) {
     // Some sources are known to give weird file extensions, do our best to
     // convert them.
     switch (fileExt) {
-    case "letv":
-        fileExt = "flv";
+    case 'letv':
+        fileExt = 'flv';
         break;
     default:
          // remain the same, nothing
@@ -667,35 +669,36 @@ function getDownloadOptions(url, filename) {
 
     resFn = filenameSanitize(filename, {
         replacement: '_',
-        max: 255 - fileExt.length - 1
+        max: 255 - fileExt.length - 1,
     }) + '.' + fileExt;
 
     return {
-        "url": url,
-        "filename": resFn
+        'url': url,
+        'filename': resFn,
     };
 }
 
+
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(0);
 
-const docReady = () =>new Promise(r => document.addEventListener( "DOMContentLoaded", r));
-const replaceList = ["avid", "author", "play", "video_review", "coins", "favorites", "tid", "mid", "pic", "spid", "season_id", "created_at", "face"];
+const docReady = () => new Promise((r) => document.addEventListener('DOMContentLoaded', r));
+const replaceList = ['avid', 'author', 'play', 'video_review', 'coins', 'favorites', 'tid', 'mid', 'pic', 'spid', 'season_id', 'created_at', 'face'];
 const genPageFunc = async(cid, videoInfo, redirectUrl) => {
-    let tagList = "";
-    let alist = "";
+    let tagList = '';
+    let alist = '';
     if (videoInfo && videoInfo.list && videoInfo.list.length > 1) {
-        alist += "<select id='dedepagetitles' onchange='location.href=this.options[this.selectedIndex].value;'>";
-        alist += videoInfo.list.map(vPart => "<option value='/video/av" + videoInfo.avid + "/index_" + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(vPart.page) + ".html'>" + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(vPart.page) + "、" + (vPart.part ? vPart.part : ("P" + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(vPart.page))) + "</option>").join();
-        alist += "</select>";
+        alist += '<select id=\'dedepagetitles\' onchange=\'location.href=this.options[this.selectedIndex].value;\'>';
+        alist += videoInfo.list.map((vPart) => '<option value=\'/video/av' + videoInfo.avid + '/index_' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(vPart.page) + '.html\'>' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(vPart.page) + '、' + (vPart.part ? vPart.part : ('P' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(vPart.page))) + '</option>').join();
+        alist += '</select>';
     }
-    if (videoInfo && videoInfo.tag) tagList += videoInfo.tag.split(",").map(tag => '<li><a class="tag-val" href="/tag/' + encodeURIComponent(tag) + '/" title="' + tag + '" target="_blank">' + tag + '</a></li>').join('');
-    if (!videoInfo.tag) videoInfo.tag = "";
-    const template = await fetch(chrome.runtime.getURL("template.html")).then(res => res.text());
+    if (videoInfo && videoInfo.tag) tagList += videoInfo.tag.split(',').map((tag) => '<li><a class="tag-val" href="/tag/' + encodeURIComponent(tag) + '/" title="' + tag + '" target="_blank">' + tag + '</a></li>').join('');
+    if (!videoInfo.tag) videoInfo.tag = '';
+    const template = await fetch(chrome.runtime.getURL('template.html')).then((res) => res.text());
     let page = template.replace(/__bl_page/g, videoInfo.currentPage)
         .replace(/__bl_cid/g, cid)
         .replace(/__bl_title/g, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(videoInfo.title))
@@ -703,59 +706,61 @@ const genPageFunc = async(cid, videoInfo, redirectUrl) => {
         .replace(/__bl_sp_title/g, videoInfo.sp_title ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(videoInfo.sp_title) : '')
         .replace(/__bl_description/g, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["j" /* parseSafe */])(videoInfo.description))
         .replace(/__bl_redirectUrl/g, redirectUrl)
-        .replace(/__bl_tags/g, JSON.stringify(videoInfo.tag.split(",")))
+        .replace(/__bl_tags/g, JSON.stringify(videoInfo.tag.split(',')))
         .replace(/__bl_tag_list/g, tagList)
         .replace(/__bl_alist/g, alist)
         .replace(/__bl_bangumi_cover/g, videoInfo.pic)
         .replace(/__bl_bangumi_desc/g, videoInfo.description);
-       for (let i of replaceList) page = page.replace(new RegExp('__bl_' + i, 'g'), videoInfo[i])
+    for (let i of replaceList) page = page.replace(new RegExp('__bl_' + i, 'g'), videoInfo[i]);
     document.open();
     document.write(page);
     document.close();
     await docReady();
     await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["l" /* sleep */])(500);
-    await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* mySendMessage */])({command: "injectCSS"});
+    await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["h" /* mySendMessage */])({command: 'injectCSS'});
     return false;
 };
 /* harmony default export */ __webpack_exports__["a"] = (genPageFunc);
 
+
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-const errorCode = ["正常", "选择的弹幕模式错误", "用户被禁止", "系统禁止", "投稿不存在", "UP主禁止", "权限有误", "视频未审核/未发布", "禁止游客弹幕"];
+const errorCode = ['正常', '选择的弹幕模式错误', '用户被禁止', '系统禁止', '投稿不存在', 'UP主禁止', '权限有误', '视频未审核/未发布', '禁止游客弹幕'];
 const sendComment = async(avid, cid, page, commentData) => {
     commentData.cid = cid;
-    const comment = Object.keys(commentData).map(key => encodeURIComponent(key).replace(/%20/g, "+") + "=" + encodeURIComponent(commentData[key]).replace(/%20/g, "+")).join('&');
+    const comment = Object.keys(commentData).map((key) => encodeURIComponent(key).replace(/%20/g, '+') + '=' + encodeURIComponent(commentData[key]).replace(/%20/g, '+')).join('&');
     try {
         let result = await fetch(`${location.protocol}//interface.bilibili.com/dmpost?cid=${cid}&aid=${avid}&pid=${page}`, {
-            method: "POST",
+            method: 'POST',
             headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
+                'Content-Type': 'application/x-www-form-urlencoded',
             },
             credentials: 'include',
-            body: comment
-        }).then(res => res.text());
+            body: comment,
+        }).then((res) => res.text());
         result = parseInt(result);
         return result < 0 ? {
             result: false,
-            error: errorCode[-result]
+            error: errorCode[-result],
         } : {
             result: true,
-            id: result
+            id: result,
         };
     } catch (e) {
         return {
             result: false,
-            error: e.toString()
+            error: e.toString(),
         };
     }
 };
 /* harmony default export */ __webpack_exports__["a"] = (sendComment);
 
+
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -781,7 +786,7 @@ const sendComment = async(avid, cid, page, commentData) => {
 	*/
 
 // 设置项
-var config = {
+let config = {
     'playResX': 560,           // 屏幕分辨率宽（像素）
     'playResY': 420,           // 屏幕分辨率高（像素）
     'fontlist': [              // 字形（会自动选择最前面一个可用的）
@@ -804,60 +809,65 @@ var config = {
     'debug': false,            // 打印调试信息
 };
 
-var debug = config.debug ? console.warn.bind(console) : function () { };
+let debug = config.debug ? console.warn.bind(console) : function() { };
 
 // 将字典中的值填入字符串
-var fillStr = function (str) {
-    var dict = Array.apply(Array, arguments);
-    return str.replace(/{{([^}]+)}}/g, function (r, o) {
-        var ret;
-        dict.some(function (i) { return ret = i[o]; });
+let fillStr = function(str) {
+    let dict = Array.apply(Array, arguments);
+    return str.replace(/{{([^}]+)}}/g, function(r, o) {
+        let ret;
+        dict.some(function(i) {
+            return ret = i[o];
+        });
         return ret || '';
     });
 };
 
 // 将颜色的数值化为十六进制字符串表示
-var RRGGBB = function (color) {
-    var t = Number(color).toString(16).toUpperCase();
-    return ('000000' + t).slice(-6)
+let RRGGBB = function(color) {
+    let t = Number(color).toString(16).toUpperCase();
+    return ('000000' + t).slice(-6);
 };
 
 // 将可见度转换为透明度
-var hexAlpha = function (opacity) {
-    var alpha = Math.round(0xFF * (1 - opacity)).toString(16).toUpperCase();
+let hexAlpha = function(opacity) {
+    let alpha = Math.round(0xFF * (1 - opacity)).toString(16).toUpperCase();
     return Array(3 - alpha.length).join('0') + alpha;
 };
 
 // 平方和开根
-var hypot = Math.hypot ? Math.hypot.bind(Math) : function () {
+let hypot = Math.hypot ? Math.hypot.bind(Math) : function() {
     return Math.sqrt([0].concat(Array.apply(Array, arguments))
-	.reduce(function (x, y) { return x + y * y; }));
+	.reduce(function(x, y) {
+    return x + y * y;
+}));
 };
 
 // 计算文字宽度
-var calcWidth = (function () {
-
+let calcWidth = (function() {
 	// 使用Canvas计算
-    var calcWidthCanvas = function () {
-        var canvas = document.createElement("canvas");
-        var context = canvas.getContext("2d");
-        return function (fontname, text, fontsize) {
+    let calcWidthCanvas = function() {
+        let canvas = document.createElement('canvas');
+        let context = canvas.getContext('2d');
+        return function(fontname, text, fontsize) {
             context.font = 'bold ' + fontsize + 'px ' + fontname;
             return Math.ceil(context.measureText(text).width + config.space);
         };
-    }
+    };
 
 	// 使用Div计算
-    var calcWidthDiv = function () {
-        var d = document.createElement('div');
+    let calcWidthDiv = function() {
+        let d = document.createElement('div');
         d.setAttribute('style', [
             'all: unset', 'top: -10000px', 'left: -10000px',
             'width: auto', 'height: auto', 'position: absolute',
-            '',].join(' !important; '));
-        var ld = function () { document.body.parentNode.appendChild(d); }
+            ''].join(' !important; '));
+        let ld = function() {
+            document.body.parentNode.appendChild(d);
+        };
         if (!document.body) document.addEventListener('DOMContentLoaded', ld);
         else ld();
-        return function (fontname, text, fontsize) {
+        return function(fontname, text, fontsize) {
             d.textContent = text;
             d.style.font = 'bold ' + fontsize + 'px ' + fontname;
             return d.clientWidth + config.space;
@@ -872,48 +882,47 @@ var calcWidth = (function () {
     debug('use canvas: %o', config.use_canvas !== false);
     if (config.use_canvas === false) return calcWidthDiv();
     return calcWidthCanvas();
-
 }());
 
 // 选择合适的字体
-var choseFont = function (fontlist) {
+let choseFont = function(fontlist) {
 	// 检查这个字串的宽度来检查字体是否存在
-    var sampleText =
+    let sampleText =
 	'The quick brown fox jumps over the lazy dog' +
 	'7531902468' + ',.!-' + '，。：！' +
 	'天地玄黄' + '則近道矣';
 	// 和这些字体进行比较
-    var sampleFont = [
+    let sampleFont = [
         'monospace', 'sans-serif', 'sans',
         'Symbol', 'Arial', 'Comic Sans MS', 'Fixed', 'Terminal',
         'Times', 'Times New Roman',
-        '宋体', '黑体', '文泉驿正黑', 'Microsoft YaHei', 'PingFang SC'
+        '宋体', '黑体', '文泉驿正黑', 'Microsoft YaHei', 'PingFang SC',
     ];
 	// 如果被检查的字体和基准字体可以渲染出不同的宽度
 	// 那么说明被检查的字体总是存在的
-    var diffFont = function (base, test) {
-        var baseSize = calcWidth(base, sampleText, 72);
-        var testSize = calcWidth(test + ',' + base, sampleText, 72);
+    let diffFont = function(base, test) {
+        let baseSize = calcWidth(base, sampleText, 72);
+        let testSize = calcWidth(test + ',' + base, sampleText, 72);
         return baseSize !== testSize;
     };
-    var validFont = function (test) {
-        var valid = sampleFont.some(function (base) {
+    let validFont = function(test) {
+        let valid = sampleFont.some(function(base) {
             return diffFont(base, test);
         });
         debug('font %s: %o', test, valid);
         return valid;
     };
 	// 找一个能用的字体
-    var f = fontlist[fontlist.length - 1];
+    let f = fontlist[fontlist.length - 1];
     fontlist = fontlist.filter(validFont);
     debug('fontlist: %o', fontlist);
     return fontlist[0] || f;
 };
 
 // 从备选的字体中选择一个机器上提供了的字体
-var initFont = (function () {
-    var done = false;
-    return function () {
+let initFont = (function() {
+    let done = false;
+    return function() {
         if (done) return; done = true;
         calcWidth = calcWidth.bind(window,
 	config.font = choseFont(config.fontlist)
@@ -921,55 +930,61 @@ var initFont = (function () {
     };
 }());
 
-var generateASS = function (danmaku, info) {
+let generateASS = function(danmaku, info) {
     if (Number(info.opacity)) config.opacity = info.opacity;
-    var assHeader = fillStr('[Script Info]\nTitle: {{title}}\nOriginal Script: 根据 {{ori}} 的弹幕信息，由 https://github.com/tiansh/us-danmaku 生成\nScriptType: v4.00+\nCollisions: Normal\nPlayResX: {{playResX}}\nPlayResY: {{playResY}}\nTimer: 10.0000\n\n[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\nStyle: Fix,{{font}},25,&H{{alpha}}FFFFFF,&H{{alpha}}FFFFFF,&H{{alpha}}000000,&H{{alpha}}000000,0,0,0,0,100,100,0,0,1,2,0,2,20,20,2,0\nStyle: R2L,{{font}},25,&H{{alpha}}FFFFFF,&H{{alpha}}FFFFFF,&H{{alpha}}000000,&H{{alpha}}000000,0,0,0,0,100,100,0,0,1,2,0,2,20,20,2,0\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n', config, info, {'alpha': hexAlpha(config.opacity) });
+    let assHeader = fillStr('[Script Info]\nTitle: {{title}}\nOriginal Script: 根据 {{ori}} 的弹幕信息，由 https://github.com/tiansh/us-danmaku 生成\nScriptType: v4.00+\nCollisions: Normal\nPlayResX: {{playResX}}\nPlayResY: {{playResY}}\nTimer: 10.0000\n\n[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\nStyle: Fix,{{font}},25,&H{{alpha}}FFFFFF,&H{{alpha}}FFFFFF,&H{{alpha}}000000,&H{{alpha}}000000,0,0,0,0,100,100,0,0,1,2,0,2,20,20,2,0\nStyle: R2L,{{font}},25,&H{{alpha}}FFFFFF,&H{{alpha}}FFFFFF,&H{{alpha}}000000,&H{{alpha}}000000,0,0,0,0,100,100,0,0,1,2,0,2,20,20,2,0\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n', config, info, {'alpha': hexAlpha(config.opacity)});
 	// 补齐数字开头的0
-    var paddingNum = function (num, len) {
+    let paddingNum = function(num, len) {
         num = '' + num;
         while (num.length < len) num = '0' + num;
         return num;
     };
 	// 格式化时间
-    var formatTime = function (time) {
+    let formatTime = function(time) {
         time = 100 * time ^ 0;
-        var l = [[100, 2], [60, 2], [60, 2], [Infinity, 0]].map(function (c) {
-            var r = time % c[0];
+        let l = [[100, 2], [60, 2], [60, 2], [Infinity, 0]].map(function(c) {
+            let r = time % c[0];
             time = (time - r) / c[0];
             return paddingNum(r, c[1]);
         }).reverse();
         return l.slice(0, -1).join(':') + '.' + l[3];
     };
 	// 格式化特效
-    var format = (function () {
+    let format = (function() {
 	// 适用于所有弹幕
-        var common = function (line) {
-            var s = '';
-            var rgb = line.color.split(/(..)/).filter(function (x) { return x; })
-	.map(function (x) { return parseInt(x, 16); });
+        let common = function(line) {
+            let s = '';
+            let rgb = line.color.split(/(..)/).filter(function(x) {
+                return x;
+            })
+	.map(function(x) {
+    return parseInt(x, 16);
+});
 	// 如果不是白色，要指定弹幕特殊的颜色
             if (line.color !== 'FFFFFF') // line.color 是 RRGGBB 格式
                 s += '\\c&H' + line.color.split(/(..)/).reverse().join('');
 	// 如果弹幕颜色比较深，用白色的外边框
-            var dark = rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114 < 0x30;
+            let dark = rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114 < 0x30;
             if (dark) s += '\\3c&HFFFFFF';
             if (line.size !== 25) s += '\\fs' + line.size;
             return s;
         };
 	// 适用于从右到左弹幕
-        var r2l = function (line) {
+        let r2l = function(line) {
             return '\\move(' + [
-                line.poss.x, line.poss.y, line.posd.x, line.posd.y
+                line.poss.x, line.poss.y, line.posd.x, line.posd.y,
             ].join(',') + ')';
         };
 	// 适用于固定位置弹幕
-        var fix = function (line) {
+        let fix = function(line) {
             return '\\pos(' + [
-                line.poss.x, line.poss.y
+                line.poss.x, line.poss.y,
             ].join(',') + ')';
         };
-        var withCommon = function (f) {
-            return function (line) { return f(line) + common(line); };
+        let withCommon = function(f) {
+            return function(line) {
+                return f(line) + common(line);
+            };
         };
         return {
             'R2L': withCommon(r2l),
@@ -977,12 +992,12 @@ var generateASS = function (danmaku, info) {
         };
     }());
 	// 转义一些字符
-    var escapeAssText = function (s) {
+    let escapeAssText = function(s) {
 	// "{"、"}"字符libass可以转义，但是VSFilter不可以，所以直接用全角补上
         return s.replace(/{/g, '｛').replace(/}/g, '｝').replace(/\r|\n/g, '');
     };
 	// 将一行转换为ASS的事件
-    var convert2Ass = function (line) {
+    let convert2Ass = function(line) {
         return 'Dialogue: ' + [
             0,
             formatTime(line.stime),
@@ -995,7 +1010,9 @@ var generateASS = function (danmaku, info) {
     };
     return assHeader +
 	danmaku.map(convert2Ass)
-	.filter(function (x) { return x; })
+	.filter(function(x) {
+    return x;
+})
 	.join('\n');
 };
 
@@ -1042,26 +1059,26 @@ td := p + ts
 */
 
 // 滚动弹幕
-var normalDanmaku = (function (wc, hc, b, u, maxr) {
-    return function () {
+let normalDanmaku = (function(wc, hc, b, u, maxr) {
+    return function() {
 	// 初始化屏幕外面是不可用的
-        var used = [
-	{ 'p': -Infinity, 'm': 0, 'tf': Infinity, 'td': Infinity, 'b': false },
-	{ 'p': hc, 'm': Infinity, 'tf': Infinity, 'td': Infinity, 'b': false },
-	{ 'p': hc - b, 'm': hc, 'tf': Infinity, 'td': Infinity, 'b': true },
+        let used = [
+	{'p': -Infinity, 'm': 0, 'tf': Infinity, 'td': Infinity, 'b': false},
+	{'p': hc, 'm': Infinity, 'tf': Infinity, 'td': Infinity, 'b': false},
+	{'p': hc - b, 'm': hc, 'tf': Infinity, 'td': Infinity, 'b': true},
         ];
 	// 检查一些可用的位置
-        var available = function (hv, t0s, t0l, b) {
-            var suggestion = [];
+        let available = function(hv, t0s, t0l, b) {
+            let suggestion = [];
 	// 这些上边缘总之别的块的下边缘
-            used.forEach(function (i) {
+            used.forEach(function(i) {
                 if (i.m > hc) return;
-                var p = i.m;
-                var m = p + hv;
-                var tas = t0s;
-                var tal = t0l;
+                let p = i.m;
+                let m = p + hv;
+                let tas = t0s;
+                let tal = t0l;
 	// 这些块的左边缘总是这个区域里面最大的边缘
-                used.forEach(function (j) {
+                used.forEach(function(j) {
                     if (j.p >= m) return;
                     if (j.m <= p) return;
                     if (j.b && b) return;
@@ -1075,10 +1092,12 @@ var normalDanmaku = (function (wc, hc, b, u, maxr) {
                 });
             });
 	// 根据高度排序
-            suggestion.sort(function (x, y) { return x.p - y.p; });
-            var mr = maxr;
+            suggestion.sort(function(x, y) {
+                return x.p - y.p;
+            });
+            let mr = maxr;
 	// 又靠右又靠下的选择可以忽略，剩下的返回
-            suggestion = suggestion.filter(function (i) {
+            suggestion = suggestion.filter(function(i) {
                 if (i.r >= mr) return false;
                 mr = i.r;
                 return true;
@@ -1086,31 +1105,35 @@ var normalDanmaku = (function (wc, hc, b, u, maxr) {
             return suggestion;
         };
 	// 添加一个被使用的
-        var use = function (p, m, tf, td) {
-            used.push({ 'p': p, 'm': m, 'tf': tf, 'td': td, 'b': false });
+        let use = function(p, m, tf, td) {
+            used.push({'p': p, 'm': m, 'tf': tf, 'td': td, 'b': false});
         };
 	// 根据时间同步掉无用的
-        var syn = function (t0s, t0l) {
-            used = used.filter(function (i) { return i.tf > t0s || i.td > t0l; });
+        let syn = function(t0s, t0l) {
+            used = used.filter(function(i) {
+                return i.tf > t0s || i.td > t0l;
+            });
         };
 	// 给所有可能的位置打分，分数是[0, 1)的
-        var score = function (i) {
+        let score = function(i) {
             if (i.r > maxr) return -Infinity;
             return 1 - hypot(i.r / maxr, i.p / hc) * Math.SQRT1_2;
         };
 	// 添加一条
-        return function (t0s, wv, hv, b) {
-            var t0l = wc / (wv + wc) * u + t0s;
+        return function(t0s, wv, hv, b) {
+            let t0l = wc / (wv + wc) * u + t0s;
             syn(t0s, t0l);
-            var al = available(hv, t0s, t0l, b);
+            let al = available(hv, t0s, t0l, b);
             if (!al.length) return null;
-            var scored = al.map(function (i) { return [score(i), i]; });
-            var best = scored.reduce(function (x, y) {
+            let scored = al.map(function(i) {
+                return [score(i), i];
+            });
+            let best = scored.reduce(function(x, y) {
                 return x[0] > y[0] ? x : y;
             })[1];
-            var ts = t0s + best.r;
-            var tf = wv / (wv + wc) * u + ts;
-            var td = u + ts;
+            let ts = t0s + best.r;
+            let tf = wv / (wv + wc) * u + ts;
+            let td = u + ts;
             use(best.p, best.p + hv, tf, td);
             return {
                 'top': best.p,
@@ -1121,79 +1144,87 @@ var normalDanmaku = (function (wc, hc, b, u, maxr) {
 }(config.playResX, config.playResY, config.bottom, config.r2ltime, config.max_delay));
 
 // 顶部、底部弹幕
-var sideDanmaku = (function (hc, b, u, maxr) {
-    return function () {
-        var used = [
-	{ 'p': -Infinity, 'm': 0, 'td': Infinity, 'b': false },
-	{ 'p': hc, 'm': Infinity, 'td': Infinity, 'b': false },
-	{ 'p': hc - b, 'm': hc, 'td': Infinity, 'b': true },
+let sideDanmaku = (function(hc, b, u, maxr) {
+    return function() {
+        let used = [
+	{'p': -Infinity, 'm': 0, 'td': Infinity, 'b': false},
+	{'p': hc, 'm': Infinity, 'td': Infinity, 'b': false},
+	{'p': hc - b, 'm': hc, 'td': Infinity, 'b': true},
         ];
 	// 查找可用的位置
-        var fr = function (p, m, t0s, b) {
-            var tas = t0s;
-            used.forEach(function (j) {
+        let fr = function(p, m, t0s, b) {
+            let tas = t0s;
+            used.forEach(function(j) {
                 if (j.p >= m) return;
                 if (j.m <= p) return;
                 if (j.b && b) return;
                 tas = Math.max(tas, j.td);
             });
-            return { 'r': tas - t0s, 'p': p, 'm': m };
+            return {'r': tas - t0s, 'p': p, 'm': m};
         };
 	// 顶部
-        var top = function (hv, t0s, b) {
-            var suggestion = [];
-            used.forEach(function (i) {
+        let top = function(hv, t0s, b) {
+            let suggestion = [];
+            used.forEach(function(i) {
                 if (i.m > hc) return;
                 suggestion.push(fr(i.m, i.m + hv, t0s, b));
             });
             return suggestion;
         };
 	// 底部
-        var bottom = function (hv, t0s, b) {
-            var suggestion = [];
-            used.forEach(function (i) {
+        let bottom = function(hv, t0s, b) {
+            let suggestion = [];
+            used.forEach(function(i) {
                 if (i.p < 0) return;
                 suggestion.push(fr(i.p - hv, i.p, t0s, b));
             });
             return suggestion;
         };
-        var use = function (p, m, td) {
-            used.push({ 'p': p, 'm': m, 'td': td, 'b': false });
+        let use = function(p, m, td) {
+            used.push({'p': p, 'm': m, 'td': td, 'b': false});
         };
-        var syn = function (t0s) {
-            used = used.filter(function (i) { return i.td > t0s; });
+        let syn = function(t0s) {
+            used = used.filter(function(i) {
+                return i.td > t0s;
+            });
         };
 	// 挑选最好的方案：延迟小的优先，位置不重要
-        var score = function (i, is_top) {
+        let score = function(i, is_top) {
             if (i.r > maxr) return -Infinity;
-            var f = function (p) { return is_top ? p : (hc - p); };
+            let f = function(p) {
+                return is_top ? p : (hc - p);
+            };
             return 1 - (i.r / maxr * (31 / 32) + f(i.p) / hc * (1 / 32));
         };
-        return function (t0s, hv, is_top, b) {
+        return function(t0s, hv, is_top, b) {
             syn(t0s);
-            var al = (is_top ? top : bottom)(hv, t0s, b);
+            let al = (is_top ? top : bottom)(hv, t0s, b);
             if (!al.length) return null;
-            var scored = al.map(function (i) { return [score(i, is_top), i]; });
-            var best = scored.reduce(function (x, y) {
+            let scored = al.map(function(i) {
+                return [score(i, is_top), i];
+            });
+            let best = scored.reduce(function(x, y) {
                 return x[0] > y[0] ? x : y;
             })[1];
-            use(best.p, best.m, best.r + t0s + u)
-            return { 'top': best.p, 'time': best.r + t0s };
+            use(best.p, best.m, best.r + t0s + u);
+            return {'top': best.p, 'time': best.r + t0s};
         };
     };
 }(config.playResY, config.bottom, config.fixtime, config.max_delay));
 
 // 为每条弹幕安置位置
-var setPosition = function (danmaku) {
-    var normal = normalDanmaku(), side = sideDanmaku();
+let setPosition = function(danmaku) {
+    let normal = normalDanmaku(), side = sideDanmaku();
     return danmaku
-	.sort(function (x, y) { return x.time - y.time; })
-	.map(function (line) {
-    var font_size = Math.round(line.size * config.font_size);
-    var width = calcWidth(line.text, font_size);
+	.sort(function(x, y) {
+    return x.time - y.time;
+})
+	.map(function(line) {
+    let font_size = Math.round(line.size * config.font_size);
+    let width = calcWidth(line.text, font_size);
     switch (line.mode) {
-    case 'R2L': return (function () {
-        var pos = normal(line.time, width, font_size, line.bottom);
+    case 'R2L': return (function() {
+        let pos = normal(line.time, width, font_size, line.bottom);
         if (!pos) return null;
         line.type = 'R2L';
         line.stime = pos.time;
@@ -1208,8 +1239,8 @@ var setPosition = function (danmaku) {
         line.dtime = config.r2ltime + line.stime;
         return line;
     }());
-    case 'TOP': case 'BOTTOM': return (function (isTop) {
-        var pos = side(line.time, font_size, isTop, line.bottom);
+    case 'TOP': case 'BOTTOM': return (function(isTop) {
+        let pos = side(line.time, font_size, isTop, line.bottom);
         if (!pos) return null;
         line.type = 'Fix';
         line.stime = pos.time;
@@ -1223,18 +1254,22 @@ var setPosition = function (danmaku) {
     default: return null;
     }
 })
-	.filter(function (l) { return l; })
-	.sort(function (x, y) { return x.stime - y.stime; });
+	.filter(function(l) {
+    return l;
+})
+	.sort(function(x, y) {
+    return x.stime - y.stime;
+});
 };
 
 /*
 	* bilibili
 	*/
 
-var parseXML = function (content, data) {
+let parseXML = function(content, data) {
     data = data || (new DOMParser()).parseFromString(content, 'text/xml');
-    return Array.apply(Array, data.querySelectorAll('d')).map(function (line) {
-        var info = line.getAttribute('p').split(','), text = line.textContent;
+    return Array.apply(Array, data.querySelectorAll('d')).map(function(line) {
+        let info = line.getAttribute('p').split(','), text = line.textContent;
         return {
             'text': text,
             'time': Number(info[0]),
@@ -1251,8 +1286,34 @@ var parseXML = function (content, data) {
 };
 
 initFont();
-const xml2ass = (xmldoc, opts) =>  '\ufeff' + generateASS(setPosition(parseXML('', xmldoc)), opts);
+const xml2ass = (xmldoc, opts) => '\ufeff' + generateASS(setPosition(parseXML('', xmldoc)), opts);
 /* harmony default export */ __webpack_exports__["a"] = (xml2ass);
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__crc32__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__crc32___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__crc32__);
+
+const commentSenderQuery = async(hash, retries = 5) => {
+    if (sessionStorage['commentSender_hash_' + hash]) return JSON.parse(sessionStorage['commentSender_hash_' + hash]);
+    if (hash.indexOf('D') === 0) return {};
+    let mid = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__crc32__["checkCRCHash"])(hash);
+    if (!mid) return {mid};
+    try {
+        let json = await fetch(`${location.protocol}//api.bilibili.com/cardrich?mid=${mid}`).then((res) => res.json());
+        if (hash && (__WEBPACK_IMPORTED_MODULE_0__crc32__["CRC32"].bstr('' + mid) >>> 0) === parseInt(hash, 16)) sessionStorage['commentSender_hash_' + hash] = JSON.stringify(json.data.card);
+        return json.data.card;
+    } catch (e) {
+        if (--retries > 0) return await commentSenderQuery(hash, retries);
+        else return mid;
+    }
+};
+/* harmony default export */ __webpack_exports__["a"] = (commentSenderQuery);
+
 
 /***/ }),
 /* 11 */
@@ -1260,17 +1321,16 @@ const xml2ass = (xmldoc, opts) =>  '\ufeff' + generateASS(setPosition(parseXML('
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__bilibiliVideoInfoProvider__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__bilibiliVideoInfoProvider__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__commentSenderQuery__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__commentQuerySection__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__commentsHistorySection__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__bilibiliVideoProvider__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__xml2ass__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__filename_sanitize__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__genPageFunc__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__addTitleLink__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__sendComment__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__commentQuerySection__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__commentsHistorySection__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__bilibiliVideoProvider__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__xml2ass__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__filename_sanitize__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__genPageFunc__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__addTitleLink__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__sendComment__ = __webpack_require__(8);
 // require external libs
 
 
@@ -1283,19 +1343,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-
-//main func
+// main func
 (async function() {
     const url = location.href;
     let avid, page, epid, cid, videoInfo, videoLink, options, isBangumi, genPage;
-    //preload options
+    // preload options
     const _options = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["a" /* storageGet */])();
-    //prevent offical html5 autoload
+    // prevent offical html5 autoload
     localStorage.removeItem('defaulth5');
 
-    //get video info
+    // get video info
     switch (location.hostname) {
-    case 'www.bilibili.com':
+    case 'www.bilibili.com': {
         const _avid = url.match(/bilibili.com\/video\/av([0-9]+)/);
         if (!_avid) return console.warn('cannot match avid');
         avid = url.match(/bilibili.com\/video\/av([0-9]+)/)[1];
@@ -1303,7 +1362,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         page = _page ? _page[1] : 1;
         videoInfo = await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__bilibiliVideoInfoProvider__["a" /* bilibiliVideoInfoProvider */])(avid, page);
         break;
-    case 'bangumi.bilibili.com':
+    }
+    case 'bangumi.bilibili.com': {
         const hash = location.hash;
         epid = hash.length > 1 && hash.match(/^\#[0-9]+$/) && hash.substr(1);
         const _epid = url.match(/bangumi.bilibili.com\/anime\/v\/([0-9]+)/);
@@ -1314,6 +1374,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         page = Number(videoInfo.currentPage);
         isBangumi = true;
         break;
+    }
     default:
         return;
     }
@@ -1321,39 +1382,39 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     if (!(avid && page && cid && videoInfo)) return console.warn('something went wrong, exiting.');
 
     // preload video links
-    const _videoLink = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__bilibiliVideoProvider__["a" /* default */])(cid, avid, page);
+    const _videoLink = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__bilibiliVideoProvider__["a" /* default */])(cid, avid, page);
     let comment = {};
 
     // preload comments
     comment.url = `${location.protocol}//comment.bilibili.com/${cid}.xml`;
-    comment._xml = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* fetchretry */])(comment.url).then(res => res.text()).then(text => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* parseXmlSafe */])(text));
+    comment._xml = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* fetchretry */])(comment.url).then((res) => res.text()).then((text) => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* parseXmlSafe */])(text));
     options = await _options;
 
     const videoPic = videoInfo.pic || (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('img.cover_image') && __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('img.cover_image').attr('src'));
-    //genPage func
+    // genPage func
     if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.b-page-body')) genPage = decodeURIComponent(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* getCookie */])('redirectUrl'));
     if (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.b-page-body .z-msg') > 0 && __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.b-page-body .z-msg').text().indexOf('版权') > -1) genPage = 1;
-    if (genPage) await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_8__genPageFunc__["a" /* default */])(cid, videoInfo, genPage);
+    if (genPage) await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_7__genPageFunc__["a" /* default */])(cid, videoInfo, genPage);
 
-    //addTitleLink func
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.viewbox .info .v-title h1').html(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_9__addTitleLink__["a" /* default */])(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.viewbox .info .v-title h1').attr('title'), options.rel_search));
+    // addTitleLink func
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.viewbox .info .v-title h1').html(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_8__addTitleLink__["a" /* default */])(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.viewbox .info .v-title h1').attr('title'), options.rel_search));
     const titleNumbers = document.getElementsByClassName('titleNumber');
-    if (titleNumbers.length > 0) titleNumbers.forEach(el => {
-        el.append(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="popuptext">\u70b9\u51fb\u641c\u7d22\u76f8\u5173\u89c6\u9891\uff1a<br /><a target="_blank" href="http://www.bilibili.com/search?orderby=default&keyword=' + encodeURIComponent(el.attr("previous")) + '">' + el.attr("previous") + '</a><br /><a target="_blank" href="http://www.bilibili.com/search?orderby=ranklevel&keyword=' + encodeURIComponent(el.attr("next")) + '">' + el.attr("next") + '</a></div>'));
-        el.on('click', e => el.find('.popuptext').classList.toggle("show"));
+    if (titleNumbers.length > 0) titleNumbers.forEach((el) => {
+        el.append(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="popuptext">\u70b9\u51fb\u641c\u7d22\u76f8\u5173\u89c6\u9891\uff1a<br /><a target="_blank" href="http://www.bilibili.com/search?orderby=default&keyword=' + encodeURIComponent(el.attr('previous')) + '">' + el.attr('previous') + '</a><br /><a target="_blank" href="http://www.bilibili.com/search?orderby=ranklevel&keyword=' + encodeURIComponent(el.attr('next')) + '">' + el.attr('next') + '</a></div>'));
+        el.on('click', () => el.find('.popuptext').classList.toggle('show'));
         el.parentNode.style.overflow = 'visible';
         el.parentNode.parentNode.style.overflow = 'visible';
         el.parentNode.parentNode.parentNode.style.overflow = 'visible';
     });
 
-    //some ui code from original helper
-    let biliHelper = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])(isBangumi && !genPage ? "<div class=\"v1-bangumi-info-btn helper\" id=\"bilibili_helper\"><span class=\"t\">哔哩哔哩助手</span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.runtime.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>" : "<div class=\"block helper\" id=\"bilibili_helper\"><span class=\"t\"><div class=\"icon\"></div><div class=\"t-right\"><span class=\"t-right-top middle\">助手</span><span class=\"t-right-bottom\">扩展菜单</span></div></span><div class=\"info\"><div class=\"main\"></div><div class=\"version\">哔哩哔哩助手 " + chrome.runtime.getManifest().version + "<a class=\"setting b-btn w\" href=\"" + chrome.runtime.getURL("options.html") + "\" target=\"_blank\">设置</a></div></div></div>");
+    // some ui code from original helper
+    let biliHelper = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])(isBangumi && !genPage ? '<div class="v1-bangumi-info-btn helper" id="bilibili_helper"><span class="t">哔哩哔哩助手</span><div class="info"><div class="main"></div><div class="version">哔哩哔哩助手 ' + chrome.runtime.getManifest().version + '<a class="setting b-btn w" href="' + chrome.runtime.getURL('options.html') + '" target="_blank">设置</a></div></div></div>' : '<div class="block helper" id="bilibili_helper"><span class="t"><div class="icon"></div><div class="t-right"><span class="t-right-top middle">助手</span><span class="t-right-bottom">扩展菜单</span></div></span><div class="info"><div class="main"></div><div class="version">哔哩哔哩助手 ' + chrome.runtime.getManifest().version + '<a class="setting b-btn w" href="' + chrome.runtime.getURL('options.html') + '" target="_blank">设置</a></div></div></div>');
     biliHelper.find('.t').onclick = () => biliHelper.toggleClass('active');
     biliHelper.blockInfo = biliHelper.find('.info');
     biliHelper.mainBlock = biliHelper.find('.main');
     biliHelper.mainBlock.infoSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="section video hidden"><h3>视频信息</h3><p><span></span><span>aid: ' + avid + '</span><span>pg: ' + page + '</span></p></div>');
     biliHelper.mainBlock.append(biliHelper.mainBlock.infoSection);
-    biliHelper.mainBlock.ondblclick = e => e.shiftKey && biliHelper.mainBlock.infoSection.toggleClass('hidden');
+    biliHelper.mainBlock.ondblclick = (e) => e.shiftKey && biliHelper.mainBlock.infoSection.toggleClass('hidden');
     if (genPage && genPage.match && genPage.match('http')) {
         biliHelper.mainBlock.redirectSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="section redirect">生成页选项: <a class="b-btn w" href="' + genPage + '">前往原始跳转页</a></div>');
         biliHelper.mainBlock.append(biliHelper.mainBlock.redirectSection);
@@ -1368,7 +1429,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     biliHelper.mainBlock.speedSection.rotate.step = 90;
     biliHelper.mainBlock.switcherSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="section switcher"><h3>播放器切换</h3></div>');
     biliHelper.mainBlock.switcherSection.button = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<p><a class="b-btn w" type="original">原始播放器</a><a class="b-btn w" type="bilih5">原始HTML5</a><a class="b-btn w hidden" type="bilimac">Mac 客户端</a><a class="b-btn w hidden" type="swf">SWF 播放器</a><a class="b-btn w hidden" type="iframe">Iframe 播放器</a><a class="b-btn w hidden" type="html5">HTML5超清</a><a class="b-btn w hidden" type="html5hd">HTML5高清</a><a class="b-btn w hidden" type="html5ld">HTML5低清</a></p>');
-    biliHelper.mainBlock.switcherSection.button.onclick = e => biliHelper.switcher[e.target.attr('type')]();
+    biliHelper.mainBlock.switcherSection.button.onclick = (e) => biliHelper.switcher[e.target.attr('type')]();
     biliHelper.mainBlock.switcherSection.append(biliHelper.mainBlock.switcherSection.button);
     if (genPage) {
         biliHelper.mainBlock.switcherSection.find('a[type="original"]').addClass('hidden');
@@ -1397,18 +1458,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
     // process video links
     videoLink = await _videoLink;
-    //follow ws video url redircet
-    for (let i in videoLink.hd) if (videoLink.hd[i].match('ws.acgvideo.com')) fetch(videoLink.hd[i], {method: 'head'}).then(resp => resp.ok && (videoLink.hd[i] = resp.url));
-    for (let i in videoLink.ld) if (videoLink.ld[i].match('ws.acgvideo.com')) fetch(videoLink.ld[i], {method: 'head'}).then(resp => resp.ok && (videoLink.ld[i] = resp.url));
+    // follow ws video url redircet
+    for (let i in videoLink.hd) if (videoLink.hd[i].match('ws.acgvideo.com')) fetch(videoLink.hd[i], {method: 'head'}).then((resp) => resp.ok && (videoLink.hd[i] = resp.url));
+    for (let i in videoLink.ld) if (videoLink.ld[i].match('ws.acgvideo.com')) fetch(videoLink.ld[i], {method: 'head'}).then((resp) => resp.ok && (videoLink.ld[i] = resp.url));
 
-    //downloaderSection code
+    // downloaderSection code
     const clickDownLinkElementHandler = async(event) => !event.preventDefault() && await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["h" /* mySendMessage */])({
         command: 'requestForDownload',
         url: event.target.attr('href'),
-        filename: event.target.attr('download')
+        filename: event.target.attr('download'),
     });
     const createDownLinkElement = (segmentInfo, index) => {
-        const downloadOptions = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_7__filename_sanitize__["a" /* getDownloadOptions */])(segmentInfo.url, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_7__filename_sanitize__["b" /* getNiceSectionFilename */])(avid, page, videoInfo.pages || 1, index, videoLink.mediaDataSource.segments.length, videoInfo));
+        const downloadOptions = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6__filename_sanitize__["a" /* getDownloadOptions */])(segmentInfo.url, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6__filename_sanitize__["b" /* getNiceSectionFilename */])(avid, page, videoInfo.pages || 1, index, videoLink.mediaDataSource.segments.length, videoInfo));
         const length = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["i" /* parseTime */])(segmentInfo.duration);
         const size = (segmentInfo.filesize / 1048576 + 0.5) >>> 0;
         const title = isNaN(size) ? (`长度: ${length}`) : (`长度: ${length} 大小: ${size} MB`);
@@ -1423,7 +1484,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     if (videoLink.mediaDataSource.segments.length > 1) {
         let bhDownAllLink = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])(`<a class="b-btn">下载全部${videoLink.mediaDataSource.segments.length}个分段</a>`);
         biliHelper.mainBlock.downloaderSection.find('p').append(bhDownAllLink);
-        bhDownAllLink.onclick = () => biliHelper.mainBlock.downloaderSection.findAll('p .b-btn.w').each(e => e.click());
+        bhDownAllLink.onclick = () => biliHelper.mainBlock.downloaderSection.findAll('p .b-btn.w').each((e) => e.click());
     }
     biliHelper.mainBlock.downloaderSection.find('p').append(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<a class="b-btn" target="_blank" title="实验性功能，由bilibilijj提供，访问慢且不稳定" href="http://www.bilibilijj.com/Files/DownLoad/' + cid + '.mp3/www.bilibilijj.com.mp3?mp3=true">音频</a>'));
     biliHelper.mainBlock.downloaderSection.find('p').append(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<a class="b-btn" target="_blank" href="' + videoPic + '">封面</a>'));
@@ -1435,25 +1496,25 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     if (videoLink.ld.length > 0) biliHelper.mainBlock.switcherSection.find('a[type="html5ld"]').removeClass('hidden');
 
     // comment begin
-    biliHelper.downloadFileName = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_7__filename_sanitize__["a" /* getDownloadOptions */])(comment.url, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_7__filename_sanitize__["b" /* getNiceSectionFilename */])(avid, page, videoInfo.pages || 1, 1, 1, videoInfo)).filename;
+    biliHelper.downloadFileName = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6__filename_sanitize__["a" /* getDownloadOptions */])(comment.url, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6__filename_sanitize__["b" /* getNiceSectionFilename */])(avid, page, videoInfo.pages || 1, 1, 1, videoInfo)).filename;
     biliHelper.mainBlock.infoSection.find('p').append(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<span>cid: ' + cid + '</span>'));
     biliHelper.mainBlock.commentSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])(`<div class="section comment"><h3>弹幕下载</h3><p><a class="b-btn w" href="${comment.url}" download="${biliHelper.downloadFileName}">下载 XML 格式弹幕</a></p></div>`);
     biliHelper.mainBlock.commentSection.find('a').onclick = clickDownLinkElementHandler;
     biliHelper.mainBlock.append(biliHelper.mainBlock.commentSection);
     comment.xml = await comment._xml;
     let assData;
-    const clickAssBtnHandler = event => {
+    const clickAssBtnHandler = (event) => {
         event.preventDefault();
-        if (!assData) assData = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6__xml2ass__["a" /* default */])(comment.xml, {
-            'title': __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_7__filename_sanitize__["b" /* getNiceSectionFilename */])(avid, page, videoInfo.pages || 1, 1, 1, videoInfo),
+        if (!assData) assData = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__xml2ass__["a" /* default */])(comment.xml, {
+            'title': __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6__filename_sanitize__["b" /* getNiceSectionFilename */])(avid, page, videoInfo.pages || 1, 1, 1, videoInfo),
             'ori': location.href,
-            'opacity': options.opacity || 0.75
+            'opacity': options.opacity || 0.75,
         });
         const assBlob = new Blob([assData], {type: 'application/octet-stream'}),
             assUrl = window.URL.createObjectURL(assBlob);
         event.target.href = assUrl;
         clickDownLinkElementHandler(event);
-        document.addEventListener('unload',  () => window.URL.revokeObjectURL(assUrl));
+        document.addEventListener('unload', () => window.URL.revokeObjectURL(assUrl));
     };
     let assBtn = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])(`<a class="b-btn w" download="${biliHelper.downloadFileName.replace('.xml', '.ass')}" href>下载 ASS 格式弹幕</a>`);
     assBtn.onclick = clickAssBtnHandler;
@@ -1462,35 +1523,36 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     // begin comment user query
     biliHelper.comments = comment.xml.getElementsByTagName('d');
     comment.ccl = BilibiliParser(comment.xml);
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__commentQuerySection__["a" /* default */])(biliHelper.comments, biliHelper.mainBlock.querySection.find('p'));
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__commentQuerySection__["a" /* default */])(biliHelper.comments, biliHelper.mainBlock.querySection.find('p'));
     const changeComments = async(url) => {
         comment.url = url;
-        comment._xml = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* fetchretry */])(comment.url).then(res => res.text()).then(text => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* parseXmlSafe */])(text));
+        comment._xml = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* fetchretry */])(comment.url).then((res) => res.text()).then((text) => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* parseXmlSafe */])(text));
         comment.xml = await comment._xml;
         biliHelper.comments = comment.xml.getElementsByTagName('d');
         comment.ccl = BilibiliParser(comment.xml);
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__commentQuerySection__["a" /* default */])(biliHelper.comments, biliHelper.mainBlock.querySection.find('p'));
-        if (biliHelper.switcher.cmManager) comment.ccl.forEach(cmt => biliHelper.switcher.cmManager.insert(cmt));
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__commentQuerySection__["a" /* default */])(biliHelper.comments, biliHelper.mainBlock.querySection.find('p'));
+        biliHelper.mainBlock.commentSection.find('a[download*=xml]').href = comment.url;
+        if (biliHelper.switcher.cmManager) comment.ccl.forEach((cmt) => biliHelper.switcher.cmManager.insert(cmt));
     };
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__commentsHistorySection__["a" /* default */])(cid, biliHelper.mainBlock.historySection.find('p'), changeComments).then(event => (event !== true) && biliHelper.mainBlock.historySection.hide());
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__commentsHistorySection__["a" /* default */])(cid, biliHelper.mainBlock.historySection.find('p'), changeComments).then((event) => (event !== true) && biliHelper.mainBlock.historySection.hide());
 
     // video player switcher begin
-    const restartVideo = video => !video.paused && !video.pause() && !video.play();
-    const mirrorAndRotateHandler = e => {
+    const restartVideo = (video) => !video.paused && !video.pause() && !video.play();
+    const mirrorAndRotateHandler = (e) => {
         biliHelper.mainBlock.speedSection.rotate.value %= 360;
         let transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg)';
-        if (e.target == biliHelper.mainBlock.speedSection.mirror) {
-        	if (e.target.hasClass('w')) transform += 'matrix(-1, 0, 0, 1, 0, 0)';
-        	e.target.toggleClass('w');
+        if (e.target === biliHelper.mainBlock.speedSection.mirror) {
+            if (e.target.hasClass('w')) transform += 'matrix(-1, 0, 0, 1, 0, 0)';
+            e.target.toggleClass('w');
         } else if (!biliHelper.mainBlock.speedSection.mirror.hasClass('w')) transform += 'matrix(-1, 0, 0, 1, 0, 0)';
         biliHelper.switcher.video.style.transform = transform;
     };
     biliHelper.switcher = {
-        current: "original",
+        current: 'original',
         inited: false,
-        _init: function (video) {
+        _init: function(video) {
             this.video = video;
-            biliHelper.mainBlock.speedSection.input.on("change", e => {
+            biliHelper.mainBlock.speedSection.input.on('change', (e) => {
                 if (Number(e.target.value)) {
                     biliHelper.switcher.video.playbackRate = Number(e.target.value);
                     restartVideo(biliHelper.switcher.video);
@@ -1498,52 +1560,52 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     e.target.value = 1.0;
                 }
             });
-            biliHelper.mainBlock.speedSection.rotate.on("change", mirrorAndRotateHandler);
-            biliHelper.mainBlock.speedSection.mirror.on("click", mirrorAndRotateHandler);
+            biliHelper.mainBlock.speedSection.rotate.on('change', mirrorAndRotateHandler);
+            biliHelper.mainBlock.speedSection.mirror.on('click', mirrorAndRotateHandler);
             this.inited = 1;
         },
-        bind: function (video) {
+        bind: function(video) {
             this.video = video;
-            video.on("loadedmetadata", e => biliHelper.mainBlock.speedSection.res.innerText = '分辨率: ' + e.target.videoWidth + "x" + e.target.videoHeight);
+            video.on('loadedmetadata', (e) => biliHelper.mainBlock.speedSection.res.innerText = '分辨率: ' + e.target.videoWidth + 'x' + e.target.videoHeight);
             if (!this.inited) this._init(video);
             biliHelper.mainBlock.speedSection.removeClass('hidden');
         },
-        unbind: function () {
+        unbind: function() {
             this.video = null;
             biliHelper.mainBlock.speedSection.addClass('hidden');
         },
-        set: function (newMode) {
+        set: function(newMode) {
             biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + this.current + '"]').addClass('w');
             biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + newMode + '"]').removeClass('w');
             localStorage.removeItem('defaulth5');
-            if (this.current == 'html5' && this.flvPlayer) this.flvPlayer.destroy();
+            if (this.current === 'html5' && this.flvPlayer) this.flvPlayer.destroy();
             if (this.checkFinished) clearInterval(this.checkFinished);
             if (this.interval) clearInterval(this.interval);
             if (this.cmManager) this.cmManager = null;
             if (!newMode.match('html5')) this.unbind();
-            biliHelper.mainBlock.speedSection.res.innerText = "";
+            biliHelper.mainBlock.speedSection.res.innerText = '';
             biliHelper.mainBlock.speedSection.input.onchange = null;
             biliHelper.mainBlock.speedSection.input.value = 1.0;
             this.current = newMode;
         },
-        original: function () {
+        original: function() {
             this.set('original');
             __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').html(biliHelper.originalPlayer);
-            if (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi object').attr('width') == 950) __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi object').setAttribute('width', 980);
+            if (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi object').attr('width') === 950) __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi object').setAttribute('width', 980);
         },
-        swf: function () {
+        swf: function() {
             this.set('swf');
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').html('<object type="application/x-shockwave-flash" class="player" data="https://static-s.bilibili.com/play.swf" id="player_placeholder" style="visibility: visible;"><param name="allowfullscreeninteractive" value="true"><param name="allowfullscreen" value="true"><param name="quality" value="high"><param name="allowscriptaccess" value="always"><param name="wmode" value="opaque"><param name="flashvars" value="cid=' + cid + '&aid=' + avid + '"></object>');
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').html(`<object type="application/x-shockwave-flash" class="player" data="https://static-s.bilibili.com/play.swf" id="player_placeholder" style="visibility: visible;"><param name="allowfullscreeninteractive" value="true"><param name="allowfullscreen" value="true"><param name="quality" value="high"><param name="allowscriptaccess" value="always"><param name="wmode" value="opaque"><param name="flashvars" value="cid=${cid}&aid=${avid}"></object>`);
         },
-        iframe: function () {
+        iframe: function() {
             this.set('iframe');
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').html('<iframe height="536" width="980" class="player" src="https://secure.bilibili.com/secure,cid=' + cid + '&aid=' + avid + '" scrolling="no" border="0" frameborder="no" framespacing="0" onload="window.securePlayerFrameLoaded=true"></iframe>');
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').html(`<iframe height="536" width="980" class="player" src="https://secure.bilibili.com/secure,cid=${cid}&aid=${avid}" scrolling="no" border="0" frameborder="no" framespacing="0" onload="window.securePlayerFrameLoaded=true"></iframe>`);
         },
-        bilih5: function () {
+        bilih5: function() {
             this.set('bilih5');
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').html('<iframe height="536" width="980" class="player" src="//www.bilibili.com/html/html5player.html?cid=' + cid + '&aid=' + avid + '" scrolling="no" border="0" frameborder="no" framespacing="0"></iframe>');
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').html(`<iframe height="536" width="980" class="player" src="//www.bilibili.com/html/html5player.html?cid=${cid}&aid=${avid}" scrolling="no" border="0" frameborder="no" framespacing="0"></iframe>`);
         },
-        html5: function (type) {
+        html5: function(type) {
             let html5VideoUrl;
             switch (type) {
             case 'html5ld':
@@ -1557,47 +1619,47 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             default:
                 this.set('html5');
                 html5VideoUrl = videoLink.hd[0];
-                if (videoLink.mediaDataSource.type === 'mp4') return console.warn('No Flv urls available, switch back to html5 hd',biliHelper.switcher.html5hd());
+                if (videoLink.mediaDataSource.type === 'mp4') return console.warn('No Flv urls available, switch back to html5 hd', biliHelper.switcher.html5hd());
             }
             __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + videoPic + '" crossorigin="anonymous"><source src="' + html5VideoUrl + '" type="video/mp4"></video></div>');
-            let abp = ABP.create(document.getElementById("bilibili_helper_html5_player"), {
+            let abp = ABP.create(document.getElementById('bilibili_helper_html5_player'), {
                 src: {
                     playlist: [{
-                        video: document.getElementById("bilibili_helper_html5_player_video"),
-                        comments: comment.ccl
-                    }]
+                        video: document.getElementById('bilibili_helper_html5_player_video'),
+                        comments: comment.ccl,
+                    }],
                 },
-                width: "100%",
-                height: "100%",
-                config: options
+                width: '100%',
+                height: '100%',
+                config: options,
             });
-            abp.playerUnit.addEventListener("wide", () => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])("#bofqi").addClass("wide"));
-            abp.playerUnit.addEventListener("normal", () => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])("#bofqi").removeClass("wide"));
-            abp.playerUnit.addEventListener("sendcomment", function (e) {
+            abp.playerUnit.addEventListener('wide', () => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').addClass('wide'));
+            abp.playerUnit.addEventListener('normal', () => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').removeClass('wide'));
+            abp.playerUnit.addEventListener('sendcomment', function(e) {
                 const commentId = e.detail.id,
                     commentData = e.detail;
                 delete e.detail.id;
-                __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_10__sendComment__["a" /* default */])(avid, cid, page, commentData).then(function (response) {
+                __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_9__sendComment__["a" /* default */])(avid, cid, page, commentData).then(function(response) {
                     response.tmp_id = commentId;
                     abp.commentCallback(response);
                 });
             });
-            abp.playerUnit.addEventListener("saveconfig",  e => e.detail && Object.assign(options, e.detail) && chrome.storage.local.set(options));
+            abp.playerUnit.addEventListener('saveconfig', (e) => e.detail && Object.assign(options, e.detail) && chrome.storage.local.set(options));
             this.bind(abp.video);
             this.cmManager = abp.cmManager;
             if (type && type.match(/hd|ld/)) return abp;
             this.flvPlayer = flvjs.createPlayer(videoLink.mediaDataSource);
-            biliHelper.switcher.interval = setInterval(function () {
+            biliHelper.switcher.interval = setInterval(function() {
                 if (abp.commentObjArray && biliHelper.switcher.flvPlayer) {
                     clearInterval(biliHelper.switcher.interval);
                     biliHelper.switcher.flvPlayer.attachMediaElement(abp.video);
                     biliHelper.switcher.flvPlayer.load();
-                    biliHelper.switcher.flvPlayer.on(flvjs.Events.ERROR, e => console.warn(e, 'Switch back to HTML5 HD.', biliHelper.switcher.html5hd()));
-                    biliHelper.switcher.flvPlayer.on(flvjs.Events.MEDIA_INFO, e => console.log('分辨率: ' + e.width + "x" + e.height + ', FPS: ' + e.fps, '视频码率: ' + Math.round(e.videoDataRate * 100) / 100, '音频码率: ' + Math.round(e.audioDataRate * 100) / 100));
+                    biliHelper.switcher.flvPlayer.on(flvjs.Events.ERROR, (e) => console.warn(e, 'Switch back to HTML5 HD.', biliHelper.switcher.html5hd()));
+                    biliHelper.switcher.flvPlayer.on(flvjs.Events.MEDIA_INFO, (e) => console.log('分辨率: ' + e.width + 'x' + e.height + ', FPS: ' + e.fps, '视频码率: ' + Math.round(e.videoDataRate * 100) / 100, '音频码率: ' + Math.round(e.audioDataRate * 100) / 100));
                 }
             }, 100);
             let lastTime;
-            biliHelper.switcher.checkFinished = setInterval(function () {
+            biliHelper.switcher.checkFinished = setInterval(function() {
                 if (abp.video.currentTime !== lastTime) {
                     lastTime = abp.video.currentTime;
                 } else {
@@ -1606,16 +1668,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                         if (!abp.video.loop) {
                             abp.video.pause();
                             setTimeout(abp.video.pause, 200);
-                            document.querySelector('.button.ABP-Play.ABP-Pause.icon-pause').className = "button ABP-Play icon-play";
+                            document.querySelector('.button.ABP-Play.ABP-Pause.icon-pause').className = 'button ABP-Play icon-play';
                         }
                     }
                 }
             }, 200);
         },
-        html5hd: function () {
+        html5hd: function() {
             this.set('html5hd');
             let abp = biliHelper.switcher.html5('html5hd');
-            const hdErrorHandler = e => {
+            const hdErrorHandler = (e) => {
                 if (e.toString().match('request was interrupted by a call')) throw e;
                 if (videoLink.hd.length > 1) {
                     console.warn(e, 'HTML5 HD Error, try another link...');
@@ -1626,10 +1688,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             abp.video.querySelector('source').on('error', hdErrorHandler);
             abp.video.on('error', hdErrorHandler);
         },
-        html5ld: function () {
+        html5ld: function() {
             this.set('html5ld');
             let abp = biliHelper.switcher.html5('html5ld');
-            const ldErrorHandler = e => {
+            const ldErrorHandler = (e) => {
                 if (e.toString().match('request was interrupted by a call')) throw e;
                 if (videoLink.ld.length > 1) {
                     console.warn(e, 'HTML5 LD Error, try another link...');
@@ -1640,7 +1702,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             abp.video.querySelector('source').on('error', ldErrorHandler);
             abp.video.on('error', ldErrorHandler);
         },
-        bilimac: function () {
+        bilimac: function() {
             this.set('bilimac');
             __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').html('<div id="player_placeholder" class="player"></div><div id="loading-notice">正在加载 Bilibili Mac 客户端…</div>');
             __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').find('#player_placeholder').style.cssText =
@@ -1648,13 +1710,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 -webkit-filter: blur(20px);
                 overflow: hidden;
                 visibility: visible;`;
-            fetch("http://localhost:23330/rpc", {
-                method: "POST",
-                headers: {"Content-Type": "application/x-www-form-urlencoded"},
-                body: `action=playVideoByCID&data=${cid}|${window.location.href}|${document.title}|1`
-            }).then(res => res.ok && __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').find('#loading-notice').text('已在 Bilibili Mac 客户端中加载'))
-                .catch(e => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').find('#loading-notice').text('调用 Bilibili Mac 客户端失败 :('));
-        }
+            fetch('http://localhost:23330/rpc', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `action=playVideoByCID&data=${cid}|${window.location.href}|${document.title}|1`,
+            }).then((res) => res.ok && __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').find('#loading-notice').text('已在 Bilibili Mac 客户端中加载'))
+                .catch(() => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').find('#loading-notice').text('调用 Bilibili Mac 客户端失败 :('));
+        },
     };
     biliHelper.switcher[options.player]();
 })();
@@ -1662,108 +1724,107 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 /***/ }),
 /* 12 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-(function (root) {
-    'use strict';
-    var crctable = function () {
-        var c = 0,
-            table = typeof Int32Array !== 'undefined' ? new Int32Array(256) : new Array(256);
-        for (var n = 0; n !== 256; ++n) {
-            c = n;
-            for (var x = 0; x < 8; x++) {
-                c = c & 1 ? -306674912 ^ c >>> 1 : c >>> 1;
-            }
-            table[n] = c;
-        }
-        return table;
-    }();
-    var crcIndex = new crctable.constructor(256);
-    for (var f in crctable) crcIndex[f] = crctable[f] >>> 24;
+"use strict";
 
-    function crc32(input) {
-        if (typeof input !== 'string') input = "" + input;
-        var crcstart = 0xFFFFFFFF,
-            len = input.length,
-            index;
-        for (var _i = 0; _i < len; ++_i) {
-            index = (crcstart ^ input.charCodeAt(_i)) & 0xff;
-            crcstart = crcstart >>> 8 ^ crctable[index];
+let crctable = function() {
+    let c = 0,
+        table = typeof Int32Array !== 'undefined' ? new Int32Array(256) : new Array(256);
+    for (let n = 0; n !== 256; ++n) {
+        c = n;
+        for (let x = 0; x < 8; x++) {
+            c = c & 1 ? -306674912 ^ c >>> 1 : c >>> 1;
         }
-        return crcstart;
+        table[n] = c;
     }
+    return table;
+}();
+let crcIndex = new crctable.constructor(256);
+for (let f = 0; f < crctable.length; f++) crcIndex[f] = crctable[f] >>> 24;
 
-    function crc32lastindex(input) {
-        if (typeof input !== 'string') input = "" + input;
-        var crcstart = 0xFFFFFFFF,
-            len = input.length,
-            index;
-        for (var _i2 = 0; _i2 < len; ++_i2) {
-            index = (crcstart ^ input.charCodeAt(_i2)) & 0xff;
-            crcstart = crcstart >>> 8 ^ crctable[index];
-        }
-        return index;
+function crc32(input) {
+    if (typeof input !== 'string') input = '' + input;
+    let crcstart = 0xFFFFFFFF,
+        len = input.length,
+        index;
+    for (let _i = 0; _i < len; ++_i) {
+        index = (crcstart ^ input.charCodeAt(_i)) & 0xff;
+        crcstart = crcstart >>> 8 ^ crctable[index];
     }
+    return crcstart;
+}
 
-    function getcrcindex(t) {
-        for (var _i3 = 0; _i3 < 256; _i3++)
-            if (crcIndex[_i3] === t) return _i3;
-
-        return -1;
+function crc32lastindex(input) {
+    if (typeof input !== 'string') input = '' + input;
+    let crcstart = 0xFFFFFFFF,
+        len = input.length,
+        index;
+    for (let _i2 = 0; _i2 < len; ++_i2) {
+        index = (crcstart ^ input.charCodeAt(_i2)) & 0xff;
+        crcstart = crcstart >>> 8 ^ crctable[index];
     }
+    return index;
+}
 
-    function deepCheck(i, index) {
-        var tc = 0x00,
-            str = '',
-            hash = crc32(i);
-        for (var _i4 = 2; _i4 > -1; _i4--) {
-            tc = hash & 0xff ^ index[_i4];
-            if (tc > 57 || tc < 48) return [!1];
-            str += tc - 48;
-            hash = crctable[index[_i4]] ^ hash >>> 8;
-        }
-        return [!0, str];
+function getcrcindex(t) {
+    for (let _i3 = 0; _i3 < 256; _i3++)
+        if (crcIndex[_i3] === t) return _i3;
+
+    return -1;
+}
+
+function deepCheck(i, index) {
+    let tc = 0x00,
+        str = '',
+        hash = crc32(i);
+    for (let _i4 = 2; _i4 > -1; _i4--) {
+        tc = hash & 0xff ^ index[_i4];
+        if (tc > 57 || tc < 48) return [!1];
+        str += tc - 48;
+        hash = crctable[index[_i4]] ^ hash >>> 8;
     }
+    return [!0, str];
+}
 
-    function crc32_bstr(bstr, seed) {
-        var C = seed ^ -1,
-            L = bstr.length - 1;
-        for (var i = 0; i < L;) {
-            C = C >>> 8 ^ crctable[(C ^ bstr.charCodeAt(i++)) & 0xFF];
-            C = C >>> 8 ^ crctable[(C ^ bstr.charCodeAt(i++)) & 0xFF];
-        }
-        if (i === L) C = C >>> 8 ^ crctable[(C ^ bstr.charCodeAt(i)) & 0xFF];
-        return C ^ -1;
+function crc32_bstr(bstr, seed) {
+    let C = seed ^ -1,
+        L = bstr.length - 1,
+        i;
+    for (i = 0; i < L;) {
+        C = C >>> 8 ^ crctable[(C ^ bstr.charCodeAt(i++)) & 0xFF];
+        C = C >>> 8 ^ crctable[(C ^ bstr.charCodeAt(i++)) & 0xFF];
     }
-    var CRC32 = {};
-    CRC32.bstr = crc32_bstr;
-    var cache = {};
-    for (var s = 0; s < 1000; ++s) cache[CRC32.bstr('' + s) >>> 0] = s;
+    if (i === L) C = C >>> 8 ^ crctable[(C ^ bstr.charCodeAt(i)) & 0xFF];
+    return C ^ -1;
+}
+let CRC32 = {};
+CRC32.bstr = crc32_bstr;
+let cache = {};
+for (let s = 0; s < 1000; ++s) cache[CRC32.bstr('' + s) >>> 0] = s;
 
-    var index = new Array(4);
-    var checkCRCHash = function checkCRCHash(input) {
-        var snum, i, lastindex, deepCheckData, ht = parseInt(input, 16) ^ 0xffffffff;
-        if (cache[parseInt(input, 16)]) return cache[parseInt(input, 16)];
-        for (i = 3; i >= 0; i--) {
-            index[3 - i] = getcrcindex(ht >>> i * 8);
-            snum = crctable[index[3 - i]];
-            ht ^= snum >>> (3 - i) * 8;
+let index = new Array(4);
+let checkCRCHash = function checkCRCHash(input) {
+    let snum, i, lastindex, deepCheckData, ht = parseInt(input, 16) ^ 0xffffffff;
+    if (cache[parseInt(input, 16)]) return cache[parseInt(input, 16)];
+    for (i = 3; i >= 0; i--) {
+        index[3 - i] = getcrcindex(ht >>> i * 8);
+        snum = crctable[index[3 - i]];
+        ht ^= snum >>> (3 - i) * 8;
+    }
+    for (i = 0; i < 100000; i++) {
+        lastindex = crc32lastindex(i);
+        if (lastindex === index[3]) {
+            deepCheckData = deepCheck(i, index);
+            if (deepCheckData[0]) break;
         }
-        for (i = 0; i < 100000; i++) {
-            lastindex = crc32lastindex(i);
-            if (lastindex === index[3]) {
-                deepCheckData = deepCheck(i, index);
-                if (deepCheckData[0]) break;
-            }
-        }
-        if (i === 100000) return -1;
-        return i + '' + deepCheckData[1];
-    };
+    }
+    if (i === 100000) return -1;
+    return i + '' + deepCheckData[1];
+};
 
-    root.CRC32 = CRC32;
-    root.checkCRCHash = checkCRCHash;
-    if (typeof module === 'object' && module.exports) module.exports = {CRC32, checkCRCHash};
-})(this);
+module.exports = {CRC32, checkCRCHash};
+
 
 /***/ }),
 /* 13 */
@@ -1788,7 +1849,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  * Distributed under the BSD License
  * See http://pajhome.org.uk/crypt/md5 for more info.
  */
-/* global define */
+
 
 
 /*

@@ -7,13 +7,13 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
     url.flv = 'https://www.biliplus.com/BPplayurl.php?cid=' + cid + '&otype=json&type=flv';
     const parseJsonforFlvjs = (json) => {
         if (!json) return console.warn('parseJsonforFlvjs Failed: No JSON provided.');
-        var mediaDataSource = {};
+        let mediaDataSource = {};
         mediaDataSource.type = 'flv';
         if (parseInt(json.timelength)) mediaDataSource.duration = parseInt(json.timelength);
-        if (json.durl) mediaDataSource.segments = json.durl.map(obj => ({
-            "duration": obj.length,
-            "filesize": obj.size,
-            "url": obj.url.match("ws.acgvideo.com") ? obj.url : obj.url.replace(/^http:\/\//, "https://")
+        if (json.durl) mediaDataSource.segments = json.durl.map((obj) => ({
+            'duration': obj.length,
+            'filesize': obj.size,
+            'url': obj.url.match('ws.acgvideo.com') ? obj.url : obj.url.replace(/^http:\/\//, 'https://'),
         }));
         if (!json.durl) return console.warn('parseJsonforFlvjs Failed: Nothing to play.');
         return mediaDataSource;
@@ -21,21 +21,20 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
     const getVideoJson = async(url, retries) => {
         let json;
         try {
-            json = await fetch(url,{credentials}).then(response => response.json());
+            json = await fetch(url, {credentials}).then((response) => response.json());
         } catch (error) {
             if (--retries > 0) {
                 await sleep(retryDelay);
-                return await getVideoJson(url,retries);
-            }
-            else json = {
+                return await getVideoJson(url, retries);
+            } else json = {
                 'code': -1,
-                'message': error
+                'message': error,
             };
         }
         return json;
-    }
+    };
     let video = {};
-    for (let i of ['low','mp4','flv']) video[i] = await getVideoJson(url[i]);
+    for (let i of ['low', 'mp4', 'flv']) video[i] = await getVideoJson(url[i]);
     video.mediaDataSource = parseJsonforFlvjs(video.flv);
     return video;
 };

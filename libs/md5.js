@@ -16,7 +16,7 @@
  * Distributed under the BSD License
  * See http://pajhome.org.uk/crypt/md5 for more info.
  */
-/* global define */
+
 'use strict'
 
 /*
