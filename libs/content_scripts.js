@@ -2,6 +2,8 @@
 import {bilibiliVideoInfoProvider,bilibiliBangumiVideoInfoProvider} from './bilibiliVideoInfoProvider';
 import {parseSafe, parseTime, mySendMessage, parseXmlSafe, fetchretry, storageGet, _$, $h, getCookie, findPosTop} from './utils';
 import commentSenderQuery from './commentSenderQuery';
+import commentQuerySection from './commentQuerySection';
+import commentsHistorySection from './commentsHistorySection';
 import bilibiliVideoProvider from './bilibiliVideoProvider';
 import xml2ass from './xml2ass';
 import {getDownloadOptions, getNiceSectionFilename} from './filename-sanitize';
@@ -105,6 +107,8 @@ import sendComment from './sendComment';
     biliHelper.mainBlock.append(biliHelper.mainBlock.downloaderSection);
     biliHelper.mainBlock.querySection = $h('<div class="section query"><h3>弹幕发送者查询</h3><p><span></span>正在加载全部弹幕, 请稍等…</p></div>');
     biliHelper.mainBlock.append(biliHelper.mainBlock.querySection);
+    biliHelper.mainBlock.historySection = $h('<div class="section history"><h3>历史弹幕切换</h3><p><span></span>正在加载全部弹幕, 请稍等…</p></div>');
+    biliHelper.mainBlock.append(biliHelper.mainBlock.historySection);
     biliHelper.originalPlayer = _$('#bofqi').innerHTML;
     (isBangumi && !genPage ? _$('.v1-bangumi-info-operate .v1-app-btn').empty() : _$('.player-wrapper .arc-toolbar')).append(biliHelper);
     _$('#bofqi').html('<div id="player_placeholder" class="player"></div>');
@@ -184,46 +188,18 @@ import sendComment from './sendComment';
 
     // begin comment user query
     biliHelper.comments = comment.xml.getElementsByTagName('d');
-    let control = $h('<div><input type="text" class="b-input" placeholder="根据关键词筛选弹幕"><select class="list"><option disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</option></select><span class="result">选择弹幕查看发送者…</span></div>');
-    control.find('.b-input').onkeyup = e => {
-        const keyword = control.find('input').value,
-            regex = new RegExp(parseSafe(keyword), 'gi');
-        control.find('select.list').html('<option disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</option>');
-        for (let node of biliHelper.comments){
-            let text = node.childNodes[0];
-            if (text && node && regex.test(text.nodeValue)) {
-                text = text.nodeValue;
-                const commentData = node.getAttribute('p').split(','),
-    	                        sender = commentData[6],
-    	                        time = parseTime(parseInt(commentData[0]) * 1000);
-    	        let option = $h(`<option sender=${sender}></option>`);
-    	        option.sender = sender;
-    	        option.html('[' + time + '] ' + (keyword.trim() === '' ? parseSafe(text) : parseSafe(text).replace(regex, kw => '<span class="kw">' + kw + '</span>')));
-    	        control.find('select.list').append(option);
-    	    }
-        }
+    comment.ccl = BilibiliParser(comment.xml);
+    commentQuerySection(biliHelper.comments, biliHelper.mainBlock.querySection.find('p'));
+    const changeComments = async(url) => {
+        comment.url = url;
+        comment._xml = fetchretry(comment.url).then(res => res.text()).then(text => parseXmlSafe(text));
+        comment.xml = await comment._xml;
+        biliHelper.comments = comment.xml.getElementsByTagName('d');
+        comment.ccl = BilibiliParser(comment.xml);
+        commentQuerySection(biliHelper.comments, biliHelper.mainBlock.querySection.find('p'));
+        if (biliHelper.switcher.cmManager) comment.ccl.forEach(cmt => biliHelper.switcher.cmManager.insert(cmt));
     };
-    control.find('.b-input').onkeyup();
-    const displayUserInfo = (mid, data) => {
-        if (!mid) return control.find('.result').text('查询失败');
-        control.find('.result').html('发送者: <a href="http://space.bilibili.com/' + mid + '" target="_blank" card="' + parseSafe(data.name) + '" mid="' + mid + '">' + parseSafe(data.name) + '</a><div target="_blank" class="user-info-level l' + parseSafe(data.level_info.current_level) + '"></div>');
-        let s = document.createElement('script');
-        s.appendChild(document.createTextNode('UserCard.bind($("#bilibili_helper .query .result"));'));
-        document.body.appendChild(s);
-        s.parentNode.removeChild(s);
-    };
-
-    const _selectList = control.find('select.list');
-    _selectList.style.maxWidth = '272px';
-    _selectList.style.borderRadius = '3px';
-    _selectList.style.height = '25px';
-    _selectList.onchange = e => {
-        const sender = _selectList.selectedOptions[0].sender;
-        control.find('.result').text('查询中…');
-        if (sender.indexOf('D') == 0) return control.find('.result').text('游客弹幕');
-        commentSenderQuery(sender).then(data => displayUserInfo(data.mid,data));
-    };
-    biliHelper.mainBlock.querySection.find('p').empty().append(control);
+    commentsHistorySection(cid, biliHelper.mainBlock.historySection.find('p'), changeComments);
 
     // video player switcher begin
     const restartVideo = video => !video.paused && !video.pause() && !video.play();
@@ -270,6 +246,7 @@ import sendComment from './sendComment';
             if (this.current == 'html5' && this.flvPlayer) this.flvPlayer.destroy();
             if (this.checkFinished) clearInterval(this.checkFinished);
             if (this.interval) clearInterval(this.interval);
+            if (this.cmManager) this.cmManager = null;
             if (!newMode.match('html5')) this.unbind();
             biliHelper.mainBlock.speedSection.res.innerText = "";
             biliHelper.mainBlock.speedSection.input.onchange = null;
@@ -314,7 +291,7 @@ import sendComment from './sendComment';
                 src: {
                     playlist: [{
                         video: document.getElementById("bilibili_helper_html5_player_video"),
-                        comments: BilibiliParser(comment.xml)
+                        comments: comment.ccl
                     }]
                 },
                 width: "100%",
@@ -334,6 +311,7 @@ import sendComment from './sendComment';
             });
             abp.playerUnit.addEventListener("saveconfig",  e => e.detail && Object.assign(options, e.detail) && chrome.storage.local.set(options));
             this.bind(abp.video);
+            this.cmManager = abp.cmManager;
             if (type && type.match(/hd|ld/)) return abp;
             this.flvPlayer = flvjs.createPlayer(videoLink.mediaDataSource);
             biliHelper.switcher.interval = setInterval(function () {
@@ -344,7 +322,7 @@ import sendComment from './sendComment';
                     biliHelper.switcher.flvPlayer.on(flvjs.Events.ERROR, e => console.warn(e, 'Switch back to HTML5 HD.', biliHelper.switcher.html5hd()));
                     biliHelper.switcher.flvPlayer.on(flvjs.Events.MEDIA_INFO, e => console.log('分辨率: ' + e.width + "x" + e.height + ', FPS: ' + e.fps, '视频码率: ' + Math.round(e.videoDataRate * 100) / 100, '音频码率: ' + Math.round(e.audioDataRate * 100) / 100));
                 }
-            }, 1000);
+            }, 100);
             let lastTime;
             biliHelper.switcher.checkFinished = setInterval(function () {
                 if (abp.video.currentTime !== lastTime) {

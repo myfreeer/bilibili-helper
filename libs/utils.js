@@ -7,7 +7,7 @@ Element.prototype.off = Element.prototype.removeEventListener;
 Element.prototype.data = function(str){ return this.dataset[str]; };
 Element.prototype.text = function(str){ return str ? (this.innerText = str) : this.innerText; };
 Element.prototype.empty = function(){ this.innerHTML = ''; return this; };
-Element.prototype.html = function(str){ str ? (this.innerHTML = str) : this.innerHTML;return this; };
+Element.prototype.html = function(str){ return str ? (this.innerHTML = str) && this : this.innerHTML; };
 Element.prototype.hide = function(){ this.style.display = 'none'; };
 Element.prototype.show = function(){ this.style.display = ''; };
 Element.prototype.addClass = function(){ return this.classList.add(...arguments); };
@@ -63,4 +63,11 @@ export const findPosTop = obj => {
         }
     }
     return curtop;
+};
+
+export const unsafeEval = string => {
+	let script = document.createElement('script');
+	script.appendChild(document.createTextNode(string));
+	(document.body || document.getElementsByTagName('body')[0]).appendChild(script);
+	script.parentNode.removeChild(script);
 };
