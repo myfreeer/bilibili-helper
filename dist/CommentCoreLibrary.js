@@ -443,8 +443,8 @@ var CoreComment = (function () {
             var color = c.toString(16);
             color = color.length >= 6 ? color : new Array(6 - color.length + 1).join("0") + color;
             this.dom.style.color = "#" + color;
-            var reversedColor = (((parseInt(color[0], 16) * 16 + parseInt(color[1], 16)) * 0.2126 + (parseInt(color[2], 16) * 16 - parseInt(color[3], 16)) * 0.7152 + (parseInt(color[4], 16) * 16 - parseInt(color[5], 16)) * 0.0722)) < 0x48 ? '#FFFFFF' : '#000000';
-            var textShadow = '-0.6px -0.6px 0 ' + reversedColor + ',0.6px 0.6px 0 ' + reversedColor + ',0.6px -0.6px 0 ' + reversedColor + ',-0.6px 0.6px 0 ' + reversedColor;
+            var reversedColor = (((c >> 16) & 0xff) * 0.2126 + ((c >>  8) & 0xff) * 0.7152 + (c & 0xff) * 0.0722)) < 0x48 ? '#FFFFFF' : '#000000';
+            var textShadow = '-0.6px -0.6px 0 ' + reversedColor + new Array(4).join(',0.6px 0.6px 0 ' + reversedColor);
             this.dom.style.textShadow = textShadow;
             if (this._color === 0) {
                 this.dom.className = this.parent.options.global.className + " rshadow";
@@ -511,16 +511,6 @@ var CoreComment = (function () {
         enumerable: true,
         configurable: true
     });
-
-
-
-
-
-
-
-
-
-
 
     CoreComment.prototype.time = function (time) {
         this.ttl -= time;
