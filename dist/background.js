@@ -64,7 +64,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     switch (request.command) {
     case 'injectCSS':
         chrome.tabs.insertCSS(sender.tab.id, {file: 'bilibili-helper.css'});
-        chrome.tabs.insertCSS(sender.tab.id, {file: 'colpick.css'});
+        chrome.tabs.insertCSS(sender.tab.id, {file: 'ColorPicker.css'});
         chrome.tabs.insertCSS(sender.tab.id, {file: 'ABPlayer.css'}, sendResponse);
         return true;
     case 'refreshOptions':
