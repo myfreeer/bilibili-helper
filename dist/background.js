@@ -57,7 +57,7 @@ const trackingUrls = [
     '*://data.bilibili.com/rec.js*',
     '*://data.bilibili.com/v/flashplay/h5_player_op*',
 ];
-const videoPlaybackHosts = ['*://*.hdslb.com/*', '*://*.acgvideo.com/*', '*://*/*.acgvideo.com/*', '*://*.biliplus.com/BPplayurl.php*'];
+const videoPlaybackHosts = ['*://*.hdslb.com/*', '*://api.bilibili.com/*', '*://interface.bilibili.com/*', '*://*.acgvideo.com/*', '*://*/*.acgvideo.com/*', '*://*.biliplus.com/BPplayurl.php*'];
 
 // message listener
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -85,6 +85,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         return false;
     }
 });
+// tabs listener
+let tabs = [];
+chrome.tabs.query({}, (info) => (tabs = info));
+chrome.tabs.onUpdated.addListener(() => chrome.tabs.query({}, (info) => (tabs = info)));
 
 // webRequest listener
 chrome.webRequest.onBeforeRequest.addListener(function(details) {
@@ -104,19 +108,28 @@ chrome.webRequest.onBeforeRequest.addListener(function() {
 }, ['blocking']);
 
 function receivedHeaderModifier(details) {
-    let hasCORS = false;
+    let hasCORS, hasCredentials;
+    let cors = '*';
+    for (let i of tabs) if (i.id === details.tabId) cors = (new URL(i.url)).protocol + '//' + (new URL(i.url)).hostname;
     details.responseHeaders.forEach(function(v) {
         if (v.name.toLowerCase() === 'access-control-allow-origin') {
             hasCORS = true;
-            v.value = '*';
+            v.value = cors;
+        } else if (v.name.toLowerCase() === 'access-control-allow-credentials') {
+            v.value = 'true';
+            hasCredentials = true;
         }
     });
     if (!hasCORS) {
         details.responseHeaders.push({
             name: 'Access-Control-Allow-Origin',
-            value: '*',
+            value: cors,
         });
     }
+    if (!hasCredentials) details.responseHeaders.push({
+        name: 'Access-Control-Allow-Credentials',
+        value: 'true',
+    });
     return {
         responseHeaders: details.responseHeaders,
     };
