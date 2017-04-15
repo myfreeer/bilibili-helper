@@ -162,6 +162,12 @@
     height: 6px;
 }
 
+.arc-toolbar .helper .info .main .section.speed input,
+.v1-bangumi-info-btn.helper .info .main .section.speed input {
+    padding: 0px;
+    width: 35px;
+}
+
 .arc-toolbar .helper .info .main .section.query .b-slt .kw,
 .v1-bangumi-info-btn.helper .info .main .section.query .b-slt .kw {
     color: #f25d8e;

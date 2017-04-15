@@ -1412,20 +1412,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     biliHelper.find('.t').onclick = () => biliHelper.toggleClass('active');
     biliHelper.blockInfo = biliHelper.find('.info');
     biliHelper.mainBlock = biliHelper.find('.main');
-    biliHelper.mainBlock.infoSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="section video hidden"><h3>视频信息</h3><p><span></span><span>aid: ' + avid + '</span><span>pg: ' + page + '</span></p></div>');
+    biliHelper.mainBlock.infoSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="section video hidden"><h3>视频信息</h3><p><span></span><span>aid: ' + avid + '</span><span>pg: ' + page + '</span><span id="bilibili_helper_html5_video_res"></span></p></div>');
     biliHelper.mainBlock.append(biliHelper.mainBlock.infoSection);
     biliHelper.mainBlock.ondblclick = (e) => e.shiftKey && biliHelper.mainBlock.infoSection.toggleClass('hidden');
     if (genPage && genPage.match && genPage.match('http')) {
         biliHelper.mainBlock.redirectSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="section redirect">生成页选项: <a class="b-btn w" href="' + genPage + '">前往原始跳转页</a></div>');
         biliHelper.mainBlock.append(biliHelper.mainBlock.redirectSection);
     }
-    biliHelper.mainBlock.speedSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="section speed hidden"><h3>视频播放控制</h3><p><span id="bilibili_helper_html5_video_res"></span><a class="b-btn w" id="bilibili_helper_html5_video_mirror">镜像视频</a><br>视频播放速度: <input id="bilibili_helper_html5_video_speed" type="number" class="b-input" placeholder="1.0" value=1.0 style="width: 40px;">    旋转视频: <input id="bilibili_helper_html5_video_rotate" type="number" class="b-input" placeholder="0" value=0 style="width: 40px;"></p></div>');
+    biliHelper.mainBlock.speedSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="section speed hidden"><h3>视频播放控制</h3><p><a class="b-btn w" id="bilibili_helper_html5_video_mirror">镜像视频</a>  旋转视频: <input id="bilibili_helper_html5_video_rotate" type="number" class="b-input" placeholder="0" value="0" style="padding: 0px;width: 40px;" step="90">  亮度: <input id="bilibili_helper_html5_video_brightness" type="number" class="b-input" placeholder="1" value="1" step="0.1"><br>播放速度: <input id="bilibili_helper_html5_video_speed" type="number" class="b-input" placeholder="1" value="1" step="0.1">对比度:<input id="bilibili_helper_html5_video_contrast" type="number" class="b-input" placeholder="1" value="1" step="0.1">饱和度:<input id="bilibili_helper_html5_video_saturate" type="number" class="b-input" placeholder="1" value="1" step="0.1"></p></p></div>');
     biliHelper.mainBlock.append(biliHelper.mainBlock.speedSection);
     biliHelper.mainBlock.speedSection.input = biliHelper.mainBlock.speedSection.find('input#bilibili_helper_html5_video_speed.b-input');
     biliHelper.mainBlock.speedSection.input.step = 0.1;
-    biliHelper.mainBlock.speedSection.res = biliHelper.mainBlock.speedSection.find('#bilibili_helper_html5_video_res');
-    biliHelper.mainBlock.speedSection.mirror = biliHelper.mainBlock.speedSection.find('#bilibili_helper_html5_video_mirror');
-    biliHelper.mainBlock.speedSection.rotate = biliHelper.mainBlock.speedSection.find('#bilibili_helper_html5_video_rotate');
+    biliHelper.mainBlock.speedSection.res = biliHelper.mainBlock.infoSection.find('#bilibili_helper_html5_video_res');
+    for (let i of ['mirror', 'rotate', 'brightness', 'speed', 'contrast', 'saturate']) biliHelper.mainBlock.speedSection[i] = biliHelper.mainBlock.speedSection.find('#bilibili_helper_html5_video_' + i);
     biliHelper.mainBlock.speedSection.rotate.step = 90;
     biliHelper.mainBlock.switcherSection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="section switcher"><h3>播放器切换</h3></div>');
     biliHelper.mainBlock.switcherSection.button = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<p><a class="b-btn w" type="original">原始播放器</a><a class="b-btn w" type="bilih5">原始HTML5</a><a class="b-btn w hidden" type="bilimac">Mac 客户端</a><a class="b-btn w hidden" type="swf">SWF 播放器</a><a class="b-btn w hidden" type="iframe">Iframe 播放器</a><a class="b-btn w hidden" type="html5">HTML5超清</a><a class="b-btn w hidden" type="html5hd">HTML5高清</a><a class="b-btn w hidden" type="html5ld">HTML5低清</a></p>');
@@ -1547,12 +1546,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         } else if (!biliHelper.mainBlock.speedSection.mirror.hasClass('w')) transform += 'matrix(-1, 0, 0, 1, 0, 0)';
         biliHelper.switcher.video.style.transform = transform;
     };
+    const cssFilterHandler = (e) => {
+        const elements = biliHelper.mainBlock.speedSection;
+        let filter = '';
+        for (let i of  ['brightness', 'contrast', 'saturate']) filter += `${i}(${elements[i].value}) `;
+        biliHelper.switcher.video.style.filter = filter;
+    };
     biliHelper.switcher = {
         current: 'original',
         inited: false,
         _init: function(video) {
             this.video = video;
-            biliHelper.mainBlock.speedSection.input.on('change', (e) => {
+            const elements = biliHelper.mainBlock.speedSection;
+            elements.input.on('change', (e) => {
                 if (Number(e.target.value)) {
                     biliHelper.switcher.video.playbackRate = Number(e.target.value);
                     restartVideo(biliHelper.switcher.video);
@@ -1560,8 +1566,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     e.target.value = 1.0;
                 }
             });
-            biliHelper.mainBlock.speedSection.rotate.on('change', mirrorAndRotateHandler);
-            biliHelper.mainBlock.speedSection.mirror.on('click', mirrorAndRotateHandler);
+            elements.rotate.on('change', mirrorAndRotateHandler);
+            elements.mirror.on('click', mirrorAndRotateHandler);
+            for (let i of  ['brightness', 'contrast', 'saturate']) elements[i].on('change', cssFilterHandler);
             this.inited = 1;
         },
         bind: function(video) {
@@ -1681,7 +1688,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 if (e.toString().match('request was interrupted by a call')) throw e;
                 if (videoLink.hd.length > 1) {
                     console.warn(e, 'HTML5 HD Error, try another link...');
-                    videoLink.hd.splice(0, 1);
+                    videoLink.hd.shift();
                     biliHelper.switcher.html5('html5hd');
                 } else console.warn(e, 'HTML5 HD Error, switch back to HTML5 LD.', biliHelper.switcher.html5ld());
             };
@@ -1695,7 +1702,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 if (e.toString().match('request was interrupted by a call')) throw e;
                 if (videoLink.ld.length > 1) {
                     console.warn(e, 'HTML5 LD Error, try another link...');
-                    videoLink.ld.splice(0, 1);
+                    videoLink.ld.shift();
                     biliHelper.switcher.html5('html5ld');
                 } else throw e;
             };
