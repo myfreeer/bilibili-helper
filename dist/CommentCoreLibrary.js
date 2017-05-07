@@ -450,9 +450,7 @@ var CoreComment = (function () {
             var color = c.toString(16);
             color = color.length >= 6 ? color : new Array(6 - color.length + 1).join('0') + color;
             this.dom.style.color = '#' + color;
-            var shadowColor = (((c >> 16) & 0xff) * 0.2126 + ((c >> 8) & 0xff) * 0.7152 + (c & 0xff) * 0.0722) < 0x48 ? '#FFFFFF' : '#000000';
-            this.dom.style.textShadow = '-0.6px -0.6px 0 ' + shadowColor + Array(4).join(',0.6px 0.6px 0 ' + shadowColor);
-            if (this._color === 0) {
+            if ((((c >> 16) & 0xff) * 0.2126 + ((c >> 8) & 0xff) * 0.7152 + (c & 0xff) * 0.0722) < 0x80) {
                 this.dom.className = this.parent.options.global.className + ' rshadow';
             }
         },

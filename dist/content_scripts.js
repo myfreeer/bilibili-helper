@@ -342,7 +342,7 @@ const parseJsonforFlvjs = (json) => {
     if (json.durl) mediaDataSource.segments = json.durl.map((obj) => ({
         'duration': obj.length,
         'filesize': obj.size,
-        'url': obj.url.match('ws.acgvideo.com') ? obj.url : obj.url.replace(/^http:\/\//, 'https://'),
+        'url': obj.url.replace(/^http:\/\//, 'https://'),
     }));
     if (!json.durl) return console.warn('parseJsonforFlvjs Failed: Nothing to play.');
     if (mediaDataSource.segments.length === 1 && json.durl[0].backup_url && json.durl[0].backup_url.length === 1 && !mediaDataSource.segments[0].url.match('flv') && json.durl[0].backup_url[0].match('flv')) mediaDataSource.segments[0].url = json.durl[0].backup_url[0].replace(/^http:\/\//, 'https://');
@@ -414,7 +414,7 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
     video.ld = [];
     const processVideoUrl = (url) => {
         if (!url) return;
-        if (!url.match('ws.acgvideo.com')) url = url.replace(/^http:\/\//, 'https://');
+        url = url.replace(/^http:\/\//, 'https://');
         if (url.match('hd.mp4')) video.hd.push(url);
         else if (url.match('.mp4')) video.ld.push(url);
     };

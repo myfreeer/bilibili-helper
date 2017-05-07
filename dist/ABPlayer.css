@@ -172,13 +172,11 @@
   -webkit-text-stroke: 2px black;
   z-index: 10;
 }
-.ABP-Unit .ABP-Video .ABP-Container .cmt.noshadow::after {
-  content: "";
-  display: none;
-  z-index: 10;
+.ABP-Unit .ABP-Video .ABP-Container .cmt.noshadow {
+  text-shadow: none;
 }
-.ABP-Unit .ABP-Video .ABP-Container .cmt.rshadow::after {
-  -webkit-text-stroke: 1px white;
+.ABP-Unit .ABP-Video .ABP-Container .cmt.rshadow {
+  text-shadow: rgb(255, 255, 255) -0.6px -0.6px 0px, rgb(255, 255, 255) 0.6px 0.6px 0px, rgb(255, 255, 255) 0.6px 0.6px 0px, rgb(255, 255, 255) 0.6px 0.6px 0px;
   z-index: 10;
 }
 
