@@ -90,7 +90,7 @@ let checkCRCHash = function checkCRCHash(input) {
             if (deepCheckData[0]) break;
         }
     }
-    if (i === 100000) return -1;
+    if (i === 100000) return false;
     return i + '' + deepCheckData[1];
 };
 

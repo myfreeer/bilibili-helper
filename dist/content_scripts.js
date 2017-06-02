@@ -6,9 +6,9 @@
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -1296,16 +1296,15 @@ const xml2ass = (xmldoc, opts) => '\ufeff' + generateASS(setPosition(parseXML(''
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__crc32__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__crc32___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__crc32__);
 
 const commentSenderQuery = async(hash, retries = 5) => {
     if (sessionStorage['commentSender_hash_' + hash]) return JSON.parse(sessionStorage['commentSender_hash_' + hash]);
     if (hash.indexOf('D') === 0) return {};
-    let mid = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__crc32__["checkCRCHash"])(hash);
+    let mid = await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__crc32__["a" /* checkCRCHash */])(hash);
     if (!mid) return {mid};
     try {
         let json = await fetch(`${location.protocol}//api.bilibili.com/cardrich?mid=${mid}`).then((res) => res.json());
-        if (hash && (__WEBPACK_IMPORTED_MODULE_0__crc32__["CRC32"].bstr('' + mid) >>> 0) === parseInt(hash, 16)) sessionStorage['commentSender_hash_' + hash] = JSON.stringify(json.data.card);
+        if (hash && (__WEBPACK_IMPORTED_MODULE_0__crc32__["b" /* CRC32 */].bstr('' + mid) >>> 0) === parseInt(hash, 16)) sessionStorage['commentSender_hash_' + hash] = JSON.stringify(json.data.card);
         return json.data.card;
     } catch (e) {
         if (--retries > 0) return await commentSenderQuery(hash, retries);
@@ -1549,7 +1548,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     const cssFilterHandler = (e) => {
         const elements = biliHelper.mainBlock.speedSection;
         let filter = '';
-        for (let i of  ['brightness', 'contrast', 'saturate']) filter += `${i}(${elements[i].value}) `;
+        for (let i of ['brightness', 'contrast', 'saturate']) filter += `${i}(${elements[i].value}) `;
         biliHelper.switcher.video.style.filter = filter;
     };
     biliHelper.switcher = {
@@ -1568,7 +1567,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             });
             elements.rotate.on('change', mirrorAndRotateHandler);
             elements.mirror.on('click', mirrorAndRotateHandler);
-            for (let i of  ['brightness', 'contrast', 'saturate']) elements[i].on('change', cssFilterHandler);
+            for (let i of ['brightness', 'contrast', 'saturate']) elements[i].on('change', cssFilterHandler);
             this.inited = 1;
         },
         bind: function(video) {
@@ -1731,9 +1730,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 /***/ }),
 /* 12 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(0);
+
 
 let crctable = function() {
     let c = 0,
@@ -1747,52 +1748,6 @@ let crctable = function() {
     }
     return table;
 }();
-let crcIndex = new crctable.constructor(256);
-for (let f = 0; f < crctable.length; f++) crcIndex[f] = crctable[f] >>> 24;
-
-function crc32(input) {
-    if (typeof input !== 'string') input = '' + input;
-    let crcstart = 0xFFFFFFFF,
-        len = input.length,
-        index;
-    for (let _i = 0; _i < len; ++_i) {
-        index = (crcstart ^ input.charCodeAt(_i)) & 0xff;
-        crcstart = crcstart >>> 8 ^ crctable[index];
-    }
-    return crcstart;
-}
-
-function crc32lastindex(input) {
-    if (typeof input !== 'string') input = '' + input;
-    let crcstart = 0xFFFFFFFF,
-        len = input.length,
-        index;
-    for (let _i2 = 0; _i2 < len; ++_i2) {
-        index = (crcstart ^ input.charCodeAt(_i2)) & 0xff;
-        crcstart = crcstart >>> 8 ^ crctable[index];
-    }
-    return index;
-}
-
-function getcrcindex(t) {
-    for (let _i3 = 0; _i3 < 256; _i3++)
-        if (crcIndex[_i3] === t) return _i3;
-
-    return -1;
-}
-
-function deepCheck(i, index) {
-    let tc = 0x00,
-        str = '',
-        hash = crc32(i);
-    for (let _i4 = 2; _i4 > -1; _i4--) {
-        tc = hash & 0xff ^ index[_i4];
-        if (tc > 57 || tc < 48) return [!1];
-        str += tc - 48;
-        hash = crctable[index[_i4]] ^ hash >>> 8;
-    }
-    return [!0, str];
-}
 
 function crc32_bstr(bstr, seed) {
     let C = seed ^ -1,
@@ -1805,32 +1760,21 @@ function crc32_bstr(bstr, seed) {
     if (i === L) C = C >>> 8 ^ crctable[(C ^ bstr.charCodeAt(i)) & 0xFF];
     return C ^ -1;
 }
-let CRC32 = {};
-CRC32.bstr = crc32_bstr;
-let cache = {};
-for (let s = 0; s < 1000; ++s) cache[CRC32.bstr('' + s) >>> 0] = s;
+const CRC32 = {bstr: crc32_bstr};
+/* harmony export (immutable) */ __webpack_exports__["b"] = CRC32;
 
-let index = new Array(4);
-let checkCRCHash = function checkCRCHash(input) {
-    let snum, i, lastindex, deepCheckData, ht = parseInt(input, 16) ^ 0xffffffff;
-    if (cache[parseInt(input, 16)]) return cache[parseInt(input, 16)];
-    for (i = 3; i >= 0; i--) {
-        index[3 - i] = getcrcindex(ht >>> i * 8);
-        snum = crctable[index[3 - i]];
-        ht ^= snum >>> (3 - i) * 8;
+
+const checkCRCHash = async(input) => {
+    let obj;
+    try {
+        obj = await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* fetchretry */])(`https://biliquery.typcn.com/api/user/hash/${input}`).then((res) => res.json());
+        if (obj && obj.data && obj.data[0] && obj.data[0].id) return obj.data[0].id;
+    } catch (e) {
+        console.warn(e);
     }
-    for (i = 0; i < 100000; i++) {
-        lastindex = crc32lastindex(i);
-        if (lastindex === index[3]) {
-            deepCheckData = deepCheck(i, index);
-            if (deepCheckData[0]) break;
-        }
-    }
-    if (i === 100000) return -1;
-    return i + '' + deepCheckData[1];
+    return false;
 };
-
-module.exports = {CRC32, checkCRCHash};
+/* harmony export (immutable) */ __webpack_exports__["a"] = checkCRCHash;
 
 
 /***/ }),
