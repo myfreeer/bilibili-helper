@@ -22,11 +22,17 @@ import sendComment from './sendComment';
     // get video info
     switch (location.hostname) {
     case 'www.bilibili.com': {
-        const _avid = url.match(/bilibili.com\/video\/av([0-9]+)/);
-        if (!_avid) return console.warn('cannot match avid');
-        avid = url.match(/bilibili.com\/video\/av([0-9]+)/)[1];
-        const _page = url.match(/bilibili.com\/video\/av[0-9]+\/index_([0-9]+).html/);
-        page = _page ? _page[1] : 1;
+        let _avid, _page;
+        if (url.match('bilibili.com/watchlater')) {
+            _avid = url.match(/bilibili.com\/watchlater\/#\/av(\d+)/);
+            _page = url.match(/bilibili.com\/watchlater\/#\/av\d+/);
+        } else {
+            _avid = url.match(/bilibili.com\/video\/av([0-9]+)/);
+            _page = url.match(/bilibili.com\/video\/av[0-9]+\/index_([0-9]+)/);
+        }
+        if (!(_avid && _avid[1])) return console.warn('cannot match avid');
+        avid = _avid[1];
+        page = (_page && _page[1]) ? _page[1] : 1;
         videoInfo = await bilibiliVideoInfoProvider(avid, page);
         break;
     }

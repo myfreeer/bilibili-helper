@@ -6,9 +6,9 @@
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
+/******/ 		if(installedModules[moduleId])
 /******/ 			return installedModules[moduleId].exports;
-/******/ 		}
+/******/
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -1354,11 +1354,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     // get video info
     switch (location.hostname) {
     case 'www.bilibili.com': {
-        const _avid = url.match(/bilibili.com\/video\/av([0-9]+)/);
-        if (!_avid) return console.warn('cannot match avid');
-        avid = url.match(/bilibili.com\/video\/av([0-9]+)/)[1];
-        const _page = url.match(/bilibili.com\/video\/av[0-9]+\/index_([0-9]+).html/);
-        page = _page ? _page[1] : 1;
+        let _avid, _page;
+        if (url.match('bilibili.com/watchlater')) {
+            _avid = url.match(/bilibili.com\/watchlater\/#\/av(\d+)/);
+            _page = url.match(/bilibili.com\/watchlater\/#\/av\d+/);
+        } else {
+            _avid = url.match(/bilibili.com\/video\/av([0-9]+)/);
+            _page = url.match(/bilibili.com\/video\/av[0-9]+\/index_([0-9]+)/);
+        }
+        if (!(_avid && _avid[1])) return console.warn('cannot match avid');
+        avid = _avid[1];
+        page = (_page && _page[1]) ? _page[1] : 1;
         videoInfo = await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__bilibiliVideoInfoProvider__["a" /* bilibiliVideoInfoProvider */])(avid, page);
         break;
     }
@@ -1775,6 +1781,7 @@ const checkCRCHash = async(input) => {
     return false;
 };
 /* harmony export (immutable) */ __webpack_exports__["a"] = checkCRCHash;
+
 
 
 /***/ }),
