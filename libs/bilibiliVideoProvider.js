@@ -145,7 +145,7 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
     }
     // if flv urls still not available, retry with biliplus api (a 3rd-party api)
     if (video.mediaDataSource.type === 'mp4') {
-        video.flv = await getVideoLink(`${location.protocol}://www.biliplus.com/BPplayurl.php?cid=${cid}&otype=json&quality=4&type=flv&update=1`, 'flv', retries, credentials, retryDelay);
+        video.flv = await getVideoLink(`${location.protocol}//www.biliplus.com/BPplayurl.php?cid=${cid}&otype=json&quality=4&type=flv&update=1`, null, retries, credentials, retryDelay);
         processVideoUrlObj(video.flv);
         video.mediaDataSource = parseJsonforFlvjs(video.flv);
     }
