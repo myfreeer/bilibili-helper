@@ -424,10 +424,17 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
         if (obj.durl[0].backup_url && obj.durl[0].backup_url[0]) obj.durl[0].backup_url.forEach((url) => processVideoUrl(url));
     };
     for (let i of types) processVideoUrlObj(video[i]);
+    // if flv urls not available, retry with alternative api
     if (video.mediaDataSource.type === 'mp4') {
         const ts = Math.ceil(Date.now() / 1000);
         url.flv = url._base + `${interfaceUrl(cid, ts)}&sign=${calcSign(cid, ts)}`;
         video.flv = await getVideoLink(url.flv, 'flv', retries, credentials, retryDelay);
+        processVideoUrlObj(video.flv);
+        video.mediaDataSource = parseJsonforFlvjs(video.flv);
+    }
+    // if flv urls still not available, retry with biliplus api (a 3rd-party api)
+    if (video.mediaDataSource.type === 'mp4') {
+        video.flv = await getVideoLink(`${location.protocol}://www.biliplus.com/BPplayurl.php?cid=${cid}&otype=json&quality=4&type=flv&update=1`, 'flv', retries, credentials, retryDelay);
         processVideoUrlObj(video.flv);
         video.mediaDataSource = parseJsonforFlvjs(video.flv);
     }
