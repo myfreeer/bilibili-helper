@@ -18,6 +18,10 @@ refreshOptions();
 // static data
 const trackingUrls = [
     '*://data.bilibilijj.com/free/*.txt*',
+    '*://data.bilibili.com/log/web*',
+    '*://cm.bilibili.com/cm/api/fees/pc',
+    '*://cm.bilibili.com/cm/api/apidata/pc',
+    '*://cm.bilibili.com/cm/api/receive/content/pc',
     '*://tajs.qq.com/stats*',
     '*://*.secureweb24.net/*',
     '*://*.cnzz.com/stat.php*',
