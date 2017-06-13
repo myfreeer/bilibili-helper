@@ -258,9 +258,9 @@ class PlayerSwitcher {
                 e.target.value = 1.0;
             }
         });
-        elements.rotate.on('change', (e)=>this._mirrorAndRotateHandler(e, this.speedSection, this.video));
-        elements.mirror.on('click', (e)=>this._mirrorAndRotateHandler(e, this.speedSection, this.video));
-        for (let i of ['brightness', 'contrast', 'saturate']) elements[i].on('change', (e)=>this._cssFilterHandler(e, this.speedSection, this.video));
+        elements.rotate.on('change', (e) => this._mirrorAndRotateHandler(e, this.speedSection, this.video));
+        elements.mirror.on('click', (e) => this._mirrorAndRotateHandler(e, this.speedSection, this.video));
+        for (let i of ['brightness', 'contrast', 'saturate']) elements[i].on('change', (e) => this._cssFilterHandler(e, this.speedSection, this.video));
         this.inited = true;
     }
     _bind(video) {
@@ -1593,7 +1593,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     comment.url = `${location.protocol}//comment.bilibili.com/${cid}.xml`;
     comment._xml = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* fetchretry */])(comment.url).then((res) => res.text()).then((text) => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* parseXmlSafe */])(text));
     options = await _options;
-    const optionsChangeCallback = (newOpts) => (options = newOpts);
+    const optionsChangeCallback = (newOpts) => (options = newOpts) && chrome.storage.local.set(options);
 
     const videoPic = videoInfo.pic || (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('img.cover_image') && __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('img.cover_image').attr('src'));
     // genPage func

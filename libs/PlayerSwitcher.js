@@ -41,9 +41,9 @@ class PlayerSwitcher {
                 e.target.value = 1.0;
             }
         });
-        elements.rotate.on('change', (e)=>this._mirrorAndRotateHandler(e, this.speedSection, this.video));
-        elements.mirror.on('click', (e)=>this._mirrorAndRotateHandler(e, this.speedSection, this.video));
-        for (let i of ['brightness', 'contrast', 'saturate']) elements[i].on('change', (e)=>this._cssFilterHandler(e, this.speedSection, this.video));
+        elements.rotate.on('change', (e) => this._mirrorAndRotateHandler(e, this.speedSection, this.video));
+        elements.mirror.on('click', (e) => this._mirrorAndRotateHandler(e, this.speedSection, this.video));
+        for (let i of ['brightness', 'contrast', 'saturate']) elements[i].on('change', (e) => this._cssFilterHandler(e, this.speedSection, this.video));
         this.inited = true;
     }
     _bind(video) {

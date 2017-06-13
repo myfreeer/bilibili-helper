@@ -62,7 +62,7 @@ import PlayerSwitcher from './PlayerSwitcher';
     comment.url = `${location.protocol}//comment.bilibili.com/${cid}.xml`;
     comment._xml = fetchretry(comment.url).then((res) => res.text()).then((text) => parseXmlSafe(text));
     options = await _options;
-    const optionsChangeCallback = (newOpts) => (options = newOpts);
+    const optionsChangeCallback = (newOpts) => (options = newOpts) && chrome.storage.local.set(options);
 
     const videoPic = videoInfo.pic || (_$('img.cover_image') && _$('img.cover_image').attr('src'));
     // genPage func
