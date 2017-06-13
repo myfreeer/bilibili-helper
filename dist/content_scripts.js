@@ -71,53 +71,61 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Element.prototype.find = Element.prototype.querySelector;
-Element.prototype.findAll = Element.prototype.querySelectorAll;
-Element.prototype.attr = Element.prototype.getAttribute;
-Element.prototype.on = Element.prototype.addEventListener;
-Element.prototype.off = Element.prototype.removeEventListener;
+let ep = Element.prototype,
+    hp = HTMLCollection.prototype,
+    np = NodeList.prototype,
+    ap = Array.prototype;
+
+ep.find = ep.querySelector;
+ep.findAll = ep.querySelectorAll;
+ep.attr = ep.getAttribute;
+ep.on = ep.addEventListener;
+ep.off = ep.removeEventListener;
+
 // arrow functions binds no this nor arguments
-Element.prototype.data = function(str) {
+ep.data = function(str) {
     return this.dataset[str];
 };
-Element.prototype.text = function(str) {
+ep.text = function(str) {
     return str ? (this.innerText = str) : this.innerText;
 };
-Element.prototype.empty = function() {
-    this.innerHTML = ''; return this;
+ep.empty = function() {
+    this.innerHTML = '';
+    return this;
 };
-Element.prototype.html = function(str) {
+ep.html = function(str) {
     return str ? (this.innerHTML = str) && this : this.innerHTML;
 };
-Element.prototype.hide = function() {
+ep.hide = function() {
     this.style.display = 'none';
 };
-Element.prototype.show = function() {
+ep.show = function() {
     this.style.display = '';
 };
-Element.prototype.addClass = function(...args) {
+ep.addClass = function(...args) {
     return this.classList.add(...args);
 };
-Element.prototype.removeClass = function(...args) {
+ep.removeClass = function(...args) {
     return this.classList.remove(...args);
 };
-Element.prototype.toggleClass = function(...args) {
+ep.toggleClass = function(...args) {
     return this.classList.toggle(...args);
 };
-Element.prototype.hasClass = function(...args) {
+ep.hasClass = function(...args) {
     return this.classList.contains(...args);
 };
-Element.prototype.replaceClass = function(...args) {
+ep.replaceClass = function(...args) {
     return this.classList.replace(...args);
 };
-NodeList.prototype.map = HTMLCollection.prototype.map = Array.prototype.map;
-NodeList.prototype.each = HTMLCollection.prototype.each = NodeList.prototype.forEach;
-NodeList.prototype.filter = HTMLCollection.prototype.filter = Array.prototype.filter;
-NodeList.prototype.reduce = HTMLCollection.prototype.reduce = Array.prototype.reduce;
-NodeList.prototype.reduceRight = HTMLCollection.prototype.reduceRight = Array.prototype.reduceRight;
-NodeList.prototype.every = HTMLCollection.prototype.every = Array.prototype.every;
-NodeList.prototype.some = HTMLCollection.prototype.some = Array.prototype.some;
-HTMLCollection.prototype.forEach = Array.prototype.forEach;
+np.map = hp.map = ap.map;
+np.each = hp.each = np.forEach;
+np.filter = hp.filter = ap.filter;
+np.reduce = hp.reduce = ap.reduce;
+np.reduceRight = hp.reduceRight = ap.reduceRight;
+np.every = hp.every = ap.every;
+np.some = hp.some = ap.some;
+hp.forEach = ap.forEach;
+
 const sleep = (time = 0) => new Promise((r) => setTimeout(r, time));
 /* harmony export (immutable) */ __webpack_exports__["l"] = sleep;
 
