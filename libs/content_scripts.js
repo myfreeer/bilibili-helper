@@ -8,7 +8,7 @@ import xml2ass from './xml2ass';
 import {getDownloadOptions, getNiceSectionFilename} from './filename-sanitize';
 import genPageFunc from './genPageFunc';
 import addTitleLink from './addTitleLink';
-import sendComment from './sendComment';
+import PlayerSwitcher from './PlayerSwitcher';
 
 // main func
 (async function() {
@@ -62,6 +62,7 @@ import sendComment from './sendComment';
     comment.url = `${location.protocol}//comment.bilibili.com/${cid}.xml`;
     comment._xml = fetchretry(comment.url).then((res) => res.text()).then((text) => parseXmlSafe(text));
     options = await _options;
+    const optionsChangeCallback = (newOpts) => (options = newOpts);
 
     const videoPic = videoInfo.pic || (_$('img.cover_image') && _$('img.cover_image').attr('src'));
     // genPage func
@@ -101,7 +102,7 @@ import sendComment from './sendComment';
     biliHelper.mainBlock.speedSection.rotate.step = 90;
     biliHelper.mainBlock.switcherSection = $h('<div class="section switcher"><h3>播放器切换</h3></div>');
     biliHelper.mainBlock.switcherSection.button = $h('<p><a class="b-btn w" type="original">原始播放器</a><a class="b-btn w" type="bilih5">原始HTML5</a><a class="b-btn w hidden" type="bilimac">Mac 客户端</a><a class="b-btn w hidden" type="swf">SWF 播放器</a><a class="b-btn w hidden" type="iframe">Iframe 播放器</a><a class="b-btn w hidden" type="html5">HTML5超清</a><a class="b-btn w hidden" type="html5hd">HTML5高清</a><a class="b-btn w hidden" type="html5ld">HTML5低清</a></p>');
-    biliHelper.mainBlock.switcherSection.button.onclick = (e) => biliHelper.switcher[e.target.attr('type')]();
+    biliHelper.mainBlock.switcherSection.button.onclick = (e) => playerSwitcher[e.target.attr('type')]();
     biliHelper.mainBlock.switcherSection.append(biliHelper.mainBlock.switcherSection.button);
     if (genPage) {
         biliHelper.mainBlock.switcherSection.find('a[type="original"]').addClass('hidden');
@@ -115,7 +116,7 @@ import sendComment from './sendComment';
     biliHelper.mainBlock.append(biliHelper.mainBlock.querySection);
     biliHelper.mainBlock.historySection = $h('<div class="section history"><h3>历史弹幕切换</h3><p><span></span>正在加载全部弹幕, 请稍等…</p></div>');
     biliHelper.mainBlock.append(biliHelper.mainBlock.historySection);
-    biliHelper.originalPlayer = _$('#bofqi').innerHTML;
+    biliHelper.originalPlayerHTML = _$('#bofqi').innerHTML;
     (isBangumi && !genPage ? _$('.v1-bangumi-info-operate .v1-app-btn').empty() : _$('.player-wrapper .arc-toolbar')).append(biliHelper);
     _$('#bofqi').html('<div id="player_placeholder" class="player"></div>');
     _$('#bofqi').find('#player_placeholder').style.cssText =
@@ -124,15 +125,18 @@ import sendComment from './sendComment';
         overflow: hidden;
         visibility: visible;`;
     let replaceNotice = $h('<div id="loading-notice">正在尝试替换播放器…<span id="cancel-replacing">取消</span></div>');
-    replaceNotice.find('#cancel-replacing').onclick = () => !_$('#loading-notice').remove() && biliHelper.switcher.original();
+    replaceNotice.find('#cancel-replacing').onclick = () => !_$('#loading-notice').remove() && playerSwitcher.original();
     _$('#bofqi').append(replaceNotice);
     if (options.scrollToPlayer) window.scroll(window.pageXOffset, findPosTop(_$('#bofqi')) - 30);
+    // Initize PlayerSwitcher
+    let playerSwitcher = new PlayerSwitcher(avid, cid, page, videoPic, options, optionsChangeCallback, biliHelper.mainBlock.switcherSection, biliHelper.mainBlock.speedSection, biliHelper.originalPlayerHTML);
 
     // process video links
     videoLink = await _videoLink;
     // follow ws video url redircet
-    for (let i in videoLink.hd) if (videoLink.hd[i].match('ws.acgvideo.com')) fetch(videoLink.hd[i], {method: 'head'}).then((resp) => resp.ok && (videoLink.hd[i] = resp.url));
-    for (let i in videoLink.ld) if (videoLink.ld[i].match('ws.acgvideo.com')) fetch(videoLink.ld[i], {method: 'head'}).then((resp) => resp.ok && (videoLink.ld[i] = resp.url));
+    for (let i in videoLink.hd) if (videoLink.hd[i].match('ws.acgvideo.com')) fetch(videoLink.hd[i], {method: 'head'}).then((resp) => resp.ok && (videoLink.hd[i] = resp.url) && playerSwitcher.setVideoLink(videoLink));
+    for (let i in videoLink.ld) if (videoLink.ld[i].match('ws.acgvideo.com')) fetch(videoLink.ld[i], {method: 'head'}).then((resp) => resp.ok && (videoLink.ld[i] = resp.url) && playerSwitcher.setVideoLink(videoLink));
+    playerSwitcher.setVideoLink(videoLink);
 
     // downloaderSection code
     const clickDownLinkElementHandler = async(event) => !event.preventDefault() && await mySendMessage({
@@ -195,6 +199,7 @@ import sendComment from './sendComment';
     // begin comment user query
     biliHelper.comments = comment.xml.getElementsByTagName('d');
     comment.ccl = BilibiliParser(comment.xml);
+    playerSwitcher.setComment(comment.ccl);
     commentQuerySection(biliHelper.comments, biliHelper.mainBlock.querySection.find('p'));
     const changeComments = async(url) => {
         comment.url = url;
@@ -202,201 +207,13 @@ import sendComment from './sendComment';
         comment.xml = await comment._xml;
         biliHelper.comments = comment.xml.getElementsByTagName('d');
         comment.ccl = BilibiliParser(comment.xml);
+        playerSwitcher.setComment(comment.ccl);
         commentQuerySection(biliHelper.comments, biliHelper.mainBlock.querySection.find('p'));
         biliHelper.mainBlock.commentSection.find('a[download*=xml]').href = comment.url;
-        if (biliHelper.switcher.cmManager) comment.ccl.forEach((cmt) => biliHelper.switcher.cmManager.insert(cmt));
+        if (playerSwitcher.cmManager) comment.ccl.forEach((cmt) => playerSwitcher.cmManager.insert(cmt));
     };
     commentsHistorySection(cid, biliHelper.mainBlock.historySection.find('p'), changeComments).then((event) => (event !== true) && biliHelper.mainBlock.historySection.hide());
 
     // video player switcher begin
-    const restartVideo = (video) => !video.paused && !video.pause() && !video.play();
-    const mirrorAndRotateHandler = (e) => {
-        biliHelper.mainBlock.speedSection.rotate.value %= 360;
-        let transform = 'rotate(' + Number(biliHelper.mainBlock.speedSection.rotate.value) + 'deg)';
-        if (e.target === biliHelper.mainBlock.speedSection.mirror) {
-            if (e.target.hasClass('w')) transform += 'matrix(-1, 0, 0, 1, 0, 0)';
-            e.target.toggleClass('w');
-        } else if (!biliHelper.mainBlock.speedSection.mirror.hasClass('w')) transform += 'matrix(-1, 0, 0, 1, 0, 0)';
-        biliHelper.switcher.video.style.transform = transform;
-    };
-    const cssFilterHandler = (e) => {
-        const elements = biliHelper.mainBlock.speedSection;
-        let filter = '';
-        for (let i of ['brightness', 'contrast', 'saturate']) filter += `${i}(${elements[i].value}) `;
-        biliHelper.switcher.video.style.filter = filter;
-    };
-    biliHelper.switcher = {
-        current: 'original',
-        inited: false,
-        _init: function(video) {
-            this.video = video;
-            const elements = biliHelper.mainBlock.speedSection;
-            elements.input.on('change', (e) => {
-                if (Number(e.target.value)) {
-                    biliHelper.switcher.video.playbackRate = Number(e.target.value);
-                    restartVideo(biliHelper.switcher.video);
-                } else {
-                    e.target.value = 1.0;
-                }
-            });
-            elements.rotate.on('change', mirrorAndRotateHandler);
-            elements.mirror.on('click', mirrorAndRotateHandler);
-            for (let i of ['brightness', 'contrast', 'saturate']) elements[i].on('change', cssFilterHandler);
-            this.inited = 1;
-        },
-        bind: function(video) {
-            this.video = video;
-            video.on('loadedmetadata', (e) => biliHelper.mainBlock.speedSection.res.innerText = '分辨率: ' + e.target.videoWidth + 'x' + e.target.videoHeight);
-            if (!this.inited) this._init(video);
-            biliHelper.mainBlock.speedSection.removeClass('hidden');
-        },
-        unbind: function() {
-            this.video = null;
-            biliHelper.mainBlock.speedSection.addClass('hidden');
-        },
-        set: function(newMode) {
-            biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + this.current + '"]').addClass('w');
-            biliHelper.mainBlock.switcherSection.find('a.b-btn[type="' + newMode + '"]').removeClass('w');
-            localStorage.removeItem('defaulth5');
-            if (this.current === 'html5' && this.flvPlayer) this.flvPlayer.destroy();
-            if (this.checkFinished) clearInterval(this.checkFinished);
-            if (this.interval) clearInterval(this.interval);
-            if (this.cmManager) this.cmManager = null;
-            if (!newMode.match('html5')) this.unbind();
-            biliHelper.mainBlock.speedSection.res.innerText = '';
-            biliHelper.mainBlock.speedSection.input.onchange = null;
-            biliHelper.mainBlock.speedSection.input.value = 1.0;
-            this.current = newMode;
-        },
-        original: function() {
-            this.set('original');
-            _$('#bofqi').html(biliHelper.originalPlayer);
-            if (_$('#bofqi object').attr('width') === 950) _$('#bofqi object').setAttribute('width', 980);
-        },
-        swf: function() {
-            this.set('swf');
-            _$('#bofqi').html(`<object type="application/x-shockwave-flash" class="player" data="https://static-s.bilibili.com/play.swf" id="player_placeholder" style="visibility: visible;"><param name="allowfullscreeninteractive" value="true"><param name="allowfullscreen" value="true"><param name="quality" value="high"><param name="allowscriptaccess" value="always"><param name="wmode" value="opaque"><param name="flashvars" value="cid=${cid}&aid=${avid}"></object>`);
-        },
-        iframe: function() {
-            this.set('iframe');
-            _$('#bofqi').html(`<iframe height="536" width="980" class="player" src="https://secure.bilibili.com/secure,cid=${cid}&aid=${avid}" scrolling="no" border="0" frameborder="no" framespacing="0" onload="window.securePlayerFrameLoaded=true"></iframe>`);
-        },
-        bilih5: function() {
-            this.set('bilih5');
-            _$('#bofqi').html(`<iframe height="536" width="980" class="player" src="//www.bilibili.com/html/html5player.html?cid=${cid}&aid=${avid}" scrolling="no" border="0" frameborder="no" framespacing="0"></iframe>`);
-        },
-        html5: function(type) {
-            let html5VideoUrl;
-            switch (type) {
-            case 'html5ld':
-                this.set('html5ld');
-                html5VideoUrl = videoLink.ld[0];
-                break;
-            case 'html5hd':
-                this.set('html5hd');
-                html5VideoUrl = videoLink.hd[0];
-                break;
-            default:
-                this.set('html5');
-                html5VideoUrl = videoLink.hd[0];
-                if (videoLink.mediaDataSource.type === 'mp4') return console.warn('No Flv urls available, switch back to html5 hd', biliHelper.switcher.html5hd());
-            }
-            _$('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + videoPic + '" crossorigin="anonymous"><source src="' + html5VideoUrl + '" type="video/mp4"></video></div>');
-            let abp = ABP.create(document.getElementById('bilibili_helper_html5_player'), {
-                src: {
-                    playlist: [{
-                        video: document.getElementById('bilibili_helper_html5_player_video'),
-                        comments: comment.ccl,
-                    }],
-                },
-                width: '100%',
-                height: '100%',
-                config: options,
-            });
-            abp.playerUnit.addEventListener('wide', () => _$('#bofqi').addClass('wide'));
-            abp.playerUnit.addEventListener('normal', () => _$('#bofqi').removeClass('wide'));
-            abp.playerUnit.addEventListener('sendcomment', function(e) {
-                const commentId = e.detail.id,
-                    commentData = e.detail;
-                delete e.detail.id;
-                sendComment(avid, cid, page, commentData).then(function(response) {
-                    response.tmp_id = commentId;
-                    abp.commentCallback(response);
-                });
-            });
-            abp.playerUnit.addEventListener('saveconfig', (e) => e.detail && Object.assign(options, e.detail) && chrome.storage.local.set(options));
-            this.bind(abp.video);
-            this.cmManager = abp.cmManager;
-            if (type && type.match(/hd|ld/)) return abp;
-            this.flvPlayer = flvjs.createPlayer(videoLink.mediaDataSource);
-            biliHelper.switcher.interval = setInterval(function() {
-                if (abp.commentObjArray && biliHelper.switcher.flvPlayer) {
-                    clearInterval(biliHelper.switcher.interval);
-                    biliHelper.switcher.flvPlayer.attachMediaElement(abp.video);
-                    biliHelper.switcher.flvPlayer.load();
-                    biliHelper.switcher.flvPlayer.on(flvjs.Events.ERROR, (e) => console.warn(e, 'Switch back to HTML5 HD.', biliHelper.switcher.html5hd()));
-                    biliHelper.switcher.flvPlayer.on(flvjs.Events.MEDIA_INFO, (e) => console.log('分辨率: ' + e.width + 'x' + e.height + ', FPS: ' + e.fps, '视频码率: ' + Math.round(e.videoDataRate * 100) / 100, '音频码率: ' + Math.round(e.audioDataRate * 100) / 100));
-                }
-            }, 100);
-            let lastTime;
-            biliHelper.switcher.checkFinished = setInterval(function() {
-                if (abp.video.currentTime !== lastTime) {
-                    lastTime = abp.video.currentTime;
-                } else {
-                    if ((abp.video.duration - abp.video.currentTime) / abp.video.currentTime < 0.001 && !abp.video.paused) {
-                        abp.video.currentTime = 0;
-                        if (!abp.video.loop) {
-                            abp.video.pause();
-                            setTimeout(abp.video.pause, 200);
-                            document.querySelector('.button.ABP-Play.ABP-Pause.icon-pause').className = 'button ABP-Play icon-play';
-                        }
-                    }
-                }
-            }, 200);
-        },
-        html5hd: function() {
-            this.set('html5hd');
-            let abp = biliHelper.switcher.html5('html5hd');
-            const hdErrorHandler = (e) => {
-                if (e.toString().match('request was interrupted by a call')) throw e;
-                if (videoLink.hd.length > 1) {
-                    console.warn(e, 'HTML5 HD Error, try another link...');
-                    videoLink.hd.shift();
-                    biliHelper.switcher.html5('html5hd');
-                } else console.warn(e, 'HTML5 HD Error, switch back to HTML5 LD.', biliHelper.switcher.html5ld());
-            };
-            abp.video.querySelector('source').on('error', hdErrorHandler);
-            abp.video.on('error', hdErrorHandler);
-        },
-        html5ld: function() {
-            this.set('html5ld');
-            let abp = biliHelper.switcher.html5('html5ld');
-            const ldErrorHandler = (e) => {
-                if (e.toString().match('request was interrupted by a call')) throw e;
-                if (videoLink.ld.length > 1) {
-                    console.warn(e, 'HTML5 LD Error, try another link...');
-                    videoLink.ld.shift();
-                    biliHelper.switcher.html5('html5ld');
-                } else throw e;
-            };
-            abp.video.querySelector('source').on('error', ldErrorHandler);
-            abp.video.on('error', ldErrorHandler);
-        },
-        bilimac: function() {
-            this.set('bilimac');
-            _$('#bofqi').html('<div id="player_placeholder" class="player"></div><div id="loading-notice">正在加载 Bilibili Mac 客户端…</div>');
-            _$('#bofqi').find('#player_placeholder').style.cssText =
-                `background: url(${videoPic}) 50% 50% / cover no-repeat;
-                -webkit-filter: blur(20px);
-                overflow: hidden;
-                visibility: visible;`;
-            fetch('http://localhost:23330/rpc', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: `action=playVideoByCID&data=${cid}|${window.location.href}|${document.title}|1`,
-            }).then((res) => res.ok && _$('#bofqi').find('#loading-notice').text('已在 Bilibili Mac 客户端中加载'))
-                .catch(() => _$('#bofqi').find('#loading-notice').text('调用 Bilibili Mac 客户端失败 :('));
-        },
-    };
-    biliHelper.switcher[options.player]();
+    playerSwitcher[options.player]();
 })();
