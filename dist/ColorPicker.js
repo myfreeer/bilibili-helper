@@ -46,7 +46,7 @@
         el = document.createElementNS(svgNS, el);
         for (let key in attrs)
             el.setAttribute(key, attrs[key]);
-        if (Object.prototype.toString.call(children) != '[object Array]') children = [children];
+        if (Object.prototype.toString.call(children) !== '[object Array]') children = [children];
         let i = 0, len = (children[0] && children.length) || 0;
         for (; i < len; i++)
             el.appendChild(children[i]);
@@ -56,7 +56,7 @@
     /**
      * Create slide and picker markup depending on the supported technology.
      */
-    if (type == 'SVG') {
+    if (type === 'SVG') {
         slide = $('svg', {xmlns: 'http://www.w3.org/2000/svg', version: '1.1', width: '100%', height: '100%'},
             [
                 $('defs', {},
@@ -100,7 +100,7 @@
                 $('rect', {x: '0', y: '0', width: '100%', height: '100%', fill: 'url(#gradient-black)'}),
             ]
                   );
-    } else if (type == 'VML') {
+    } else if (type === 'VML') {
         slide = [
             '<DIV style="position: relative; width: 100%; height: 100%">',
             '<v:rect style="position: absolute; top: 0; left: 0; width: 100%; height: 100%" stroked="f" filled="t">',
@@ -120,7 +120,7 @@
             '</DIV>',
         ].join('');
 
-        if (!document.namespaces['v'])
+        if (!document.namespaces.v)
             document.namespaces.add('v', 'urn:schemas-microsoft-com:vml', '#default#VML');
     }
 
@@ -166,12 +166,12 @@
         let H, S, V, C;
         V = Math.max(r, g, b);
         C = V - Math.min(r, g, b);
-        H = (C == 0 ? null :
-             V == r ? (g - b) / C + (g < b ? 6 : 0) :
-             V == g ? (b - r) / C + 2 :
+        H = (C === 0 ? null :
+             V === r ? (g - b) / C + (g < b ? 6 : 0) :
+             V === g ? (b - r) / C + 2 :
                       (r - g) / C + 4);
         H = (H % 6) * 60;
-        S = C == 0 ? 0 : C / V;
+        S = C === 0 ? 0 : C / V;
         return {h: H, s: S, v: V};
     }
 
@@ -187,7 +187,7 @@
             let pickerColor = hsv2rgb({h: ctx.h, s: 1, v: 1});
             let c = hsv2rgb({h: ctx.h, s: ctx.s, v: ctx.v});
             pickerElement.style.backgroundColor = pickerColor.hex;
-            ctx.callback && ctx.callback(c.hex, {h: ctx.h - hueOffset, s: ctx.s, v: ctx.v}, {r: c.r, g: c.g, b: c.b}, undefined, mouse);
+            if (ctx.callback) ctx.callback(c.hex, {h: ctx.h - hueOffset, s: ctx.s, v: ctx.v}, {r: c.r, g: c.g, b: c.b}, undefined, mouse);
         };
     }
 
@@ -205,7 +205,7 @@
             ctx.s = mouse.x / width;
             ctx.v = (height - mouse.y) / height;
             let c = hsv2rgb(ctx);
-            ctx.callback && ctx.callback(c.hex, {h: ctx.h - hueOffset, s: ctx.s, v: ctx.v}, {r: c.r, g: c.g, b: c.b}, mouse);
+            if (ctx.callback) ctx.callback(c.hex, {h: ctx.h - hueOffset, s: ctx.s, v: ctx.v}, {r: c.r, g: c.g, b: c.b}, mouse);
         };
     }
 
@@ -248,7 +248,7 @@
             this.slideElement = slideElement;
         }
 
-        if (type == 'SVG') {
+        if (type === 'SVG') {
             // Generate uniq IDs for linearGradients so that we don't have the same IDs within one document.
             // Then reference those gradients in the associated rectangles.
 
@@ -372,7 +372,7 @@
         };
 
         ctx.pickerElement.style.backgroundColor = hsv2rgb({h: ctx.h, s: 1, v: 1}).hex;
-        ctx.callback && ctx.callback(hex || c.hex, {h: ctx.h, s: ctx.s, v: ctx.v}, rgb || {r: c.r, g: c.g, b: c.b}, mousePicker, mouseSlide);
+        if (ctx.callback) ctx.callback(hex || c.hex, {h: ctx.h, s: ctx.s, v: ctx.v}, rgb || {r: c.r, g: c.g, b: c.b}, mousePicker, mouseSlide);
 
         return ctx;
     }
