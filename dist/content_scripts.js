@@ -219,6 +219,43 @@ const unsafeEval = (string) => {
 
 const restartVideo = (video) => !video.paused && !video.pause() && !video.play();
 
+const mirrorAndRotateHandler = (e, speedSection, video) => {
+    speedSection.rotate.value %= 360;
+    let transform = 'rotate(' + Number(speedSection.rotate.value) + 'deg)';
+    if (e.target === speedSection.mirror) {
+        if (e.target.hasClass('w')) transform += 'matrix(-1, 0, 0, 1, 0, 0)';
+        e.target.toggleClass('w');
+    } else if (!speedSection.mirror.hasClass('w')) transform += 'matrix(-1, 0, 0, 1, 0, 0)';
+    video.style.transform = transform;
+};
+const cssFilterHandler = (e, speedSection, video) => {
+    let filter = '';
+    for (let i of ['brightness', 'contrast', 'saturate']) filter += `${i}(${speedSection[i].value}) `;
+    video.style.filter = filter;
+};
+
+const hdErrorHandler = (e, playerSwitcherObj) => {
+    if (e.toString().match('request was interrupted by a call')) throw e;
+    let videoLink = playerSwitcherObj.videoLink;
+    if (videoLink.hd.length > 1) {
+        console.warn(e, 'HTML5 HD Error, try another link...');
+        videoLink.hd.shift();
+        playerSwitcherObj.setVideoLink(videoLink);
+        playerSwitcherObj.html5('html5hd');
+    } else console.warn(e, 'HTML5 HD Error, switch back to HTML5 LD.', playerSwitcherObj.html5ld());
+};
+
+const ldErrorHandler = (e, playerSwitcherObj) => {
+    if (e.toString().match('request was interrupted by a call')) throw e;
+    let videoLink = playerSwitcherObj.videoLink;
+    if (videoLink.ld.length > 1) {
+        console.warn(e, 'HTML5 LD Error, try another link...');
+        videoLink.ld.shift();
+        playerSwitcherObj.setVideoLink(videoLink);
+        playerSwitcherObj.html5('html5ld');
+    } else throw e;
+};
+
 class PlayerSwitcher {
     constructor(avid, cid, page, videoPic, options, optionsChangeCallback, switcherSection, speedSection, originalPlayerHTML) {
         this.avid = avid;
@@ -233,20 +270,6 @@ class PlayerSwitcher {
         this._isInited = false;
         this.current = 'original';
     }
-    _mirrorAndRotateHandler(e, speedSection, video) {
-        speedSection.rotate.value %= 360;
-        let transform = 'rotate(' + Number(speedSection.rotate.value) + 'deg)';
-        if (e.target === speedSection.mirror) {
-            if (e.target.hasClass('w')) transform += 'matrix(-1, 0, 0, 1, 0, 0)';
-            e.target.toggleClass('w');
-        } else if (!speedSection.mirror.hasClass('w')) transform += 'matrix(-1, 0, 0, 1, 0, 0)';
-        video.style.transform = transform;
-    }
-    _cssFilterHandler(e, speedSection, video) {
-        let filter = '';
-        for (let i of ['brightness', 'contrast', 'saturate']) filter += `${i}(${speedSection[i].value}) `;
-        video.style.filter = filter;
-    }
     _init(video) {
         this.video = video;
         const elements = this.speedSection;
@@ -258,9 +281,9 @@ class PlayerSwitcher {
                 e.target.value = 1.0;
             }
         });
-        elements.rotate.on('change', (e) => this._mirrorAndRotateHandler(e, this.speedSection, this.video));
-        elements.mirror.on('click', (e) => this._mirrorAndRotateHandler(e, this.speedSection, this.video));
-        for (let i of ['brightness', 'contrast', 'saturate']) elements[i].on('change', (e) => this._cssFilterHandler(e, this.speedSection, this.video));
+        elements.rotate.on('change', (e) => mirrorAndRotateHandler(e, this.speedSection, this.video));
+        elements.mirror.on('click', (e) => mirrorAndRotateHandler(e, this.speedSection, this.video));
+        for (let i of ['brightness', 'contrast', 'saturate']) elements[i].on('change', (e) => cssFilterHandler(e, this.speedSection, this.video));
         this.inited = true;
     }
     _bind(video) {
@@ -396,33 +419,17 @@ class PlayerSwitcher {
             }
         }, 200);
     }
-    _hdErrorHandler(e) {
-        if (e.toString().match('request was interrupted by a call')) throw e;
-        if (this.videoLink.hd.length > 1) {
-            console.warn(e, 'HTML5 HD Error, try another link...');
-            this.videoLink.hd.shift();
-            this.html5('html5hd');
-        } else console.warn(e, 'HTML5 HD Error, switch back to HTML5 LD.', this.html5ld());
-    }
     html5hd() {
         this.set('html5hd');
         let abp = this.html5('html5hd');
-        abp.video.querySelector('source').on('error', this._hdErrorHandler);
-        abp.video.on('error', this._hdErrorHandler);
-    }
-    _ldErrorHandler(e) {
-        if (e.toString().match('request was interrupted by a call')) throw e;
-        if (this.videoLink.ld.length > 1) {
-            console.warn(e, 'HTML5 LD Error, try another link...');
-            this.videoLink.ld.shift();
-            this.html5('html5ld');
-        } else throw e;
+        abp.video.querySelector('source').on('error', (e) => hdErrorHandler(e, this));
+        abp.video.on('error', (e) => hdErrorHandler(e, this));
     }
     html5ld() {
         this.set('html5ld');
         let abp = this.html5('html5ld');
-        abp.video.querySelector('source').on('error', this._ldErrorHandler);
-        abp.video.on('error', this._ldErrorHandler);
+        abp.video.querySelector('source').on('error', (e) => ldErrorHandler(e, this));
+        abp.video.on('error', (e) => ldErrorHandler(e, this));
     }
 }
 /* harmony default export */ __webpack_exports__["a"] = (PlayerSwitcher);
