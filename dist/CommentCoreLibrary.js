@@ -157,7 +157,7 @@ var __extends = (this && this.__extends) || function(d, b) {
 	function __() {
 		this.constructor = d;
 	}
-	d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	d.prototype = !b ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var CoreComment = (function() {
 	function CoreComment(parent, init) {
@@ -274,7 +274,7 @@ var CoreComment = (function() {
 		if (recycle === void 0) {
 			recycle = null;
 		}
-		if (recycle !== null) {
+		if (recycle) {
 			this.dom = recycle.dom;
 		} else {
 			this.dom = document.createElement('div');
@@ -303,7 +303,7 @@ var CoreComment = (function() {
 		if (this._alpha !== 1 || this.parent.options.global.opacity < 1) {
 			this.alpha = this._alpha;
 		}
-		if (this._transform !== null && !this._transform.isIdentity()) {
+		if (this._transform && !this._transform.isIdentity()) {
 			this.transform = this._transform.flatArray;
 		}
 		if (this.motion.length > 0) {
@@ -513,7 +513,7 @@ var CoreComment = (function() {
 		},
 		set: function(array) {
 			this._transform = new CommentUtils.Matrix3D(array);
-			if (this.dom !== null) {
+			if (this.dom) {
 				this.dom.style.transform = this._transform.toCss();
 			}
 		},
@@ -940,7 +940,7 @@ var CommentManager = (function() {
 				return 1;
 			} else if (a.date < b.date) {
 				return -1;
-			} else if (a.dbid !== null && b.dbid !== null) {
+			} else if (a.dbid && b.dbid) {
 				if (a.dbid > b.dbid) {
 					return 1;
 				} else if (a.dbid < b.dbid) {
@@ -1034,7 +1034,7 @@ var CommentManager = (function() {
 	};
 
 	CommentManager.prototype.validate = function(cmt) {
-		if (cmt === null) {
+		if (!cmt) {
 			return false;
 		}
 		return this.filter.doValidate(cmt);
@@ -1075,10 +1075,10 @@ var CommentManager = (function() {
 
 	CommentManager.prototype.init = function(renderer) {
 		this.setBounds();
-		if (this.filter === null) {
+		if (!this.filter) {
 			this.filter = new CommentFilter(); // Only create a filter if none exist
 		}
-		if (this.factory === null) {
+		if (!this.factory) {
 			switch (renderer) {
 			case 'legacy':
 				this.factory = CommentFactory.defaultFactory();
@@ -1127,7 +1127,7 @@ var CommentManager = (function() {
 			}
 			return;
 		}
-		if (this.filter !== null) {
+		if (this.filter) {
 			data = this.filter.doModify(data);
 			if (data === null) {
 				return;
@@ -1405,7 +1405,7 @@ function BilibiliParser(xmlDoc, text, warn) {
 	}
 
 	var elems, tmp;
-	if (xmlDoc !== null) {
+	if (xmlDoc) {
 		elems = xmlDoc.getElementsByTagName('d');
 	} else {
 		if (!document || !document.createElement) {
@@ -1430,7 +1430,7 @@ function BilibiliParser(xmlDoc, text, warn) {
 
 	var tlist = [];
 	for (var i = 0; i < elems.length; i++) {
-		if (elems[i].getAttribute('p') !== null) {
+		if (elems[i].getAttribute('p')) {
 			var opt = elems[i].getAttribute('p').split(',');
 			if (!elems[i].childNodes[0])
 				continue;
@@ -1443,7 +1443,7 @@ function BilibiliParser(xmlDoc, text, warn) {
 			obj.date = parseInt(opt[4]);
 			obj.pool = parseInt(opt[5]);
 			obj.position = 'absolute';
-			if (opt[7] !== null)
+			if (opt[7])
 				obj.dbid = parseInt(opt[7]);
 			obj.hash = opt[6];
 			obj.border = false;
@@ -1492,7 +1492,7 @@ function BilibiliParser(xmlDoc, text, warn) {
 								if (obj.shadow === 'false') {
 									obj.shadow = false;
 								}
-								if (adv[12] !== null) {
+								if (adv[12]) {
 									obj.font = adv[12];
 								}
 								if (adv.length > 14) {
@@ -1507,7 +1507,7 @@ function BilibiliParser(xmlDoc, text, warn) {
 									var regex = new RegExp('([a-zA-Z])\\s*(\\d+)[, ](\\d+)', 'g');
 									var counts = path.split(/[a-zA-Z]/).length - 1;
 									var m = regex.exec(path);
-									while (m !== null) {
+									while (m) {
 										switch (m[1]) {
 										case 'M': {
 											lastPoint.x = parseInt(m[2], 10);
@@ -1528,7 +1528,7 @@ function BilibiliParser(xmlDoc, text, warn) {
 									obj.motion = pathMotion;
 								}
 							}
-							if (motion !== null) {
+							if (motion) {
 								obj.motion.push(motion);
 							}
 						}
@@ -1537,7 +1537,7 @@ function BilibiliParser(xmlDoc, text, warn) {
 							obj.dur = adv[3] * 1000;
 						}
 						tmp = adv[2].split('-');
-						if (tmp !== null && tmp.length > 1) {
+						if (tmp && tmp.length > 1) {
 							var alphaFrom = parseFloat(tmp[0]);
 							var alphaTo = parseFloat(tmp[1]);
 							obj.opacity = alphaFrom;
@@ -1553,7 +1553,7 @@ function BilibiliParser(xmlDoc, text, warn) {
 					obj.code = text; // Code comments are special
 				}
 			}
-			if (obj.text !== null)
+			if (obj.text)
 				obj.text = obj.text.replace(/\u25a0/g, '\u2588');
 			tlist.push(obj);
 		}

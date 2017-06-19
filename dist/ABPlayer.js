@@ -43,7 +43,7 @@ function CommentLoader(url, xcm, callback) {
 	xmlhttp.send();
 	xmlhttp.onreadystatechange = function() {
 		if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
-			var standarizedXML = xmlhttp.responseXML === null ? parseXmlSafe(xmlhttp.responseText) : xmlhttp.responseXML;
+			var standarizedXML = !xmlhttp.responseXML ? parseXmlSafe(xmlhttp.responseText) : xmlhttp.responseXML;
 			cm.load(BilibiliParser(standarizedXML));
 			callback();
 		}
@@ -88,7 +88,7 @@ Element.prototype.removeClass = function() {
 		}
 		if (children) {
 			for (var i = 0; i < children.length; i++) {
-				if (children[i] !== null)
+				if (children[i])
 					elem.appendChild(children[i]);
 			}
 		}
@@ -209,7 +209,7 @@ Element.prototype.removeClass = function() {
 				unitOffset = findClosest(elem, 'ABP-Unit').getBoundingClientRect(),
 				elemTop = elemOffset.top - unitOffset.top,
 				elemLeft = follow ? e.clientX - unitOffset.left : elemOffset.left - unitOffset.left;
-			if (tooltip === null) {
+			if (!tooltip) {
 				tooltip = _('div', {
 					'id': 'ABP-Tooltip',
 				}, [_('text', elem.tooltipData)]);
@@ -239,7 +239,7 @@ Element.prototype.removeClass = function() {
 		});
 	};
 	var addClass = function(elem, className) {
-		if (elem === null) return;
+		if (!elem) return;
 		var oldClass = elem.className.split(' ');
 		if (oldClass[0] === '') oldClass = [];
 		if (oldClass.indexOf(className) < 0) {
@@ -248,13 +248,13 @@ Element.prototype.removeClass = function() {
 		elem.className = oldClass.join(' ');
 	};
 	var hasClass = function(elem, className) {
-		if (elem === null) return false;
+		if (!elem) return false;
 		var oldClass = elem.className.split(' ');
 		if (oldClass[0] === '') oldClass = [];
 		return oldClass.indexOf(className) >= 0;
 	};
 	var removeClass = function(elem, className) {
-		if (elem === null) return;
+		if (!elem) return;
 		var oldClass = elem.className.split(' ');
 		if (oldClass[0] === '') oldClass = [];
 		if (oldClass.indexOf(className) >= 0) {
@@ -539,7 +539,7 @@ Element.prototype.removeClass = function() {
 						bind.gotoNext();
 					});
 				}
-				if (index < danmaku.length && danmaku[index] !== null) {
+				if (index < danmaku.length && danmaku[index]) {
 					CommentLoader(danmaku[index], bind.cmManager);
 				}
 			};
@@ -626,7 +626,7 @@ Element.prototype.removeClass = function() {
 			removePopup: function() {
 				var pops = playerUnit.getElementsByClassName('ABP-Popup');
 				for (var i = 0; i < pops.length; i++) {
-					if (pops[i].remove !== null) {
+					if (pops[i].remove) {
 						pops[i].remove();
 					} else {
 						pops[i].parentNode.removeChild(pops[i]);
@@ -726,7 +726,7 @@ Element.prototype.removeClass = function() {
 				ABPInst.barTime.style.width = '0%';
 			});
 			video.addEventListener('progress', function() {
-				if (this.buffered !== null) {
+				if (this.buffered) {
 					var e;
 					try {
 						e = this.buffered.end(0);
@@ -739,7 +739,7 @@ Element.prototype.removeClass = function() {
 				}
 			});
 			video.addEventListener('loadedmetadata', function() {
-				if (this.buffered !== null) {
+				if (this.buffered) {
 					var e;
 					try {
 						e = this.buffered.end(0);
@@ -838,7 +838,7 @@ Element.prototype.removeClass = function() {
 					} catch (err) {}
 				});
 				video.addEventListener('ratechange', function() {
-					if (ABPInst.cmManager.options.global.scale !== null) {
+					if (ABPInst.cmManager.options.global.scale) {
 						if (video.playbackRate !== 0) {
 							ABPInst.cmManager.options.global.scale = (1 / video.playbackRate);
 							ABPInst.cmManager.rescale();
@@ -866,7 +866,7 @@ Element.prototype.removeClass = function() {
 				});
 			}
 		};
-		if (playerUnit === null || playerUnit.getElementsByClassName === null) return;
+		if (!playerUnit || !playerUnit.getElementsByClassName) return;
 		ABPInst.defaults.w = playerUnit.offsetWidth;
 		ABPInst.defaults.h = playerUnit.offsetHeight;
 		var _v = playerUnit.getElementsByClassName('ABP-Video');
@@ -874,7 +874,7 @@ Element.prototype.removeClass = function() {
 		var video = null;
 		ABPInst.videoDiv = _v[0];
 		for (var i in _v[0].children) {
-			if (_v[0].children[i].tagName !== null &&
+			if (_v[0].children[i].tagName &&
 				_v[0].children[i].tagName.toUpperCase() === 'VIDEO') {
 				video = _v[0].children[i];
 				break;
@@ -883,7 +883,7 @@ Element.prototype.removeClass = function() {
 		var cmtc = _v[0].getElementsByClassName('ABP-Container');
 		if (cmtc.length > 0)
 			ABPInst.divComment = cmtc[0];
-		if (video === null) return;
+		if (!video) return;
 		ABPInst.video = video;
 		/** Bind the Play Button **/
 		var _p = playerUnit.getElementsByClassName('ABP-Play');
@@ -1478,7 +1478,7 @@ Element.prototype.removeClass = function() {
 			});
 			playerUnit.addEventListener('touchend', function(e) {
 				if (e.changedTouches.length > 0) {
-					if (_touch !== null) {
+					if (_touch) {
 						var diffx = e.changedTouches[0].pageX - _touch.pageX;
 						var diffy = e.changedTouches[0].pageY - _touch.pageY;
 						if (Math.abs(diffx) < 20 && Math.abs(diffy) < 20) {
