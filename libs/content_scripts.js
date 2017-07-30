@@ -54,6 +54,12 @@ import PlayerSwitcher from './PlayerSwitcher';
     cid = videoInfo.list[page - 1].cid;
     if (!(avid && page && cid && videoInfo)) return console.warn('something went wrong, exiting.');
 
+    // workaround for hash-based page change
+    window.onhashchange = (e) => {
+        let page;
+        if (page = location.hash.match(/^#page=(\d+)$/)) location.href = `index_${page[1]}.html`;
+    };
+
     // preload video links
     const _videoLink = bilibiliVideoProvider(cid, avid, page);
     let comment = {};

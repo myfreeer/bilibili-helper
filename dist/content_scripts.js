@@ -1592,6 +1592,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     cid = videoInfo.list[page - 1].cid;
     if (!(avid && page && cid && videoInfo)) return console.warn('something went wrong, exiting.');
 
+    // workaround for hash-based page change
+    window.onhashchange = (e) => {
+        let page;
+        if (page = location.hash.match(/^#page=(\d+)$/)) location.href = `index_${page[1]}.html`;
+    };
+
     // preload video links
     const _videoLink = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__bilibiliVideoProvider__["a" /* default */])(cid, avid, page);
     let comment = {};
