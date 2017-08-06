@@ -636,8 +636,8 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
     if (!token) token = await getToken(retries);
     url.low = `${location.protocol}//api.bilibili.com/playurl?aid=${avid}&page=${page}&platform=html5&vtype=mp4&token=${token}`;
     url._base = location.protocol + '//interface.bilibili.com/playurl?';
-    url._query = (type, quality = 3) => `appkey=${APPKEY}&cid=${cid}&otype=json&quality=${quality}&type=${type}`;
-    url.mp4 = url._base + url._query('mp4') + '&sign=' + __WEBPACK_IMPORTED_MODULE_0__md5___default()(url._query('mp4') + APPSECRET);
+    url._query = (type) => `appkey=${APPKEY}&cid=${cid}&otype=json&type=${type}`;
+    url.mp4 = url._base + url._query('hdmp4') + '&sign=' + __WEBPACK_IMPORTED_MODULE_0__md5___default()(url._query('hdmp4') + APPSECRET);
     url.flv = url._base + url._query('flv') + '&sign=' + __WEBPACK_IMPORTED_MODULE_0__md5___default()(url._query('flv') + APPSECRET);
     const interfaceUrl = (cid, ts) => `cid=${cid}&player=1&ts=${ts}`;
     const calcSign = (cid, ts) => __WEBPACK_IMPORTED_MODULE_0__md5___default()(`${interfaceUrl(cid, ts)}${SECRETKEY_MINILOADER}`);
