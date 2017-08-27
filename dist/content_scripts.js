@@ -142,7 +142,7 @@ const mySendMessage = (obj) => new Promise((resolve) => chrome.runtime.sendMessa
 /* harmony export (immutable) */ __webpack_exports__["h"] = mySendMessage;
 
 const parseXmlSafe = (text) => (new window.DOMParser()).parseFromString(text.replace(/[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}]/ug, ''), 'text/xml');
-/* harmony export (immutable) */ __webpack_exports__["c"] = parseXmlSafe;
+/* harmony export (immutable) */ __webpack_exports__["e"] = parseXmlSafe;
 
 const storageSet = (data) => new Promise((resolve) => chrome.storage.local.set(data, () => resolve()));
 /* unused harmony export storageSet */
@@ -165,10 +165,10 @@ const fetchretry = (url, options) => {
         wrappedFetch(retries);
     });
 };
-/* harmony export (immutable) */ __webpack_exports__["b"] = fetchretry;
+/* harmony export (immutable) */ __webpack_exports__["d"] = fetchretry;
 
 const _$ = (e) => document.querySelector(e);
-/* harmony export (immutable) */ __webpack_exports__["d"] = _$;
+/* harmony export (immutable) */ __webpack_exports__["b"] = _$;
 
 const $h = (html) => {
     let template = document.createElement('template');
@@ -183,7 +183,7 @@ const getCookie = (name) => {
     let parts = value.split('; ' + name + '=');
     if (parts.length === 2) return parts.pop().split(';').shift();
 };
-/* harmony export (immutable) */ __webpack_exports__["e"] = getCookie;
+/* harmony export (immutable) */ __webpack_exports__["c"] = getCookie;
 
 // http://stackoverflow.com/a/11986374
 const findPosTop = (obj) => {
@@ -318,25 +318,25 @@ class PlayerSwitcher {
     }
     original() {
         this.set('original');
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('#bofqi').html(this.originalPlayer);
-        if (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('#bofqi object').attr('width') === 950) __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('#bofqi object').setAttribute('width', 980);
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* _$ */])('#bofqi').html(this.originalPlayer);
+        if (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* _$ */])('#bofqi object').attr('width') === 950) __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* _$ */])('#bofqi object').setAttribute('width', 980);
     }
     swf() {
         this.set('swf');
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('#bofqi').html(`<object type="application/x-shockwave-flash" class="player" data="https://static-s.bilibili.com/play.swf" id="player_placeholder" style="visibility: visible;"><param name="allowfullscreeninteractive" value="true"><param name="allowfullscreen" value="true"><param name="quality" value="high"><param name="allowscriptaccess" value="always"><param name="wmode" value="opaque"><param name="flashvars" value="cid=${this.cid}&aid=${this.avid}"></object>`);
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* _$ */])('#bofqi').html(`<object type="application/x-shockwave-flash" class="player" data="https://static-s.bilibili.com/play.swf" id="player_placeholder" style="visibility: visible;"><param name="allowfullscreeninteractive" value="true"><param name="allowfullscreen" value="true"><param name="quality" value="high"><param name="allowscriptaccess" value="always"><param name="wmode" value="opaque"><param name="flashvars" value="cid=${this.cid}&aid=${this.avid}"></object>`);
     }
     iframe() {
         this.set('iframe');
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('#bofqi').html(`<iframe height="536" width="980" class="player" src="https://secure.bilibili.com/secure,cid=${this.cid}&aid=${this.avid}" scrolling="no" border="0" frameborder="no" framespacing="0" onload="window.securePlayerFrameLoaded=true"></iframe>`);
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* _$ */])('#bofqi').html(`<iframe height="536" width="980" class="player" src="https://secure.bilibili.com/secure,cid=${this.cid}&aid=${this.avid}" scrolling="no" border="0" frameborder="no" framespacing="0" onload="window.securePlayerFrameLoaded=true"></iframe>`);
     }
     bilih5() {
         this.set('bilih5');
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('#bofqi').html(`<iframe height="536" width="980" class="player" src="//www.bilibili.com/html/html5player.html?cid=${this.cid}&aid=${this.avid}" scrolling="no" border="0" frameborder="no" framespacing="0"></iframe>`);
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* _$ */])('#bofqi').html(`<iframe height="536" width="980" class="player" src="//www.bilibili.com/html/html5player.html?cid=${this.cid}&aid=${this.avid}" scrolling="no" border="0" frameborder="no" framespacing="0"></iframe>`);
     }
     bilimac() {
         this.set('bilimac');
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('#bofqi').html('<div id="player_placeholder" class="player"></div><div id="loading-notice">正在加载 Bilibili Mac 客户端…</div>');
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('#bofqi').find('#player_placeholder').style.cssText =
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* _$ */])('#bofqi').html('<div id="player_placeholder" class="player"></div><div id="loading-notice">正在加载 Bilibili Mac 客户端…</div>');
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* _$ */])('#bofqi').find('#player_placeholder').style.cssText =
       `background: url(${this.videoPic}) 50% 50% / cover no-repeat;
                 -webkit-filter: blur(20px);
                 overflow: hidden;
@@ -347,8 +347,8 @@ class PlayerSwitcher {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: `action=playVideoByCID&data=${this.cid}|${window.location.href}|${document.title}|1`,
-        }).then((res) => res.ok && __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('#bofqi').find('#loading-notice').text('已在 Bilibili Mac 客户端中加载'))
-      .catch(() => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('#bofqi').find('#loading-notice').text('调用 Bilibili Mac 客户端失败 :('));
+        }).then((res) => res.ok && __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* _$ */])('#bofqi').find('#loading-notice').text('已在 Bilibili Mac 客户端中加载'))
+      .catch(() => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* _$ */])('#bofqi').find('#loading-notice').text('调用 Bilibili Mac 客户端失败 :('));
     }
     html5(type) {
         let html5VideoUrl;
@@ -366,7 +366,7 @@ class PlayerSwitcher {
             html5VideoUrl = this.videoLink.hd[0];
             if (this.videoLink.mediaDataSource.type === 'mp4') return console.warn('No Flv urls available, switch back to html5 hd', this.html5hd());
         }
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + this.videoPic + '" crossorigin="anonymous"><source src="' + html5VideoUrl + '" type="video/mp4"></video></div>');
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* _$ */])('#bofqi').html('<div id="bilibili_helper_html5_player" class="player"><video id="bilibili_helper_html5_player_video" poster="' + this.videoPic + '" crossorigin="anonymous"><source src="' + html5VideoUrl + '" type="video/mp4"></video></div>');
         let abp = ABP.create(document.getElementById('bilibili_helper_html5_player'), {
             src: {
                 playlist: [{
@@ -378,8 +378,8 @@ class PlayerSwitcher {
             height: '100%',
             config: this.options,
         });
-        abp.playerUnit.addEventListener('wide', () => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('#bofqi').addClass('wide'));
-        abp.playerUnit.addEventListener('normal', () => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('#bofqi').removeClass('wide'));
+        abp.playerUnit.addEventListener('wide', () => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* _$ */])('#bofqi').addClass('wide'));
+        abp.playerUnit.addEventListener('normal', () => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* _$ */])('#bofqi').removeClass('wide'));
         abp.playerUnit.addEventListener('sendcomment', (e) => {
             const commentId = e.detail.id,
                 commentData = e.detail;
@@ -413,7 +413,7 @@ class PlayerSwitcher {
                     if (!abp.video.loop) {
                         abp.video.pause();
                         setTimeout(abp.video.pause, 200);
-                        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* _$ */])('.button.ABP-Play.ABP-Pause.icon-pause').className = 'button ABP-Play icon-play';
+                        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* _$ */])('.button.ABP-Play.ABP-Pause.icon-pause').className = 'button ABP-Play icon-play';
                     }
                 }
             }
@@ -507,6 +507,7 @@ const bilibiliBangumiVideoInfoProvider = async(epid, credentials = 'include', re
             videoInfo = await bilibiliBangumiVideoInfoProvider(epid, credentials, retries, retryDelay, n);
         } else throw e;
     }
+    videoInfo.isBangumi = 1;
     sessionStorage['ep_' + epid] = JSON.stringify(videoInfo);
     return videoInfo;
 };
@@ -533,6 +534,10 @@ const APPSECRET = '94aba54af9065f71de72f5508f1cd42e';
 // from project you-get (license MIT)
 // https://github.com/soimort/you-get/blob/0f0da0ccd72e93a3c93d51b5b90c81513ef77d15/src/you_get/extractors/bilibili.py#L15
 const SECRETKEY_MINILOADER = '1c15888dc316e05a15fdd0a02ed6584f';
+
+// from project you-get (license MIT)
+// https://github.com/soimort/you-get/blob/a129903da61930472d1bb46a64a0e557cf4184b7/src/you_get/extractors/bilibili.py#L30
+const BANGUMI_API_SEC = '9b288147e5474dd2aa67085f716c560d';
 
 const processXmlObj = (obj) => {
     if (obj.video) obj = obj.video;
@@ -629,7 +634,7 @@ const getVideoLink = async(url, type, retries = 5, credentials = 'include', retr
     return json;
 };
 
-const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include', retries = 5, retryDelay = 500) => {
+const bilibiliVideoProvider = async(cid, avid, page = 1, isBangumi = 0, credentials = 'include', retries = 5, retryDelay = 500) => {
     let url = {};
     let token;
     if (sessionStorage.bilibiliVideoProvider_Token) token = sessionStorage.bilibiliVideoProvider_Token;
@@ -650,7 +655,7 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
     const processVideoUrl = (url) => {
         if (!url) return;
         url = url.replace(/^http:\/\//, 'https://');
-        if (url.match('hd.mp4')) video.hd.push(url);
+        if (url.match('hd.mp4') || url.match('-48.mp4')) video.hd.push(url);
         else if (url.match('.mp4')) video.ld.push(url);
     };
     const processVideoUrlObj = (obj) => {
@@ -660,7 +665,7 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
     };
     for (let i of types) processVideoUrlObj(video[i]);
     // if flv urls not available, retry with alternative api
-    if (video.mediaDataSource.type === 'mp4') {
+    if (!isBangumi && !(video.mediaDataSource && video.mediaDataSource.type === 'flv')) {
         const ts = Math.ceil(Date.now() / 1000);
         url.flv = url._base + `${interfaceUrl(cid, ts)}&sign=${calcSign(cid, ts)}`;
         video.flv = await getVideoLink(url.flv, 'flv', retries, credentials, retryDelay);
@@ -668,8 +673,16 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
         video.mediaDataSource = parseJsonforFlvjs(video.flv);
     }
     // if flv urls still not available, retry with biliplus api (a 3rd-party api)
-    if (video.mediaDataSource.type === 'mp4') {
+    if (!isBangumi && !(video.mediaDataSource && video.mediaDataSource.type === 'flv')) {
         video.flv = await getVideoLink(`${location.protocol}//www.biliplus.com/BPplayurl.php?cid=${cid}&otype=json&quality=4&type=flv&update=1`, null, retries, credentials, retryDelay);
+        processVideoUrlObj(video.flv);
+        video.mediaDataSource = parseJsonforFlvjs(video.flv);
+    }
+    // if mediaDataSource for bangumis is not available, try bangumi api instead
+    if (!video.mediaDataSource && isBangumi) {
+        const bgmUrlBase = `cid=22383138&module=bangumi&player=1&ts=${(new Date() / 1000) | 0}`;
+        url.flv = `${location.protocol}//bangumi.bilibili.com/player/web_api/playurl?${bgmUrlBase}&sign=${__WEBPACK_IMPORTED_MODULE_0__md5___default()(bgmUrlBase + BANGUMI_API_SEC)}`;
+        video.flv = await getVideoLink(url.flv, 'flv', retries, credentials, retryDelay);
         processVideoUrlObj(video.flv);
         video.mediaDataSource = parseJsonforFlvjs(video.flv);
     }
@@ -741,7 +754,7 @@ const commentQuerySection = (comments, element) => {
 
 
 const commentsHistorySection = async(cid, element, changeComments) => {
-    let _rolldate = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* fetchretry */])(`${location.protocol}//comment.bilibili.com/rolldate,${cid}`).then((res) => res.json());
+    let _rolldate = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* fetchretry */])(`${location.protocol}//comment.bilibili.com/rolldate,${cid}`).then((res) => res.json());
     let dmrollUI = document.createElement('select');
     dmrollUI.style.cssText = 'max-width: 272px;height: 25px;border-radius: 4px;';
     let rolldate;
@@ -1599,23 +1612,24 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     };
 
     // preload video links
-    const _videoLink = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__bilibiliVideoProvider__["a" /* default */])(cid, avid, page);
+    if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* _$ */])('.b-page-body')) genPage = decodeURIComponent(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* getCookie */])('redirectUrl'));
+    const _videoLink = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__bilibiliVideoProvider__["a" /* default */])(cid, avid, page, videoInfo.isBangumi || isBangumi || (genPage && genPage.match && genPage.match('bangumi')));
     let comment = {};
 
     // preload comments
     comment.url = `${location.protocol}//comment.bilibili.com/${cid}.xml`;
-    comment._xml = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* fetchretry */])(comment.url).then((res) => res.text()).then((text) => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* parseXmlSafe */])(text));
+    comment._xml = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* fetchretry */])(comment.url).then((res) => res.text()).then((text) => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* parseXmlSafe */])(text));
     options = await _options;
     const optionsChangeCallback = (newOpts) => (options = newOpts) && chrome.storage.local.set(options);
 
-    const videoPic = videoInfo.pic || (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('img.cover_image') && __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('img.cover_image').attr('src'));
+    const videoPic = videoInfo.pic || (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* _$ */])('img.cover_image') && __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* _$ */])('img.cover_image').attr('src'));
+
     // genPage func
-    if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.b-page-body')) genPage = decodeURIComponent(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* getCookie */])('redirectUrl'));
-    if (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.b-page-body .z-msg') > 0 && __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.b-page-body .z-msg').text().indexOf('版权') > -1) genPage = 1;
+    if (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* _$ */])('.b-page-body .z-msg') > 0 && __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* _$ */])('.b-page-body .z-msg').text().indexOf('版权') > -1) genPage = 1;
     if (genPage) await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_7__genPageFunc__["a" /* default */])(cid, videoInfo, genPage);
 
     // addTitleLink func
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.viewbox .info .v-title h1').html(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_8__addTitleLink__["a" /* default */])(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.viewbox .info .v-title h1').attr('title'), options.rel_search));
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* _$ */])('.viewbox .info .v-title h1').html(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_8__addTitleLink__["a" /* default */])(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* _$ */])('.viewbox .info .v-title h1').attr('title'), options.rel_search));
     const titleNumbers = document.getElementsByClassName('titleNumber');
     if (titleNumbers.length > 0) titleNumbers.forEach((el) => {
         el.append(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="popuptext">\u70b9\u51fb\u641c\u7d22\u76f8\u5173\u89c6\u9891\uff1a<br /><a target="_blank" href="http://www.bilibili.com/search?orderby=default&keyword=' + encodeURIComponent(el.attr('previous')) + '">' + el.attr('previous') + '</a><br /><a target="_blank" href="http://www.bilibili.com/search?orderby=ranklevel&keyword=' + encodeURIComponent(el.attr('next')) + '">' + el.attr('next') + '</a></div>'));
@@ -1660,18 +1674,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     biliHelper.mainBlock.append(biliHelper.mainBlock.querySection);
     biliHelper.mainBlock.historySection = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div class="section history"><h3>历史弹幕切换</h3><p><span></span>正在加载全部弹幕, 请稍等…</p></div>');
     biliHelper.mainBlock.append(biliHelper.mainBlock.historySection);
-    biliHelper.originalPlayerHTML = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').innerHTML;
-    (isBangumi && !genPage ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.v1-bangumi-info-operate .v1-app-btn').empty() : __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('.player-wrapper .arc-toolbar')).append(biliHelper);
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').html('<div id="player_placeholder" class="player"></div>');
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').find('#player_placeholder').style.cssText =
+    biliHelper.originalPlayerHTML = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* _$ */])('#bofqi').innerHTML;
+    (isBangumi && !genPage ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* _$ */])('.v1-bangumi-info-operate .v1-app-btn').empty() : __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* _$ */])('.player-wrapper .arc-toolbar')).append(biliHelper);
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* _$ */])('#bofqi').html('<div id="player_placeholder" class="player"></div>');
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* _$ */])('#bofqi').find('#player_placeholder').style.cssText =
         `background: url(${videoPic}) 50% 50% / cover no-repeat;
         -webkit-filter: blur(5px);
         overflow: hidden;
         visibility: visible;`;
     let replaceNotice = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["f" /* $h */])('<div id="loading-notice">正在尝试替换播放器…<span id="cancel-replacing">取消</span></div>');
-    replaceNotice.find('#cancel-replacing').onclick = () => !__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#loading-notice').remove() && playerSwitcher.original();
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi').append(replaceNotice);
-    if (options.scrollToPlayer) window.scroll(window.pageXOffset, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* findPosTop */])(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* _$ */])('#bofqi')) - 30);
+    replaceNotice.find('#cancel-replacing').onclick = () => !__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* _$ */])('#loading-notice').remove() && playerSwitcher.original();
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* _$ */])('#bofqi').append(replaceNotice);
+    if (options.scrollToPlayer) window.scroll(window.pageXOffset, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["g" /* findPosTop */])(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* _$ */])('#bofqi')) - 30);
     // Initize PlayerSwitcher
     let playerSwitcher = new __WEBPACK_IMPORTED_MODULE_9__PlayerSwitcher__["a" /* default */](avid, cid, page, videoPic, options, optionsChangeCallback, biliHelper.mainBlock.switcherSection, biliHelper.mainBlock.speedSection, biliHelper.originalPlayerHTML);
 
@@ -1747,7 +1761,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__commentQuerySection__["a" /* default */])(biliHelper.comments, biliHelper.mainBlock.querySection.find('p'));
     const changeComments = async(url) => {
         comment.url = url;
-        comment._xml = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["b" /* fetchretry */])(comment.url).then((res) => res.text()).then((text) => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["c" /* parseXmlSafe */])(text));
+        comment._xml = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["d" /* fetchretry */])(comment.url).then((res) => res.text()).then((text) => __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils__["e" /* parseXmlSafe */])(text));
         comment.xml = await comment._xml;
         biliHelper.comments = comment.xml.getElementsByTagName('d');
         comment.ccl = BilibiliParser(comment.xml);
@@ -1802,7 +1816,7 @@ const CRC32 = {bstr: crc32_bstr};
 const checkCRCHash = async(input) => {
     let obj;
     try {
-        obj = await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* fetchretry */])(`https://biliquery.typcn.com/api/user/hash/${input}`).then((res) => res.json());
+        obj = await __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* fetchretry */])(`https://biliquery.typcn.com/api/user/hash/${input}`).then((res) => res.json());
         if (obj && obj.data && obj.data[0] && obj.data[0].id) return obj.data[0].id;
     } catch (e) {
         console.warn(e);

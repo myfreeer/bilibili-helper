@@ -36,6 +36,7 @@ export const bilibiliBangumiVideoInfoProvider = async(epid, credentials = 'inclu
             videoInfo = await bilibiliBangumiVideoInfoProvider(epid, credentials, retries, retryDelay, n);
         } else throw e;
     }
+    videoInfo.isBangumi = 1;
     sessionStorage['ep_' + epid] = JSON.stringify(videoInfo);
     return videoInfo;
 };

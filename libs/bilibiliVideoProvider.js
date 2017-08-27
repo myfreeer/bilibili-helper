@@ -10,6 +10,10 @@ const APPSECRET = '94aba54af9065f71de72f5508f1cd42e';
 // https://github.com/soimort/you-get/blob/0f0da0ccd72e93a3c93d51b5b90c81513ef77d15/src/you_get/extractors/bilibili.py#L15
 const SECRETKEY_MINILOADER = '1c15888dc316e05a15fdd0a02ed6584f';
 
+// from project you-get (license MIT)
+// https://github.com/soimort/you-get/blob/a129903da61930472d1bb46a64a0e557cf4184b7/src/you_get/extractors/bilibili.py#L30
+const BANGUMI_API_SEC = '9b288147e5474dd2aa67085f716c560d';
+
 const processXmlObj = (obj) => {
     if (obj.video) obj = obj.video;
     if (obj.durl && !obj.durl.push) obj.durl = [obj.durl];
@@ -105,7 +109,7 @@ const getVideoLink = async(url, type, retries = 5, credentials = 'include', retr
     return json;
 };
 
-const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include', retries = 5, retryDelay = 500) => {
+const bilibiliVideoProvider = async(cid, avid, page = 1, isBangumi = 0, credentials = 'include', retries = 5, retryDelay = 500) => {
     let url = {};
     let token;
     if (sessionStorage.bilibiliVideoProvider_Token) token = sessionStorage.bilibiliVideoProvider_Token;
@@ -126,7 +130,7 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
     const processVideoUrl = (url) => {
         if (!url) return;
         url = url.replace(/^http:\/\//, 'https://');
-        if (url.match('hd.mp4')) video.hd.push(url);
+        if (url.match('hd.mp4') || url.match('-48.mp4')) video.hd.push(url);
         else if (url.match('.mp4')) video.ld.push(url);
     };
     const processVideoUrlObj = (obj) => {
@@ -136,7 +140,7 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
     };
     for (let i of types) processVideoUrlObj(video[i]);
     // if flv urls not available, retry with alternative api
-    if (video.mediaDataSource.type === 'mp4') {
+    if (!isBangumi && !(video.mediaDataSource && video.mediaDataSource.type === 'flv')) {
         const ts = Math.ceil(Date.now() / 1000);
         url.flv = url._base + `${interfaceUrl(cid, ts)}&sign=${calcSign(cid, ts)}`;
         video.flv = await getVideoLink(url.flv, 'flv', retries, credentials, retryDelay);
@@ -144,8 +148,16 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
         video.mediaDataSource = parseJsonforFlvjs(video.flv);
     }
     // if flv urls still not available, retry with biliplus api (a 3rd-party api)
-    if (video.mediaDataSource.type === 'mp4') {
+    if (!isBangumi && !(video.mediaDataSource && video.mediaDataSource.type === 'flv')) {
         video.flv = await getVideoLink(`${location.protocol}//www.biliplus.com/BPplayurl.php?cid=${cid}&otype=json&quality=4&type=flv&update=1`, null, retries, credentials, retryDelay);
+        processVideoUrlObj(video.flv);
+        video.mediaDataSource = parseJsonforFlvjs(video.flv);
+    }
+    // if mediaDataSource for bangumis is not available, try bangumi api instead
+    if (!video.mediaDataSource && isBangumi) {
+        const bgmUrlBase = `cid=22383138&module=bangumi&player=1&ts=${(new Date() / 1000) | 0}`;
+        url.flv = `${location.protocol}//bangumi.bilibili.com/player/web_api/playurl?${bgmUrlBase}&sign=${md5(bgmUrlBase + BANGUMI_API_SEC)}`;
+        video.flv = await getVideoLink(url.flv, 'flv', retries, credentials, retryDelay);
         processVideoUrlObj(video.flv);
         video.mediaDataSource = parseJsonforFlvjs(video.flv);
     }

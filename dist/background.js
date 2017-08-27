@@ -99,7 +99,7 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
         command: 'error',
     });
 }, {
-    urls: ['http://comment.bilibili.com/1272.xml'],
+    urls: ['*://comment.bilibili.com/1272.xml'],
 });
 
 chrome.webRequest.onBeforeRequest.addListener(function() {
@@ -158,7 +158,7 @@ chrome.webRequest.onHeadersReceived.addListener(function(details) {
         responseHeaders: headers,
     };
 }, {
-    urls: ['http://www.bilibili.com/video/av*', 'http://bangumi.bilibili.com/anime/v/*'],
+    urls: ['*://www.bilibili.com/video/av*', '*://bangumi.bilibili.com/anime/v/*'],
 }, ['responseHeaders', 'blocking']);
 
 // video api replacing

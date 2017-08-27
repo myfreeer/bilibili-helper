@@ -61,7 +61,8 @@ import PlayerSwitcher from './PlayerSwitcher';
     };
 
     // preload video links
-    const _videoLink = bilibiliVideoProvider(cid, avid, page);
+    if (!_$('.b-page-body')) genPage = decodeURIComponent(getCookie('redirectUrl'));
+    const _videoLink = bilibiliVideoProvider(cid, avid, page, videoInfo.isBangumi || isBangumi || (genPage && genPage.match && genPage.match('bangumi')));
     let comment = {};
 
     // preload comments
@@ -71,8 +72,8 @@ import PlayerSwitcher from './PlayerSwitcher';
     const optionsChangeCallback = (newOpts) => (options = newOpts) && chrome.storage.local.set(options);
 
     const videoPic = videoInfo.pic || (_$('img.cover_image') && _$('img.cover_image').attr('src'));
+
     // genPage func
-    if (!_$('.b-page-body')) genPage = decodeURIComponent(getCookie('redirectUrl'));
     if (_$('.b-page-body .z-msg') > 0 && _$('.b-page-body .z-msg').text().indexOf('版权') > -1) genPage = 1;
     if (genPage) await genPageFunc(cid, videoInfo, genPage);
 
