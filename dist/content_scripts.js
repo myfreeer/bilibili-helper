@@ -399,7 +399,12 @@ class PlayerSwitcher {
                 clearInterval(this.interval);
                 this.flvPlayer.attachMediaElement(abp.video);
                 this.flvPlayer.load();
-                this.flvPlayer.on(flvjs.Events.ERROR, (e) => console.warn(e, 'Switch back to HTML5 HD.', this.html5hd()));
+                this.flvPlayer.on(flvjs.Events.ERROR, (e) => {
+                    if (this.videoLink.hd.length > 0)
+                        console.warn(e, 'Switch down to HTML5 HD.', this.html5hd());
+                    else if (this.videoLink.ld.length > 0)
+                        console.warn(e, 'Switch down to HTML5 LD.', this.html5hd());
+                });
                 this.flvPlayer.on(flvjs.Events.MEDIA_INFO, (e) => console.info('分辨率: ' + e.width + 'x' + e.height + ', FPS: ' + e.fps, '视频码率: ' + Math.round(e.videoDataRate * 100) / 100, '音频码率: ' + Math.round(e.audioDataRate * 100) / 100));
             }
         }, 100);
