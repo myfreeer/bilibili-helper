@@ -1,6 +1,6 @@
 // require external libs
 import {bilibiliVideoInfoProvider, bilibiliBangumiVideoInfoProvider} from './bilibiliVideoInfoProvider';
-import {parseTime, mySendMessage, parseXmlSafe, fetchretry, storageGet, _$, $h, getCookie, findPosTop} from './utils';
+import {parseTime, mySendMessage, storageGet, _$, $h, getCookie, findPosTop} from './utils';
 import commentQuerySection from './commentQuerySection';
 import commentsHistorySection from './commentsHistorySection';
 import bilibiliVideoProvider from './bilibiliVideoProvider';
@@ -9,6 +9,7 @@ import {getDownloadOptions, getNiceSectionFilename} from './filename-sanitize';
 import genPageFunc from './genPageFunc';
 import addTitleLink from './addTitleLink';
 import PlayerSwitcher from './PlayerSwitcher';
+import CommmentProvider from './CommmentProvider';
 
 // main func
 (async function() {
@@ -63,11 +64,9 @@ import PlayerSwitcher from './PlayerSwitcher';
     // preload video links
     if (!_$('.b-page-body')) genPage = decodeURIComponent(getCookie('redirectUrl'));
     const _videoLink = bilibiliVideoProvider(cid, avid, page, videoInfo.isBangumi || isBangumi || (genPage && genPage.match && genPage.match('bangumi')));
-    let comment = {};
 
     // preload comments
-    comment.url = `${location.protocol}//comment.bilibili.com/${cid}.xml`;
-    comment._xml = fetchretry(comment.url).then((res) => res.text()).then((text) => parseXmlSafe(text));
+    let comment = new CommmentProvider(cid);
     options = await _options;
     const optionsChangeCallback = (newOpts) => (options = newOpts) && chrome.storage.local.set(options);
 
@@ -184,7 +183,7 @@ import PlayerSwitcher from './PlayerSwitcher';
     biliHelper.mainBlock.commentSection = $h(`<div class="section comment"><h3>弹幕下载</h3><p><a class="b-btn w" href="${comment.url}" download="${biliHelper.downloadFileName}">下载 XML 格式弹幕</a></p></div>`);
     biliHelper.mainBlock.commentSection.find('a').onclick = clickDownLinkElementHandler;
     biliHelper.mainBlock.append(biliHelper.mainBlock.commentSection);
-    comment.xml = await comment._xml;
+    await comment.status;
     let assData;
     const clickAssBtnHandler = (event) => {
         event.preventDefault();
@@ -204,20 +203,17 @@ import PlayerSwitcher from './PlayerSwitcher';
     biliHelper.mainBlock.commentSection.find('p').append(assBtn);
 
     // begin comment user query
-    biliHelper.comments = comment.xml.getElementsByTagName('d');
-    comment.ccl = BilibiliParser(comment.xml);
-    playerSwitcher.setComment(comment.ccl);
-    commentQuerySection(biliHelper.comments, biliHelper.mainBlock.querySection.find('p'));
+    playerSwitcher.setComment(comment.comments);
+    commentQuerySection(comment.comments, biliHelper.mainBlock.querySection.find('p'));
     const changeComments = async(url) => {
-        comment.url = url;
-        comment._xml = fetchretry(comment.url).then((res) => res.text()).then((text) => parseXmlSafe(text));
-        comment.xml = await comment._xml;
-        biliHelper.comments = comment.xml.getElementsByTagName('d');
-        comment.ccl = BilibiliParser(comment.xml);
-        playerSwitcher.setComment(comment.ccl);
-        commentQuerySection(biliHelper.comments, biliHelper.mainBlock.querySection.find('p'));
+        await comment.pushUrl(url);
+        playerSwitcher.setComment(comment.comments);
+        commentQuerySection(comment.comments, biliHelper.mainBlock.querySection.find('p'));
         biliHelper.mainBlock.commentSection.find('a[download*=xml]').href = comment.url;
-        if (playerSwitcher.cmManager) comment.ccl.forEach((cmt) => playerSwitcher.cmManager.insert(cmt));
+        if (playerSwitcher.cmManager) {
+            playerSwitcher.cmManager.timeline = [];
+            comment.comments.forEach((cmt) => playerSwitcher.cmManager.insert(cmt));
+        }
     };
     commentsHistorySection(cid, biliHelper.mainBlock.historySection.find('p'), changeComments).then((event) => (event !== true) && biliHelper.mainBlock.historySection.hide());
 

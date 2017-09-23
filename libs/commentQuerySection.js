@@ -7,13 +7,11 @@ const commentQuerySection = (comments, element) => {
         const keyword = control.find('input').value,
             regex = new RegExp(parseSafe(keyword), 'gi');
         control.find('select.list').html('<option disabled="disabled" class="disabled" selected="selected">请选择需要查询的弹幕</option>');
-        for (let node of comments) {
-            let text = node.childNodes[0];
-            if (text && node && regex.test(text.nodeValue)) {
-                text = text.nodeValue;
-                const commentData = node.getAttribute('p').split(','),
-                    sender = commentData[6],
-                    time = parseTime(parseInt(commentData[0]) * 1000);
+        for (const comment of comments) {
+            let text = comment.text;
+            if (text && regex.test(text.nodeValue)) {
+                const sender = comment.hash,
+                    time = parseTime(comment.stime);
                 let option = $h(`<option sender=${sender}></option>`);
                 option.sender = sender;
                 option.html('[' + time + '] ' + (keyword.trim() === '' ? parseSafe(text) : parseSafe(text).replace(regex, (kw) => '<span class="kw">' + kw + '</span>')));
