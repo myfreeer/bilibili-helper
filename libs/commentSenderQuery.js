@@ -5,7 +5,7 @@ const commentSenderQuery = async(hash, retries = 5) => {
     let mid = await checkCRCHash(hash);
     if (!mid) return {mid};
     try {
-        let json = await fetch(`${location.protocol}//api.bilibili.com/cardrich?mid=${mid}`).then((res) => res.json());
+        let json = await fetch(`${location.protocol}//api.bilibili.com/x/web-interface/card?mid=${mid}&type=json`).then((res) => res.json());
         if (hash && (CRC32.bstr('' + mid) >>> 0) === parseInt(hash, 16)) sessionStorage['commentSender_hash_' + hash] = JSON.stringify(json.data.card);
         return json.data.card;
     } catch (e) {
