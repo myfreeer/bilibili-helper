@@ -66,31 +66,7 @@ const parseJsonforFlvjs = (json) => {
     return mediaDataSource;
 };
 
-const getToken = async(retries = 5, retryDelay = 500) => {
-    let token, _token;
-    const _body = (document.documentElement || document.body || document.getElementsByTagName('body')[0]);
-    if (_body && _body.innerHTML) {
-        _token = _body.innerHTML.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/i);
-        if (_token && _token[1]) {
-            token = _token[1];
-            sessionStorage.bilibiliVideoProvider_Token = token;
-            return token;
-        }
-    }
-    try {
-        let text = await fetch(location.protocol + '//www.bilibili.com/video/av7/').then((res) => res.text());
-        token = text.match(/token[ =]+[\'\"]([0-9a-f]+)[\'\"\;]+/)[1];
-        sessionStorage.bilibiliVideoProvider_Token = token;
-        return token;
-    } catch (e) {
-        if (--retries > 0) {
-            await sleep(retryDelay);
-            return await getToken(retries);
-        } else throw (e);
-    }
-};
-
-const getVideoLink = async(url, type, retries = 5, credentials = 'include', retryDelay = 500) => {
+const getVideoLink = async (url, type, retries = 5, credentials = 'include', retryDelay = 500) => {
     let json;
     try {
         if (type === 'flv') {
@@ -109,12 +85,8 @@ const getVideoLink = async(url, type, retries = 5, credentials = 'include', retr
     return json;
 };
 
-const bilibiliVideoProvider = async(cid, avid, page = 1, isBangumi = 0, credentials = 'include', retries = 5, retryDelay = 500) => {
+const bilibiliVideoProvider = async (cid, avid, page = 1, isBangumi = 0, credentials = 'include', retries = 5, retryDelay = 500) => {
     let url = {};
-    let token;
-    if (sessionStorage.bilibiliVideoProvider_Token) token = sessionStorage.bilibiliVideoProvider_Token;
-    if (!token) token = await getToken(retries);
-    url.low = `${location.protocol}//api.bilibili.com/playurl?aid=${avid}&page=${page}&platform=html5&vtype=mp4&token=${token}`;
     url._base = location.protocol + '//interface.bilibili.com/playurl?';
     url._query = (type) => `appkey=${APPKEY}&cid=${cid}&otype=json&type=${type}`;
     url.mp4 = url._base + url._query('hdmp4') + '&sign=' + md5(url._query('hdmp4') + APPSECRET);
@@ -122,7 +94,7 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, isBangumi = 0, credenti
     const interfaceUrl = (cid, ts) => `cid=${cid}&player=1&ts=${ts}`;
     const calcSign = (cid, ts) => md5(`${interfaceUrl(cid, ts)}${SECRETKEY_MINILOADER}`);
     let video = {};
-    const types = ['low', 'mp4', 'flv'];
+    const types = ['mp4', 'flv'];
     for (let i of types) video[i] = await getVideoLink(url[i], null, retries, credentials, retryDelay);
     video.mediaDataSource = parseJsonforFlvjs(video.flv);
     video.hd = [];

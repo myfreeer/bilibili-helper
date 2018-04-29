@@ -1,6 +1,6 @@
 import {sleep} from './utils';
 
-const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include', retries = 5, retryDelay = 500) => {
+const bilibiliVideoProvider = async (cid, avid, page = 1, credentials = 'include', retries = 5, retryDelay = 500) => {
     let url = {};
     url.low = 'https://www.biliplus.com/BPplayurl.php?cid=' + cid + '&otype=json&quality=1&type=mp4';
     url.mp4 = 'https://www.biliplus.com/BPplayurl.php?cid=' + cid + '&otype=json&type=mp4';
@@ -18,7 +18,7 @@ const bilibiliVideoProvider = async(cid, avid, page = 1, credentials = 'include'
         if (!json.durl) return console.warn('parseJsonforFlvjs Failed: Nothing to play.');
         return mediaDataSource;
     };
-    const getVideoJson = async(url, retries) => {
+    const getVideoJson = async (url, retries) => {
         let json;
         try {
             json = await fetch(url, {credentials}).then((response) => response.json());
