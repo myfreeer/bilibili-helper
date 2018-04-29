@@ -60,6 +60,8 @@ const trackingUrls = [
     '*://*.hdslb.com/js/bfd.js*',
     '*://data.bilibili.com/rec.js*',
     '*://data.bilibili.com/v/flashplay/h5_player_op*',
+    '*://api.bilibili.com/x/report/*',
+    '*://api.bilibili.com/x/web-interface/zone*',
 ];
 const videoPlaybackHosts = ['*://*.hdslb.com/*', '*://api.bilibili.com/*', '*://interface.bilibili.com/*', '*://*.acgvideo.com/*', '*://*/*.acgvideo.com/*', '*://*.biliplus.com/BPplayurl.php*'];
 
